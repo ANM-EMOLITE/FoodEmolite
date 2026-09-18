@@ -1,37 +1,105 @@
-import { PromotionResponse } from '../models/promotion.model';
+import { PromotionResponse, PromotionType } from '../models/promotion.model';
 
 export interface PromotionalPriceInfo {
     hasPromotion: boolean;
     originalPrice: number;
     effectivePrice: number;
     promotionName?: string;
+    /** Loại chương trình — dùng để quyết định hiện % (giảm giá) hay số tiền (đồng giá) cạnh giá gạch, và ghép vào tooltip. */
+    promotionType?: PromotionType;
+    /** Chương trình có điều kiện áp dụng (mua tối thiểu...) hay không — dùng để quyết định có hiện tooltip tên CTKM hay không. */
+    hasCondition?: boolean;
+    /** Món này thuộc 1 CT khuyến mãi nhưng CHƯA đạt điều kiện (mua tối thiểu) — hasPromotion vẫn false
+     * (giá gốc), nhưng hiện thông báo này để khách biết cần mua thêm bao nhiêu mới được giảm. */
+    unmetConditionMessage?: string;
 }
 
-/**
- * Tính giá hiệu lực (sau khuyến mãi) cho 1 món dựa trên danh sách promotion đang ACTIVE.
- * Chỉ mang tính hiển thị — giá thật do backend tính lại khi tạo đơn (đây là bên phải khớp logic đó).
- */
+/** Tên loại chương trình để hiện trong tooltip, dạng "Tên CT - Tên loại CT". */
+export function getPromotionTypeLabel(type: PromotionType | undefined): string {
+    switch (type) {
+        case 'FIXED_PRICE': return 'Đồng giá';
+        case 'PRODUCT_DISCOUNT': return 'Giảm giá sản phẩm';
+        case 'BUY_X_GET_Y': return 'Mua X tặng Y';
+        default: return '';
+    }
+}
+
+/** CT có điều kiện (mua tối thiểu) đã đạt hay chưa, tính trên tổng đơn hàng theo giá GỐC. */
+function isConditionMet(promo: PromotionResponse, subtotal: number, totalQuantity: number): boolean {
+    if (promo.conditionType === 'MIN_ORDER_AMOUNT') {
+        return subtotal >= (promo.conditionMinAmount ?? Number.POSITIVE_INFINITY);
+    }
+
+    if (promo.conditionType === 'MIN_QUANTITY') {
+        return totalQuantity >= (promo.conditionMinQuantity ?? Number.POSITIVE_INFINITY);
+    }
+
+    return true;
+}
+
+function buildUnmetConditionMessage(promo: PromotionResponse, subtotal: number, totalQuantity: number): string | undefined {
+    if (promo.conditionType === 'MIN_ORDER_AMOUNT' && promo.conditionMinAmount) {
+        const remaining = promo.conditionMinAmount - subtotal;
+
+        if (remaining > 0) {
+            return `Mua thêm ${remaining.toLocaleString('vi-VN')}đ để được giảm giá`;
+        }
+    }
+
+    if (promo.conditionType === 'MIN_QUANTITY' && promo.conditionMinQuantity) {
+        const remaining = promo.conditionMinQuantity - totalQuantity;
+
+        if (remaining > 0) {
+            return `Mua thêm ${remaining} sản phẩm để được giảm giá`;
+        }
+    }
+
+    return undefined;
+}
+
 export function getPromotionalPrice(
     storeFoodId: number,
     originalPrice: number,
-    activePromotions: PromotionResponse[]
+    activePromotions: PromotionResponse[],
+    subtotal: number,
+    totalQuantity: number
 ): PromotionalPriceInfo {
     for (const promo of activePromotions) {
         if (promo.promotionType === 'FIXED_PRICE') {
             const item = promo.fixedPriceItems.find(i => i.storeFoodId === storeFoodId);
 
             if (item) {
+                if (!isConditionMet(promo, subtotal, totalQuantity)) {
+                    return {
+                        hasPromotion: false,
+                        originalPrice,
+                        effectivePrice: originalPrice,
+                        unmetConditionMessage: buildUnmetConditionMessage(promo, subtotal, totalQuantity)
+                    };
+                }
+
                 return {
                     hasPromotion: true,
                     originalPrice,
                     effectivePrice: item.fixedPrice,
-                    promotionName: promo.name
+                    promotionName: promo.name,
+                    promotionType: promo.promotionType,
+                    hasCondition: promo.conditionType !== 'NONE'
                 };
             }
-        } else if (promo.promotionType === 'PRODUCT_DISCOUNT') {
+        } else if (promo.promotionType === 'PRODUCT_DISCOUNT' && !promo.applyToAllProducts) {
             const item = promo.discountItems.find(i => i.storeFoodId === storeFoodId);
 
             if (item) {
+                if (!isConditionMet(promo, subtotal, totalQuantity)) {
+                    return {
+                        hasPromotion: false,
+                        originalPrice,
+                        effectivePrice: originalPrice,
+                        unmetConditionMessage: buildUnmetConditionMessage(promo, subtotal, totalQuantity)
+                    };
+                }
+
                 let effectivePrice: number;
 
                 if (item.discountType === 'PERCENT') {
@@ -50,7 +118,9 @@ export function getPromotionalPrice(
                     hasPromotion: true,
                     originalPrice,
                     effectivePrice,
-                    promotionName: promo.name
+                    promotionName: promo.name,
+                    promotionType: promo.promotionType,
+                    hasCondition: promo.conditionType !== 'NONE'
                 };
             }
         }

@@ -11,7 +11,6 @@ import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { UserProfilePopupComponent } from "../pop-up-user-profile/pop-up-user-profile";
 import { ProfileService } from '../../../common/services/profile.service';
 import { GuestService } from '../../../common/services/guest.service';
-import { ThemeService } from '../../../common/services/theme.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -27,7 +26,6 @@ export class UserTopbarComponent {
   private readonly el = inject(ElementRef<HTMLElement>);
   private readonly profileService = inject(ProfileService);
   private readonly guestService = inject(GuestService)
-  readonly themeService = inject(ThemeService);
 
   isUserMenuOpen = signal(false);
   isProfilePopupOpen = signal(false);
@@ -121,10 +119,6 @@ export class UserTopbarComponent {
 
   goLogin(): void {
     this.router.navigateByUrl(URL_ENDPOINT.LOGIN);
-  }
-
-  toggleTheme(): void {
-    this.themeService.toggle();
   }
 
   @HostListener('document:click', ['$event'])

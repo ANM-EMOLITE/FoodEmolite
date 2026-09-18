@@ -1,3 +1,5 @@
+export type PaymentMethod = 'CASH' | 'BANK_TRANSFER';
+
 export interface CreateOrderRequest {
   storeRefCode: string;
   note?: string | null;
@@ -5,6 +7,7 @@ export interface CreateOrderRequest {
   selectedGifts?: SelectedGiftRequest[];
   selectedStoreWideDiscounts?: SelectedStoreWideDiscountRequest[];
   promoCode?: string | null;
+  paymentMethod: PaymentMethod;
 }
 
 export interface SelectedGiftRequest {
@@ -56,6 +59,7 @@ export interface OrderResponse {
   totalAmount: number;
   orderStatus: string;
   paymentStatus: string;
+  paymentMethod: PaymentMethod;
   note?: string | null;
   createdAt: string;
   items: OrderItemResponse[];
@@ -99,5 +103,6 @@ export interface CreateOrderResponse {
     orderId: number;
     orderCode: string;
     paymentStatus: string;
+    paymentMethod: PaymentMethod;
     totalAmount: number;
 }

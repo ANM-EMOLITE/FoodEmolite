@@ -3,7 +3,7 @@
         <section class="flex min-w-0 flex-1 flex-col">
             <div class="flex items-center justify-between gap-3 px-5 py-4">
                 <div class="flex min-w-0 items-center gap-3">
-                    @if (!isFromDirectLink()) {
+                    <!-- @if (!isFromDirectLink()) {
                     <button type="button" (click)="back()"
                         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/60 transition hover:border-violet-500/30 hover:bg-violet-500/10 hover:text-violet-300 cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -12,17 +12,11 @@
                             <path d="M12 19l-7-7 7-7" />
                         </svg>
                     </button>
-                    }
+                    } -->
 
                     <div class="min-w-0">
-                        <h1 class="font-display flex items-center gap-2 text-lg md:text-[22px] font-bold text-violet-400 uppercase tracking-[0.12em]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-fuchsia-400">
-                                <path d="M3 2v7c0 1.1.9 2 2 2h1v11" />
-                                <path d="M6 2v6" />
-                                <path d="M9 2v6" />
-                                <path d="M18 2c-2 2-3 4-3 7a3 3 0 0 0 3 3v10" />
-                            </svg>
+                        <h1
+                            class="font-display flex items-center gap-2 text-lg md:text-[22px] font-bold text-violet-400 uppercase tracking-[0.12em]">
                             <span class="truncate">DANH SÁCH MÓN</span>
                         </h1>
 
@@ -34,18 +28,19 @@
 
                 <div class="flex shrink-0 items-center gap-3">
                     @if (selectedStoreInfo(); as store) {
-                    <div class="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/3 py-1.5 pl-1.5 pr-3">
-                        <div class="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white/5 ring-1 ring-violet-500/20">
+                    <div class="flex items-center gap-3 rounded-xl border border-white/5 bg-white/3 py-1.5 pl-1.5 pr-3">
+                        <div
+                            class="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white/5 ring-1 ring-violet-500/20">
                             @if (store.thumbnailUrl) {
                             <img [src]="store.thumbnailUrl" class="h-full w-full object-cover" />
                             } @else {
-                            <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-violet-700 to-fuchsia-700">
+                            <div
+                                class="flex h-full w-full items-center justify-center bg-linear-to-br from-violet-700 to-fuchsia-700">
                                 <svg class="h-5 w-5 text-white/20" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M8 2v20l13-6V8L8 2zM3 6h2v12H3z" />
                                 </svg>
                             </div>
                             }
-                            <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0f0d1a] bg-emerald-400"></span>
                         </div>
 
                         <div class="hidden min-w-0 sm:block">
@@ -53,8 +48,9 @@
                                 {{ store.storeName }}
                             </p>
                             <p class="flex items-center gap-1 truncate text-xs text-white/40">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                    stroke-linejoin="round" class="shrink-0">
                                     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                                     <circle cx="12" cy="10" r="3" />
                                 </svg>
@@ -103,15 +99,6 @@
         ? 'bg-violet-600 text-white shadow-md shadow-violet-600/30 scale-105'
         : 'bg-white/10 text-white/70 hover:bg-white/15 hover:text-white'"
                         class="flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 cursor-pointer">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                            <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                            <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                            <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                        </svg>
-
                         Tất cả
                     </button>
 
@@ -130,14 +117,14 @@
                 @if (loading()) {
                 <div class="flex flex-col items-center justify-center py-16">
                     <div class="relative">
-                        <div class="absolute inset-0 rounded-full bg-violet-500/20 blur-xl">
+                        <div class="absolute inset-0 rounded-full bg-[#1179EA]/20 blur-xl">
                         </div>
 
                         <div class="relative h-12 w-12 animate-spin rounded-full
              border-[3px]
-             border-violet-500/15
-             border-t-violet-400
-             border-r-fuchsia-400">
+             border-[#1179EA]/15
+             border-t-[#1179EA]
+             border-r-[#1179EA]">
                         </div>
                     </div>
                     <p class="mt-5 text-sm tracking-wide text-white/50">
@@ -148,7 +135,8 @@
                 <div class="flex flex-col items-center justify-center py-20 text-center">
                     <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="text-white/25">
+                            stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                            class="text-white/25">
                             <circle cx="12" cy="12" r="9" />
                             <path d="M8 12h8" />
                         </svg>
@@ -162,10 +150,10 @@
                 <div class="hidden gap-3 sm:grid
         grid-cols-2
         md:grid-cols-3
-        lg:[grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
+        lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
 
                     @for (food of foods(); track food.id; let i = $index) {
-                    <button type="button" (click)="flyToCart(food)" [style.animation-delay.ms]="i * 30" class="animate-fade-up bg-white/3 hover:bg-violet-500/10
+                    <button type="button" (click)="flyToCart(food)" [style.animation-delay.ms]="i * 30" class="food-card animate-fade-up bg-white/3 hover:bg-violet-500/10
            border border-white/5 hover:border-violet-500/25
            rounded-2xl
            p-3 md:p-4
@@ -175,28 +163,42 @@
            group text-left cursor-pointer">
 
                         <div class="relative mb-3 md:mb-4">
-                            <div class="aspect-[4/3] rounded-xl overflow-hidden bg-white/5">
-
+                            <div class="aspect-4/3 rounded-xl overflow-hidden border border-gray-100 bg-white/5">
                                 @if (food.thumbnailUrl) {
                                 <img [src]="food.thumbnailUrl"
                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                                 } @else {
-                                <div
-                                    class="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-700 to-fuchsia-700">
-
+                                <div class="w-full h-full flex items-center justify-center bg-linear-to-br from-violet-700 to-fuchsia-700">
                                     <svg class="w-10 h-10 text-white/20" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M8 2v20l13-6V8L8 2zM3 6h2v12H3z" />
                                     </svg>
-
                                 </div>
                                 }
-
                             </div>
 
+                            @if (getFoodPricing(food); as badgePricing) {
+                            @if (badgePricing.hasPromotion) {
+                            <span
+                                class="absolute top-2 left-0 bg-red-500 py-1 pl-2 pr-3 text-[10px] font-bold uppercase text-white"
+                                style="clip-path: polygon(0 0, 100% 0, 88% 50%, 100% 100%, 0 100%); filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));"
+                                [appTooltip]="badgePricing.hasCondition ? getPromotionTooltip(badgePricing) : ''">
+                                Khuyến mãi
+                            </span>
+                            }
+                            }
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2">
+                            <h2 class="truncate text-md font-semibold text-white">
+                                {{ food.foodName }}
+                            </h2>
+
                             @if (hasOptions(food)) {
-                            <span class="absolute top-2 left-2 flex items-center gap-1 rounded-full border border-violet-400/25 bg-black/50 px-2 py-1 text-[10px] font-semibold text-violet-200 backdrop-blur">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <span
+                                class="flex shrink-0 items-center gap-1 rounded-full bg-[#1179EA]/20 px-2 py-0.5 text-[10px] font-semibold text-[#1179EA]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <line x1="4" y1="21" x2="4" y2="14" />
                                     <line x1="4" y1="10" x2="4" y2="3" />
                                     <line x1="12" y1="21" x2="12" y2="12" />
@@ -210,25 +212,9 @@
                                 Tùy chọn
                             </span>
                             }
-
-                            @if (getFoodPricing(food).hasPromotion) {
-                            <span class="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-fuchsia-600 px-2 py-1 text-[10px] font-semibold text-white shadow">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24H4a1 1 0 0 0-1 1v5.59a2 2 0 0 0 .59 1.41l9.58 9.59a2 2 0 0 0 2.83 0l5.59-5.59a2 2 0 0 0 0-2.83Z" />
-                                    <circle cx="7.5" cy="7.5" r="1" fill="currentColor" />
-                                </svg>
-                                Ưu đãi
-                            </span>
-                            }
                         </div>
 
-                        <!-- Nội dung -->
-                        <h2 class="truncate text-sm font-semibold text-white">
-                            {{ food.foodName }}
-                        </h2>
-
-                        <p class="mt-1 line-clamp-2 text-xs text-white/40">
+                        <p class="mt-1 line-clamp-2 text-sm text-white/40">
                             {{ food.description || 'Chưa có mô tả' }}
                         </p>
 
@@ -236,14 +222,19 @@
                             @if (getFoodPricing(food); as pricing) {
                             <span class="flex flex-col">
                                 @if (pricing.hasPromotion) {
-                                <span class="text-[11px] text-white/35 line-through">
-                                    {{ formatCurrency(pricing.originalPrice) }}
+                                <span class="flex items-center gap-1">
+                                    <span class="text-sm text-white/35 line-through">
+                                        {{ formatCurrency(pricing.originalPrice) }}
+                                    </span>
+                                    <span class="text-[10px] font-bold text-red-500">
+                                        {{ getDiscountBadgeText(pricing) }}
+                                    </span>
                                 </span>
                                 }
-                                <span class="flex items-center gap-1 text-sm font-bold" [class.text-fuchsia-400]="pricing.hasPromotion"
-                                    [class.text-violet-400]="!pricing.hasPromotion">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="text-violet-500/70">
+                                <span class="flex items-center gap-1 text-sm font-bold text-[#1179EA]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                                        stroke-linejoin="round" class="text-[#1179EA]/70">
                                         <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                                     </svg>
                                     {{ formatCurrency(pricing.effectivePrice) }}
@@ -260,8 +251,10 @@
                    transition-all duration-200
                    group-active:scale-90">
 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="text-[#ffffff] transition-transform duration-300 group-hover:rotate-90">
                                     <path d="M12 5v14M5 12h14" />
                                 </svg>
 
@@ -272,23 +265,23 @@
                     }
                 </div>
 
-                <div class="divide-y divide-white/5 sm:hidden">
+                <div class="sm:hidden">
 
                     @for (food of foods(); track food.id; let i = $index) {
-                    <button type="button" (click)="flyToCart(food)" [style.animation-delay.ms]="i * 25" class="animate-fade-up flex w-full items-center gap-3 py-3
+                    <button type="button" (click)="flyToCart(food)" [style.animation-delay.ms]="i * 25" class="animate-fade-up flex w-full items-center gap-3 border-b border-white/5 py-3
                    text-left transition
-                   hover:bg-violet-500/10
                    active:scale-[0.99]
+                   last:border-b-0
                    cursor-pointer">
 
-                        <div class="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-white/5">
+                        <div class="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl border border-white/5 bg-white/5">
 
                             @if (food.thumbnailUrl) {
                             <img [id]="'food-img-' + food.id" [src]="food.thumbnailUrl"
                                 class="h-full w-full object-cover" />
                             } @else {
                             <div
-                                class="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-700 to-fuchsia-700">
+                                class="w-full h-full flex items-center justify-center bg-linear-to-br from-violet-700 to-fuchsia-700">
 
                                 <svg class="w-7 h-7 text-white/20" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M8 2v20l13-6V8L8 2zM3 6h2v12H3z" />
@@ -297,20 +290,31 @@
                             </div>
                             }
 
+                            @if (getFoodPricing(food); as badgePricing) {
+                            @if (badgePricing.hasPromotion) {
+                            <span
+                                class="absolute top-1 left-0 bg-red-500 py-0.5 pl-1.5 pr-2.5 text-[8px] font-bold uppercase text-white"
+                                style="clip-path: polygon(0 0, 100% 0, 82% 50%, 100% 100%, 0 100%); filter: drop-shadow(0 1px 2px rgba(0,0,0,.3));"
+                                [appTooltip]="badgePricing.hasCondition ? getPromotionTooltip(badgePricing) : ''">
+                                Khuyến mãi
+                            </span>
+                            }
+                            }
+
                         </div>
 
                         <div class="min-w-0 flex-1">
-
-                            <div class="flex items-center gap-2">
-
-                                <h2 class="truncate text-sm font-semibold text-white">
+                            <div class="flex items-center justify-between gap-2">
+                                <h2 class="truncate text-md font-semibold text-white">
                                     {{ food.foodName }}
                                 </h2>
 
                                 @if (hasOptions(food)) {
-                                <span class="flex items-center gap-1 rounded-full bg-violet-600 px-2 py-0.5 text-[10px] text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <span
+                                    class="flex items-center gap-1 rounded-full bg-violet-600 px-2 py-0.5 text-[10px] text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                                        stroke-linejoin="round">
                                         <line x1="4" y1="21" x2="4" y2="14" />
                                         <line x1="4" y1="10" x2="4" y2="3" />
                                         <line x1="12" y1="21" x2="12" y2="12" />
@@ -318,13 +322,7 @@
                                         <line x1="20" y1="21" x2="20" y2="16" />
                                         <line x1="20" y1="12" x2="20" y2="3" />
                                     </svg>
-                                    Option
-                                </span>
-                                }
-
-                                @if (getFoodPricing(food).hasPromotion) {
-                                <span class="flex items-center gap-1 rounded-full bg-fuchsia-600 px-2 py-0.5 text-[10px] text-white">
-                                    Ưu đãi
+                                    Tuỳ Chọn
                                 </span>
                                 }
 
@@ -340,9 +338,11 @@
                                 <span class="text-xs text-white/35 line-through">
                                     {{ formatCurrency(pricing.originalPrice) }}
                                 </span>
+                                <span class="text-[10px] font-bold text-red-500">
+                                    {{ getDiscountBadgeText(pricing) }}
+                                </span>
                                 }
-                                <span class="text-sm font-bold" [class.text-fuchsia-400]="pricing.hasPromotion"
-                                    [class.text-violet-400]="!pricing.hasPromotion">
+                                <span class="text-sm font-bold text-[#1179EA]">
                                     {{ formatCurrency(pricing.effectivePrice) }}
                                 </span>
                             </p>
@@ -350,10 +350,13 @@
 
                         </div>
 
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-white/20">
-                            <path d="M9 18l6-6-6-6" />
-                        </svg>
+                        <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-600 shadow-md shadow-violet-600/30">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                class="text-[#ffffff]">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                        </div>
                     </button>
                     }
                 </div>
@@ -361,21 +364,16 @@
             </div>
         </section>
 
-        <div class="hidden w-1 cursor-col-resize border-r border-white/5 bg-[#130f21] transition hover:bg-white/15 lg:block"
-            (mousedown)="startResize($event)">
-        </div>
-
-        <aside class="hidden min-h-0 shrink-0 flex-col border-l border-white/5 bg-[#130f21] lg:flex"
-            [style.width.px]="cartWidth()">
+        <aside class="cart-panel hidden min-h-0 w-[440px] shrink-0 flex-col border-l border-white/5 bg-[#130f21] lg:flex">
 
             <div class="flex items-center gap-3 border-b border-white/5 px-4 py-4">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-600/15 text-violet-300">
+                <div
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-600/15 text-violet-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="8" cy="21" r="1" />
                         <circle cx="19" cy="21" r="1" />
-                        <path
-                            d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                     </svg>
                 </div>
 
@@ -390,13 +388,14 @@
                 </div>
             </div>
 
-            <div class="min-h-0 flex-1 space-y-3 custom-scroll overflow-y-auto p-4">
+            <div class="min-h-0 flex-1 custom-scroll overflow-y-auto p-4">
 
                 @if (cart().length === 0) {
                 <div class="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-white/40">
                     <div class="flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="text-white/25">
+                            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+                            class="text-white/25">
                             <circle cx="8" cy="21" r="1" />
                             <circle cx="19" cy="21" r="1" />
                             <path
@@ -409,7 +408,8 @@
 
                 @for (item of cart(); track item.id; let i = $index) {
 
-                <div class="animate-fade-up rounded-2xl border border-white/5 bg-white/2 p-3 transition hover:border-violet-500/20" [style.animation-delay.ms]="i * 30">
+                <div class="animate-fade-up border-b border-white/5 py-3 first:pt-0 last:border-b-0"
+                    [style.animation-delay.ms]="i * 30">
 
                     <div class="flex gap-3">
 
@@ -432,14 +432,20 @@
                                     {{ formatCurrency(pricing.originalPrice) }}
                                 </span>
                                 }
-                                <span class="text-sm font-medium" [class.text-fuchsia-400]="pricing.hasPromotion"
-                                    [class.text-violet-400]="!pricing.hasPromotion">
+                                <span class="text-sm font-medium text-[#1179EA]">
                                     {{ formatCurrency(pricing.effectivePrice) }}
                                 </span>
                             </p>
+
+                            @if (pricing.unmetConditionMessage) {
+                            <p class="mt-1 text-xs font-medium text-amber-500">
+                                {{ pricing.unmetConditionMessage }}
+                            </p>
+                            }
                             }
 
-                            @if (storeWideDiscountPromotions().length > 0 && uniqueCartFoods().length > 1 && !isStoreWideDiscountSelected(item.food.id)) {
+                            @if (storeWideDiscountPromotions().length > 0 && uniqueCartFoods().length > 1 &&
+                            !isStoreWideDiscountSelected(item.food.id)) {
                             <button type="button" (click)="applyStoreWideDiscount(item.food.id)"
                                 class="mt-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300 transition hover:bg-amber-500/20 cursor-pointer">
                                 Áp dụng ưu đãi giảm giá cho món này
@@ -449,8 +455,9 @@
                             @if (hasOptions(item.food)) {
                             <button type="button" (click)="openOptionPopup(item.id)"
                                 class="mt-2 flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/70 transition hover:border-violet-500/25 hover:bg-violet-500/10 cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <path d="M12 20h9" />
                                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                                 </svg>
@@ -467,14 +474,12 @@
                         </div>
 
                         <button type="button" (click)="remove(item.id)"
-                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/40 transition hover:bg-red-500/10 hover:text-red-400 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 6h18" />
-                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                <line x1="10" y1="11" x2="10" y2="17" />
-                                <line x1="14" y1="11" x2="14" y2="17" />
+                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/40 transition hover:text-red-500 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M18 6L6 18" />
+                                <path d="M6 6l12 12" />
                             </svg>
                         </button>
 
@@ -486,8 +491,9 @@
 
                             <button type="button" (click)="decrease(item.id)"
                                 class="flex h-8 w-8 items-center justify-center text-white/70 transition hover:bg-violet-500/10 cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <path d="M5 12h14" />
                                 </svg>
                             </button>
@@ -499,15 +505,16 @@
 
                             <button type="button" (click)="increase(item.id)"
                                 class="flex h-8 w-8 items-center justify-center text-white/70 transition hover:bg-violet-500/10 cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <path d="M12 5v14M5 12h14" />
                                 </svg>
                             </button>
 
                         </div>
 
-                        <p class="text-sm font-semibold text-white">
+                        <p class="text-sm font-semibold text-[#1179EA]">
                             {{ formatCurrency(getItemAmount(item)) }}
                         </p>
 
@@ -521,18 +528,13 @@
 
             <div class="border-t border-white/5 p-4">
 
-                <label class="mb-2 flex items-center gap-1.5 text-xs font-medium text-white/40">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                    </svg>
-                    Ghi chú cho đơn hàng
+                <label class="mb-2 flex items-center gap-1.5 text-sm font-bold uppercase text-gray-500">
+                    Ghi chú
                 </label>
 
                 <textarea rows="2" placeholder="Ví dụ: ít đá, không đường..." [value]="orderNote()"
                     (input)="updateOrderNote($any($event.target).value)"
-                    class="mb-4 w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40">
+                    class="mb-4 w-full resize-none rounded-md border border-white/10 bg-white px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40">
         </textarea>
 
                 @if (eligibleGiftPromotions().length > 0) {
@@ -570,43 +572,108 @@
                 </div>
                 }
 
-                <div class="mb-3 flex items-center gap-2">
-                    @if (appliedPromoCode()) {
-                    <div class="flex flex-1 items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
-                        <span class="text-xs font-medium text-emerald-300">
-                            Đã áp dụng mã "{{ appliedPromoCode() }}"
-                        </span>
-                        <button type="button" (click)="removePromoCode()" class="text-xs text-white/40 transition hover:text-white/70 cursor-pointer">
-                            Bỏ
+                <div class="mb-3">
+                    <p class="mb-1.5 text-sm font-bold uppercase text-gray-500">Phương thức thanh toán</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" (click)="setPaymentMethod('CASH')"
+                            class="flex items-center justify-left gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition cursor-pointer hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-700"
+                            [class.border-emerald-500]="paymentMethod() === 'CASH'"
+                            [class.bg-emerald-500/15]="paymentMethod() === 'CASH'"
+                            [class.text-emerald-700]="paymentMethod() === 'CASH'"
+                            [class.border-white/10]="paymentMethod() !== 'CASH'"
+                            [class.text-white/60]="paymentMethod() !== 'CASH'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                stroke-linejoin="round" class="shrink-0">
+                                <rect x="2" y="6" width="20" height="12" rx="2" />
+                                <circle cx="12" cy="12" r="2" />
+                                <path d="M6 12h.01M18 12h.01" />
+                            </svg>
+                            Tiền mặt
+                            @if (paymentMethod() === 'CASH') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                stroke-linejoin="round" class="ml-auto shrink-0">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                            }
+                        </button>
+                        <button type="button" (click)="setPaymentMethod('BANK_TRANSFER')"
+                            class="flex items-center justify-left gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition cursor-pointer hover:border-amber-500 hover:bg-amber-500/10 hover:text-amber-700"
+                            [class.border-amber-500]="paymentMethod() === 'BANK_TRANSFER'"
+                            [class.bg-amber-500/15]="paymentMethod() === 'BANK_TRANSFER'"
+                            [class.text-amber-700]="paymentMethod() === 'BANK_TRANSFER'"
+                            [class.border-white/10]="paymentMethod() !== 'BANK_TRANSFER'"
+                            [class.text-white/60]="paymentMethod() !== 'BANK_TRANSFER'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="shrink-0">
+                                <rect width="20" height="14" x="2" y="5" rx="2" />
+                                <line x1="2" x2="22" y1="10" y2="10" />
+                                <path d="M6 14h2" />
+                            </svg>
+                            Chuyển khoản
+                            @if (paymentMethod() === 'BANK_TRANSFER') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                stroke-linejoin="round" class="ml-auto shrink-0">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                            }
                         </button>
                     </div>
-                    } @else {
-                    <input type="text" placeholder="Nhập mã giảm giá (không bắt buộc)" [value]="promoCodeInput()"
+                </div>
+
+                <div class="mb-3 flex items-center gap-2">
+                    <input type="text" placeholder="Nhập mã giảm giá (không bắt buộc)"
+                        [value]="appliedPromoCode() ?? promoCodeInput()" [disabled]="!!appliedPromoCode()"
                         (input)="promoCodeInput.set($any($event.target).value)"
-                        class="h-9 flex-1 rounded-xl border border-white/10 bg-white/5 px-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-violet-500/40" />
+                        class="h-9 flex-1 rounded-md border border-white/10 bg-white px-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-violet-500/40 disabled:cursor-not-allowed disabled:opacity-70" />
+                    @if (appliedPromoCode()) {
+                    <button type="button" (click)="removePromoCode()"
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white/10 text-white/70 transition hover:bg-red-500/10 hover:text-red-500 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6L6 18" />
+                            <path d="M6 6l12 12" />
+                        </svg>
+                    </button>
+                    } @else {
                     <button type="button" (click)="applyPromoCode()"
-                        class="h-9 shrink-0 rounded-xl bg-white/10 px-3 text-xs font-medium text-white/80 transition hover:bg-white/15 cursor-pointer">
+                        class="h-9 shrink-0 rounded-md bg-white/10 px-3 text-xs font-medium text-white/80 transition hover:bg-white/15 cursor-pointer">
                         Áp dụng
                     </button>
                     }
                 </div>
 
-                <div class="mb-4 flex items-center justify-between">
+                @if (totalDiscountAmount() > 0) {
+                <div class="mb-1.5 flex items-center justify-between">
+                    <span class="text-sm font-bold uppercase text-red-500">
+                        Tổng tiền giảm
+                    </span>
 
-                    <span class="text-sm text-white/40">
+                    <span class="text-sm font-bold text-red-500">
+                        -{{ formatCurrency(totalDiscountAmount()) }}
+                    </span>
+                </div>
+                }
+
+                <div class="mb-4 flex items-center justify-between">
+                    <span class="text-sm font-bold uppercase text-gray-500">
                         Tổng tiền
                     </span>
 
-                    <span class="text-lg font-bold text-violet-400">
+                    <span class="text-lg font-bold text-[#1179EA]">
                         {{ formatCurrency(totalAmount()) }}
                     </span>
-
                 </div>
 
                 <button type="button" [disabled]="cart().length === 0 || ordering() || hasMissingRequiredOptions()"
                     (click)="openConfirmOrder()" class="flex w-full items-center justify-center gap-2 rounded-xl
            bg-violet-600 px-4 py-3
-           text-sm font-semibold text-white
+           text-sm font-semibold uppercase text-white
            transition-all duration-200
            hover:-translate-y-0.5 hover:bg-violet-500
            active:translate-y-0 active:scale-[0.98]
@@ -614,7 +681,8 @@
 
                     @if (ordering()) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                        class="animate-spin">
                         <path d="M21 12a9 9 0 1 1-9-9" />
                     </svg>
                     } @else {
@@ -641,17 +709,16 @@
 <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden" (click)="closeMobileCart()"></div>
 
 <aside
-    class="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] rounded-t-3xl border-t border-white/5 bg-[#130f21] lg:hidden">
+    class="cart-panel fixed bottom-0 left-0 right-0 z-50 flex max-h-[85vh] flex-col rounded-t-3xl border-t border-white/5 bg-[#130f21] lg:hidden">
 
-    <div class="flex items-center justify-between border-b border-white/5 px-4 py-4">
+    <div class="flex shrink-0 items-center justify-between border-b border-white/5 px-4 py-4">
         <div class="flex items-center gap-3">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-600/15 text-violet-300">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="8" cy="21" r="1" />
                     <circle cx="19" cy="21" r="1" />
-                    <path
-                        d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                 </svg>
             </div>
 
@@ -676,17 +743,19 @@
         </button>
     </div>
 
-    <div class="max-h-[55vh] space-y-3 custom-scroll min-h-0 flex-1 overflow-y-auto p-4">
+    <div class="custom-scroll min-h-0 flex-1 overflow-y-auto">
+
+    <div class="p-4">
 
         @if (cart().length === 0) {
         <div class="flex flex-col items-center justify-center gap-3 py-10 text-center text-sm text-white/40">
             <div class="flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="text-white/25">
+                    stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+                    class="text-white/25">
                     <circle cx="8" cy="21" r="1" />
                     <circle cx="19" cy="21" r="1" />
-                    <path
-                        d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                 </svg>
             </div>
             Chưa chọn món nào
@@ -695,7 +764,7 @@
 
         @for (item of cart(); track item.id) {
 
-        <div class="rounded-2xl border border-white/5 bg-white/2 p-3">
+        <div class="border-b border-white/5 py-3 first:pt-0 last:border-b-0">
 
             <div class="flex gap-3">
 
@@ -718,14 +787,20 @@
                             {{ formatCurrency(pricing.originalPrice) }}
                         </span>
                         }
-                        <span class="text-sm font-medium" [class.text-fuchsia-400]="pricing.hasPromotion"
-                            [class.text-violet-400]="!pricing.hasPromotion">
+                        <span class="text-sm font-medium text-[#1179EA]">
                             {{ formatCurrency(pricing.effectivePrice) }}
                         </span>
                     </p>
+
+                    @if (pricing.unmetConditionMessage) {
+                    <p class="mt-1 text-xs font-medium text-amber-500">
+                        {{ pricing.unmetConditionMessage }}
+                    </p>
+                    }
                     }
 
-                    @if (storeWideDiscountPromotions().length > 0 && uniqueCartFoods().length > 1 && !isStoreWideDiscountSelected(item.food.id)) {
+                    @if (storeWideDiscountPromotions().length > 0 && uniqueCartFoods().length > 1 &&
+                    !isStoreWideDiscountSelected(item.food.id)) {
                     <button type="button" (click)="applyStoreWideDiscount(item.food.id)"
                         class="mt-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300 transition hover:bg-amber-500/20 cursor-pointer">
                         Áp dụng ưu đãi giảm giá cho món này
@@ -753,14 +828,11 @@
                 </div>
 
                 <button type="button" (click)="remove(item.id)"
-                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/40 transition hover:bg-red-500/10 hover:text-red-400 cursor-pointer">
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/40 transition hover:text-red-500 cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 6h18" />
-                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
+                        <path d="M18 6L6 18" />
+                        <path d="M6 6l12 12" />
                     </svg>
                 </button>
 
@@ -793,7 +865,7 @@
 
                 </div>
 
-                <p class="text-sm font-semibold text-white">
+                <p class="text-sm font-semibold text-[#1179EA]">
                     {{ formatCurrency(getItemAmount(item)) }}
                 </p>
 
@@ -807,18 +879,13 @@
 
     <div class="border-t border-white/5 p-4">
 
-        <label class="mb-2 flex items-center gap-1.5 text-xs font-medium text-white/40">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-            </svg>
-            Ghi chú cho đơn hàng
+        <label class="mb-2 flex items-center gap-1.5 text-sm font-bold uppercase text-gray-500">
+            Ghi chú
         </label>
 
         <textarea rows="3" placeholder="Ví dụ: ít cay, không hành..." [value]="orderNote()"
             (input)="updateOrderNote($any($event.target).value)"
-            class="mb-4 w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40">
+            class="mb-4 w-full resize-none rounded-md border border-white/10 bg-white px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40">
         </textarea>
 
         @if (eligibleGiftPromotions().length > 0) {
@@ -856,34 +923,102 @@
         </div>
         }
 
-        <div class="mb-3 flex items-center gap-2">
-            @if (appliedPromoCode()) {
-            <div class="flex flex-1 items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
-                <span class="text-xs font-medium text-emerald-300">
-                    Đã áp dụng mã "{{ appliedPromoCode() }}"
-                </span>
-                <button type="button" (click)="removePromoCode()" class="text-xs text-white/40 transition hover:text-white/70 cursor-pointer">
-                    Bỏ
+        <div class="mb-3">
+            <p class="mb-1.5 text-sm font-bold uppercase text-gray-500">Phương thức thanh toán</p>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" (click)="setPaymentMethod('CASH')"
+                    class="flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition cursor-pointer hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-700"
+                    [class.border-emerald-500]="paymentMethod() === 'CASH'"
+                    [class.bg-emerald-500/15]="paymentMethod() === 'CASH'"
+                    [class.text-emerald-700]="paymentMethod() === 'CASH'"
+                    [class.border-white/10]="paymentMethod() !== 'CASH'"
+                    [class.text-white/60]="paymentMethod() !== 'CASH'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                        class="shrink-0">
+                        <rect x="2" y="6" width="20" height="12" rx="2" />
+                        <circle cx="12" cy="12" r="2" />
+                        <path d="M6 12h.01M18 12h.01" />
+                    </svg>
+                    Tiền mặt
+                    @if (paymentMethod() === 'CASH') {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                        class="ml-auto shrink-0">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                    }
+                </button>
+                <button type="button" (click)="setPaymentMethod('BANK_TRANSFER')"
+                    class="flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition cursor-pointer hover:border-amber-500 hover:bg-amber-500/10 hover:text-amber-700"
+                    [class.border-amber-500]="paymentMethod() === 'BANK_TRANSFER'"
+                    [class.bg-amber-500/15]="paymentMethod() === 'BANK_TRANSFER'"
+                    [class.text-amber-700]="paymentMethod() === 'BANK_TRANSFER'"
+                    [class.border-white/10]="paymentMethod() !== 'BANK_TRANSFER'"
+                    [class.text-white/60]="paymentMethod() !== 'BANK_TRANSFER'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                        class="shrink-0">
+                        <path d="M17 1l4 4-4 4" />
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                        <path d="M7 23l-4-4 4-4" />
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                    Chuyển khoản
+                    @if (paymentMethod() === 'BANK_TRANSFER') {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                        class="ml-auto shrink-0">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                    }
                 </button>
             </div>
-            } @else {
-            <input type="text" placeholder="Nhập mã giảm giá (không bắt buộc)" [value]="promoCodeInput()"
+        </div>
+
+        <div class="mb-3 flex items-center gap-2">
+            <input type="text" placeholder="Nhập mã giảm giá (không bắt buộc)"
+                [value]="appliedPromoCode() ?? promoCodeInput()" [disabled]="!!appliedPromoCode()"
                 (input)="promoCodeInput.set($any($event.target).value)"
-                class="h-9 flex-1 rounded-xl border border-white/10 bg-white/5 px-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-violet-500/40" />
+                class="h-9 flex-1 rounded-md border border-white/10 bg-white px-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-violet-500/40 disabled:cursor-not-allowed disabled:opacity-70" />
+            @if (appliedPromoCode()) {
+            <button type="button" (click)="removePromoCode()"
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white/10 text-white/70 transition hover:bg-red-500/10 hover:text-red-500 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6L6 18" />
+                    <path d="M6 6l12 12" />
+                </svg>
+            </button>
+            } @else {
             <button type="button" (click)="applyPromoCode()"
-                class="h-9 shrink-0 rounded-xl bg-white/10 px-3 text-xs font-medium text-white/80 transition hover:bg-white/15 cursor-pointer">
+                class="h-9 shrink-0 rounded-md bg-white/10 px-3 text-xs font-medium text-white/80 transition hover:bg-white/15 cursor-pointer">
                 Áp dụng
             </button>
             }
         </div>
 
+        @if (totalDiscountAmount() > 0) {
+        <div class="mb-1.5 flex items-center justify-between">
+            <span class="text-sm font-bold uppercase text-red-500">
+                Tổng tiền giảm
+            </span>
+
+            <span class="text-sm font-bold text-red-500">
+                -{{ formatCurrency(totalDiscountAmount()) }}
+            </span>
+        </div>
+        }
+
         <div class="mb-4 flex items-center justify-between">
 
-            <span class="text-sm text-white/40">
+            <span class="text-sm font-bold uppercase text-gray-500">
                 Tổng tiền
             </span>
 
-            <span class="text-lg font-bold text-violet-400">
+            <span class="text-lg font-bold text-[#1179EA]">
                 {{ formatCurrency(totalAmount()) }}
             </span>
 
@@ -892,7 +1027,7 @@
         <button type="button" [disabled]="cart().length === 0 || ordering() || hasMissingRequiredOptions()"
             (click)="openConfirmOrder()" class="flex w-full items-center justify-center gap-2 rounded-xl
            bg-violet-600 px-4 py-3
-           text-sm font-semibold text-white
+           text-sm font-semibold uppercase text-white
            transition-all duration-200
            hover:-translate-y-0.5 hover:bg-violet-500
            active:translate-y-0 active:scale-[0.98]
@@ -900,7 +1035,8 @@
 
             @if (ordering()) {
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+                stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                class="animate-spin">
                 <path d="M21 12a9 9 0 1 1-9-9" />
             </svg>
             } @else {
@@ -920,16 +1056,19 @@
 
     </div>
 
+    </div>
+
 </aside>
 }
 
 <!-- Popup A: Nhập tên khách (chỉ hiện khi chưa có tên) -->
 @if (isGuestNameOpen()) {
-<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+<div class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-[#130f21] p-5 shadow-2xl">
 
         <div class="flex items-center gap-3">
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-600/15 text-violet-300">
+            <div
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-600/15 text-violet-300">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -945,8 +1084,7 @@
         <div class="mt-5">
             <label class="mb-2 block text-sm font-medium text-white/80">Tên khách hàng</label>
             <input type="text" [value]="guestCustomerName()"
-                (input)="updateGuestCustomerName($any($event.target).value)"
-                placeholder="Nhập tên của bạn"
+                (input)="updateGuestCustomerName($any($event.target).value)" placeholder="Nhập tên của bạn"
                 class="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40" />
         </div>
 
@@ -966,20 +1104,22 @@
 
 <!-- Popup B: Cảnh báo xác nhận đặt đơn (luôn hiện, không còn phần nhập tên) -->
 @if (isConfirmOrderOpen()) {
-<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+<div class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-[#130f21] p-5 shadow-2xl">
 
         <div class="flex items-center gap-3">
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-400">
+            <div
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-400">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+                    <path
+                        d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
                     <line x1="12" y1="9" x2="12" y2="13" />
                     <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
             </div>
             <div>
-                <h2 class="font-display text-xl font-bold tracking-wide text-white">Xác nhận đặt đơn</h2>
+                <h2 class="text-xl font-semibold">Xác nhận đặt đơn</h2>
                 <p class="mt-0.5 text-sm text-white/40">Bạn có chắc muốn tạo đơn hàng này không?</p>
             </div>
         </div>
@@ -999,8 +1139,7 @@
 }
 
 @if (isOptionPopupOpen() && activePopupFood(); as popupFood) {
-<app-pop-up-user-food-options [food]="popupFood"
-    [selectedOptions]="activePopupOptions()" (closed)="closeOptionPopup()"
+<app-pop-up-user-food-options [food]="popupFood" [selectedOptions]="activePopupOptions()" (closed)="closeOptionPopup()"
     (submitted)="applyOptions($event)">
 </app-pop-up-user-food-options>
 }
@@ -1023,7 +1162,7 @@
                 Thanh toán
             </span>
 
-            <h2 class="font-display mt-1 text-2xl font-bold tracking-wide text-white">
+            <h2 class="mt-1 text-2xl font-semibold text-white">
                 Quét mã QR
             </h2>
 
@@ -1034,12 +1173,9 @@
         </div>
         <div class="px-6 py-6">
 
-            <div
-                class="rounded-2xl border border-violet-500/15 bg-white p-4">
+            <div class="rounded-2xl border border-violet-500/15 bg-white p-4">
 
-                <img
-                    [src]="qrImageUrl()"
-                    class="mx-auto h-60 w-60 rounded-xl" />
+                <img [src]="qrImageUrl()" class="mx-auto h-60 w-60 rounded-xl" />
 
             </div>
 
@@ -1102,13 +1238,9 @@
 
         <!-- Footer -->
         <div class="border-t border-white/5 px-6 py-5">
-
-            <button
-                (click)="isQrPopupOpen.set(false)"
+            <button (click)="isQrPopupOpen.set(false)"
                 class="w-full rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-violet-500 hover:shadow-lg hover:shadow-violet-600/30 cursor-pointer">
-
                 Đóng
-
             </button>
 
         </div>

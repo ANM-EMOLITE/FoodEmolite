@@ -205,7 +205,12 @@ export class PageAgentFoodsComponent {
 
     rows(): TableRow[] {
         return this.storeFoods().map((food, index) => {
-            const pricing = getPromotionalPrice(food.id, food.price, this.activePromotions());
+            // Bảng quản lý món của agent — không có ngữ cảnh giỏ hàng thật, nên coi như đã đạt mọi điều
+            // kiện "mua tối thiểu" để agent luôn thấy giá khuyến mãi đã cấu hình cho món này.
+            const pricing = getPromotionalPrice(
+                food.id, food.price, this.activePromotions(),
+                Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER
+            );
 
             return {
                 index: (this.page() - 1) * this.pageSize() + index + 1,
