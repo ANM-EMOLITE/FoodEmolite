@@ -1,6 +1,5 @@
 import {
     Component,
-    HostListener,
     OnDestroy,
     computed,
     effect,
@@ -18,13 +17,14 @@ import { PromotionService } from '../../../common/services/promotion.service';
 import { RealtimeService } from '../../../common/services/realtime.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
 import { PromotionResponse } from '../../../common/models/promotion.model';
-import { SelectedGiftRequest, SelectedStoreWideDiscountRequest } from '../../../common/models/order.model';
+import { PaymentMethod, SelectedGiftRequest, SelectedStoreWideDiscountRequest } from '../../../common/models/order.model';
 import {
     PromotionalPriceInfo,
     getEligibleGiftPromotions,
     getPromotionalPrice,
     getStoreWideDiscountPromotions,
-    computeStoreWideDiscountPrice
+    computeStoreWideDiscountPrice,
+    getPromotionTypeLabel
 } from '../../../common/utils/promotion-pricing';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up-user-food-options';
@@ -32,6 +32,7 @@ import { StoreFoodCategoryService } from '../../../common/services/store-food-ca
 import { StoreFoodCategoryResponse } from '../../../common/models/store-food-category.model';
 import { SelectedStoreService } from '../../../common/services/selectedstore.service';
 import { GuestService } from '../../../common/services/guest.service';
+import { TooltipDirective } from '../../../shared/directive/tooltip.directive';
 
 export interface CartItemOption {
     optionGroupId: number;
@@ -52,7 +53,7 @@ interface CartItem {
 
 @Component({
     selector: 'app-page-user-store-foods',
-    imports: [PopUpUserFoodOptionsComponent],
+    imports: [PopUpUserFoodOptionsComponent, TooltipDirective],
     templateUrl: './user-store-foods.html',
     styleUrl: './user-store-foods.css'
 })
@@ -77,6 +78,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     selectedStoreWideDiscounts = signal<SelectedStoreWideDiscountRequest[]>([]);
     promoCodeInput = signal('');
     appliedPromoCode = signal<string | null>(null);
+    paymentMethod = signal<PaymentMethod>('CASH');
 
     categories = signal<StoreFoodCategoryResponse[]>([]);
     selectedCategoryId = signal<number | null>(null);
@@ -101,15 +103,22 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
 
     guestCustomerName = computed(() => this.guestService.customerName());
 
-    cartWidth = signal(380);
-    isResizing = signal(false);
-
     isLoggedIn = computed(() => this.authService.isLoggedIn());
 
     selectedStoreInfo = computed(() => this.selectedStoreService.storeInfo());
 
     totalQuantity = computed(() =>
         this.cart().reduce((total, item) => total + item.quantity, 0)
+    );
+
+    /** Tổng tiền giỏ hàng theo giá GỐC (chưa áp khuyến mãi) — dùng để xét điều kiện "mua tối thiểu"
+     * của từng CT (FIXED_PRICE/PRODUCT_DISCOUNT), khớp với cách BE tính (tránh vòng lặp phụ thuộc). */
+    originalSubtotal = computed(() =>
+        this.cart().reduce((total, item) => {
+            const optionAmount = item.selectedOptions.reduce((sum, option) => sum + option.additionalPrice, 0);
+
+            return total + (item.food.price + optionAmount) * item.quantity;
+        }, 0)
     );
 
     activePopupFood = computed(() => {
@@ -197,6 +206,30 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
 
     totalAmount = computed(() =>
         this.cart().reduce((total, item) => total + this.getLineTotal(item), 0)
+    );
+
+    /** Tổng số tiền được giảm nhờ khuyến mãi (chênh lệch giá gốc - giá đã giảm), hiện phía trên Tổng tiền. */
+    totalDiscountAmount = computed(() =>
+        this.cart().reduce((total, item) => {
+            const overridePrice = this.storeWideDiscountPriceMap().get(item.food.id);
+
+            if (overridePrice !== undefined) {
+                const baseUnitPrice = getPromotionalPrice(
+                    item.food.id, item.food.price, this.applicablePromotions(),
+                    this.originalSubtotal(), this.totalQuantity()
+                ).effectivePrice;
+
+                return total + Math.max(baseUnitPrice - overridePrice, 0);
+            }
+
+            const pricing = this.getFoodPricing(item.food);
+
+            if (pricing.hasPromotion) {
+                return total + (pricing.originalPrice - pricing.effectivePrice) * item.quantity;
+            }
+
+            return total;
+        }, 0)
     );
 
     /** Chương trình "Mua X tặng Y" mà giỏ hàng hiện tại đã đủ điều kiện nhận quà. */
@@ -355,6 +388,10 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
         this.promoCodeInput.set('');
     }
 
+    setPaymentMethod(method: PaymentMethod): void {
+        this.paymentMethod.set(method);
+    }
+
     selectGift(promotionId: number, storeFoodId: number): void {
         this.selectedGifts.update(list => [
             ...list.filter(g => g.promotionId !== promotionId),
@@ -391,7 +428,37 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             };
         }
 
-        return getPromotionalPrice(food.id, food.price, this.applicablePromotions());
+        return getPromotionalPrice(
+            food.id, food.price, this.applicablePromotions(),
+            this.originalSubtotal(), this.totalQuantity()
+        );
+    }
+
+    /** Tooltip cho mác "Khuyến mãi": "Tên CT - Tên loại CT" (vd: "SALE FOR YOU - Giảm giá sản phẩm"). */
+    getPromotionTooltip(pricing: PromotionalPriceInfo): string {
+        if (!pricing.promotionName) {
+            return '';
+        }
+
+        const typeLabel = getPromotionTypeLabel(pricing.promotionType);
+
+        return typeLabel ? `${pricing.promotionName} - ${typeLabel}` : pricing.promotionName;
+    }
+
+    /** Hiện cạnh giá gạch: "-x%" nếu là CT giảm giá, hoặc số tiền được giảm nếu là CT đồng giá. */
+    getDiscountBadgeText(pricing: PromotionalPriceInfo): string {
+        const saved = pricing.originalPrice - pricing.effectivePrice;
+
+        if (saved <= 0) {
+            return '';
+        }
+
+        if (pricing.promotionType === 'PRODUCT_DISCOUNT') {
+            const percent = Math.round((saved / pricing.originalPrice) * 100);
+            return `-${percent}%`;
+        }
+
+        return `-${this.formatCurrency(saved)}`;
     }
 
     /** Tổng tiền 1 dòng giỏ hàng. Nếu món này được chọn nhận giảm giá "toàn bộ sản phẩm", CHỈ 1 đơn vị
@@ -401,7 +468,10 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
         const overridePrice = this.storeWideDiscountPriceMap().get(item.food.id);
 
         if (overridePrice !== undefined) {
-            const baseUnitPrice = getPromotionalPrice(item.food.id, item.food.price, this.applicablePromotions()).effectivePrice;
+            const baseUnitPrice = getPromotionalPrice(
+                item.food.id, item.food.price, this.applicablePromotions(),
+                this.originalSubtotal(), this.totalQuantity()
+            ).effectivePrice;
 
             return baseUnitPrice * (item.quantity - 1) + overridePrice + optionAmount * item.quantity;
         }
@@ -468,27 +538,6 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
         }
 
         this.realtimeService.disconnect();
-    }
-
-    @HostListener('document:mousemove', ['$event'])
-    onMouseMove(event: MouseEvent): void {
-        if (!this.isResizing()) return;
-
-        const width = window.innerWidth - event.clientX;
-        const min = 320;
-        const max = 560;
-
-        this.cartWidth.set(Math.min(Math.max(width, min), max));
-    }
-
-    @HostListener('document:mouseup')
-    onMouseUp(): void {
-        this.isResizing.set(false);
-    }
-
-    startResize(event: MouseEvent): void {
-        event.preventDefault();
-        this.isResizing.set(true);
     }
 
     loadCategories(): void {
@@ -687,13 +736,11 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             return;
         }
 
-        // Chưa đăng nhập và chưa có tên -> hỏi tên trước
         if (!this.isLoggedIn() && !this.hasGuestProfile()) {
             this.isGuestNameOpen.set(true);
             return;
         }
 
-        // Đã có tên (hoặc đã login) -> đi thẳng vào cảnh báo xác nhận
         this.isConfirmOrderOpen.set(true);
     }
 
@@ -822,7 +869,8 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             })),
             selectedGifts: this.selectedGifts(),
             selectedStoreWideDiscounts: this.selectedStoreWideDiscounts(),
-            promoCode: this.appliedPromoCode()
+            promoCode: this.appliedPromoCode(),
+            paymentMethod: this.paymentMethod()
         };
 
         const createOrder$ = this.isLoggedIn()
@@ -853,16 +901,20 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
                 this.appliedPromoCode.set(null);
                 this.promoCodeInput.set('');
 
-                // Đơn vừa tạo có thể đã dùng KM "toàn bộ sản phẩm" — kiểm tra lại để ẩn UI nếu đã dùng hết lượt.
                 const currentRefCode = this.storeRefCode();
                 if (currentRefCode) {
                     this.checkStoreWideDiscountEligibility(currentRefCode);
                 }
                 this.closeMobileCart();
 
-                // Đơn 0đ (vd: được giảm giá hết) — khỏi tạo QR thanh toán, đơn coi như đã thanh toán luôn.
                 if (order.totalAmount <= 0 || order.paymentStatus === 'PAID') {
                     this.toastService.success('Tạo đơn hàng thành công!');
+                    this.ordering.set(false);
+                    return;
+                }
+
+                if (order.paymentMethod === 'CASH') {
+                    this.toastService.success('Tạo đơn hàng thành công! Vui lòng thanh toán tiền mặt khi nhận món.');
                     this.ordering.set(false);
                     return;
                 }
