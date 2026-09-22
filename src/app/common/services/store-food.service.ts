@@ -38,7 +38,8 @@ export class StoreFoodService {
     page: number,
     pageSize: number,
     sortBy: string | null = null,
-    asc: boolean = false
+    asc: boolean = false,
+    isAvailable: boolean | null = null
   ): Observable<BaseTableResponse<StoreFoodResponse>> {
     const request: BaseSearchRequest<GetStoreFoodsRequest> = {
       page,
@@ -47,7 +48,8 @@ export class StoreFoodService {
       asc,
       searchParams: {
         storeRefCode,
-        storeFoodCategoryId: storeFoodCategoryId ?? undefined
+        storeFoodCategoryId: storeFoodCategoryId ?? undefined,
+        isAvailable: isAvailable ?? undefined
       }
     };
 
@@ -103,6 +105,11 @@ export class StoreFoodService {
 
     formData.append('StoreRefCode', request.storeRefCode);
     formData.append('FoodName', request.foodName);
+
+    if (request.productCode) {
+      formData.append('ProductCode', request.productCode);
+    }
+
     formData.append('Price', String(request.price));
     formData.append('Quantity', String(request.quantity));
     formData.append('Description', request.description ?? '');
@@ -123,6 +130,7 @@ export class StoreFoodService {
     const formData = new FormData();
 
     formData.append('FoodName', request.foodName);
+    formData.append('ProductCode', request.productCode);
     formData.append('Price', String(request.price));
     formData.append('Quantity', String(request.quantity));
     formData.append('IsAvailable', String(request.isAvailable));

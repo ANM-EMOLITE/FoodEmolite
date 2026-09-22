@@ -97,25 +97,25 @@
 }
 
 /* ==========================================================================
-   USER-FACING THEME ("tông xanh trắng")
+   USER-FACING THEME ("tông tím trắng")
    .user-theme-scope re-points the exact same Tailwind utility classes already
-   used across every page-user template to a blue/white palette, so no HTML
-   edits are needed anywhere else. #1179EA is the main accent; bg-blue-500
-   (Tailwind's own #3b82f6) is used for the bolder/solid-fill ("đậm") spots.
+   used across every page-user template to a purple/white palette, so no HTML
+   edits are needed anywhere else. #6d28d9 is the main accent; #7c3aed
+   (violet-600) is used for the bolder/solid-fill ("đậm") spots.
    ========================================================================== */
 .user-theme-scope {
-  --u-ink: 29 43 57;
-  --u-accent: 17 121 234;
-  --u-accent-strong: 13 91 175;
-  --u-accent-bold: 59 130 246;
-  --u-accent2: 14 165 233;
-  --u-accent2-strong: 2 132 199;
+  --u-ink: 30 27 75;
+  --u-accent: 109 40 217;
+  --u-accent-strong: 91 33 182;
+  --u-accent-bold: 124 58 237;
+  --u-accent2: 192 38 211;
+  --u-accent2-strong: 162 28 175;
 
   color-scheme: light;
 }
 
-/* Tiêu đề trang/khu vực (h1/h2 "DANH SÁCH MÓN", "Giỏ hàng"...) giữ màu chữ đậm #1D2B39
-   thay vì xanh accent — xanh chỉ dùng cho số tiền/nhấn mạnh, không dùng cho tiêu đề.
+/* Tiêu đề trang/khu vực (h1/h2 "DANH SÁCH MÓN", "Giỏ hàng"...) giữ màu chữ đậm #1e1b4b
+   thay vì tím accent — tím chỉ dùng cho số tiền/nhấn mạnh, không dùng cho tiêu đề.
    Đổi sang font tròn/mềm (Baloo 2) thay vì serif in hoa dãn chữ rộng — giữ nội dung
    đơn giản nhưng nhìn mềm mại hơn. */
 .user-theme-scope h1.text-violet-400,
@@ -132,29 +132,29 @@
 
 /* ---- scrollbar ---- */
 .user-theme-scope .custom-scroll {
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: #c4b5fd transparent;
 }
 .user-theme-scope .custom-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c4b5fd;
 }
 .user-theme-scope .custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #a78bfa;
 }
 
 /* ---- page / surface backgrounds ---- */
-.user-theme-scope .bg-\[\#0f0d1a\] { background-color: #f1f5f9; }
+.user-theme-scope .bg-\[\#0f0d1a\] { background-color: #f5f3ff; }
 .user-theme-scope .bg-\[\#070511\],
-.user-theme-scope .bg-\[\#0c0a16\] { background-color: #e2e8f0; }
+.user-theme-scope .bg-\[\#0c0a16\] { background-color: #ede9fe; }
 .user-theme-scope .bg-\[\#130f21\],
 .user-theme-scope .bg-\[\#1a1035\] { background-color: #ffffff; }
 .user-theme-scope .bg-\[\#141124\],
-.user-theme-scope .bg-\[\#171429\] { background-color: #f8fafc; }
+.user-theme-scope .bg-\[\#171429\] { background-color: #faf8ff; }
 .user-theme-scope .bg-\[\#1d1830\],
 .user-theme-scope .bg-\[\#201b39\],
-.user-theme-scope .hover\:bg-\[\#292347\]:hover { background-color: #e8f1fd; }
-.user-theme-scope .border-\[\#0f0d1a\] { border-color: #f1f5f9; }
-.user-theme-scope .from-\[\#0f0d1a\] { --tw-gradient-from: #f1f5f9; }
-.user-theme-scope .to-\[\#0f0d1a\] { --tw-gradient-to: #f1f5f9; }
+.user-theme-scope .hover\:bg-\[\#292347\]:hover { background-color: #ede9fe; }
+.user-theme-scope .border-\[\#0f0d1a\] { border-color: #f5f3ff; }
+.user-theme-scope .from-\[\#0f0d1a\] { --tw-gradient-from: #f5f3ff; }
+.user-theme-scope .to-\[\#0f0d1a\] { --tw-gradient-to: #f5f3ff; }
 .user-theme-scope .via-\[\#1a1035\] { --tw-gradient-via: #ffffff; }
 
 /* Thẻ món ăn: luôn có shadow nhẹ kiểu thẻ dashboard (không chỉ lúc hover) để nổi lên trên nền xám. */
@@ -174,7 +174,7 @@
 .user-theme-scope .bg-red-500.text-white { color: #ffffff; }
 
 /* Thẻ món ăn (danh sách món): nền trắng mặc định, không viền (chỉ có shadow phân định) — hover thì
-   lên nền xanh nhạt (dùng đúng mapping hover:bg-violet-500/10 chung, không override nữa). */
+   lên nền tím nhạt (dùng đúng mapping hover:bg-violet-500/10 chung, không override nữa). */
 .user-theme-scope .food-card.bg-white\/3 { background-color: #ffffff; }
 .user-theme-scope .food-card { border: none; }
 .user-theme-scope .text-white\/80 { color: rgb(var(--u-ink) / 80%); }
@@ -191,7 +191,7 @@
 .user-theme-scope .text-white\/20 { color: rgb(var(--u-ink) / 30%); }
 .user-theme-scope .placeholder\:text-white\/30::placeholder { color: rgb(var(--u-ink) / 38%); }
 
-/* ---- subtle white overlays (bg/border/divide -> tinted blue) ---- */
+/* ---- subtle white overlays (bg/border/divide -> tinted purple) ---- */
 .user-theme-scope .bg-white\/2 { background-color: rgb(var(--u-accent) / 3%); }
 .user-theme-scope .bg-white\/3 { background-color: rgb(var(--u-accent) / 4%); }
 .user-theme-scope .bg-white\/5,
@@ -218,9 +218,9 @@
 }
 
 /* Giỏ hàng (panel cố định + bottom-sheet mobile): đồng bộ nền với trang chính thay vì trắng riêng. */
-.user-theme-scope .cart-panel.bg-\[\#130f21\] { background-color: #f1f5f9; }
+.user-theme-scope .cart-panel.bg-\[\#130f21\] { background-color: #f5f3ff; }
 
-/* ---- brand accent: violet -> blue (#1179EA); solid fills -> bg-blue-500 ("đậm") ---- */
+/* ---- brand accent: violet -> purple (#6d28d9); solid fills -> #7c3aed ("đậm") ---- */
 .user-theme-scope .text-violet-200,
 .user-theme-scope .text-violet-300,
 .user-theme-scope .text-violet-700,
@@ -306,3 +306,73 @@
 .user-theme-scope .border-emerald-500\/30 { border-color: rgb(16 185 129 / 35%); }
 .user-theme-scope .bg-red-500\/10 { background-color: rgb(239 68 68 / 10%); }
 .user-theme-scope .text-red-400 { color: rgb(220 38 38); }
+
+/* ==========================================================================
+   AGENT (trang quản lý) — dùng chung theme tím/trắng của user (.user-theme-scope) và chỉ
+   bổ sung các màu nền tối riêng của trang agent/shared components mà theme user chưa có.
+   ========================================================================== */
+.agent-theme-scope .bg-\[\#171322\],
+.agent-theme-scope .bg-\[\#161226\] { background-color: #ffffff; }
+.agent-theme-scope .bg-\[\#1a1628\] { background-color: #f5f3ff; }
+.agent-theme-scope .bg-\[\#3b3352\] { background-color: #ddd6fe; }
+.agent-theme-scope .border-\[\#322a4a\] { border-color: #e4def7; }
+.agent-theme-scope .border-\[\#2b243d\] { border-color: #ede9fe; }
+.agent-theme-scope .border-\[\#4b3d72\] { border-color: #c4b5fd; }
+
+/* Sidebar / topbar tách lớp bằng shadow nhẹ như header bên user. */
+.agent-theme-scope nav.fixed { box-shadow: 1px 0 10px rgba(76, 29, 149, .06); }
+.agent-theme-scope header.sticky { box-shadow: 0 1px 10px rgba(76, 29, 149, .06); background-color: #ffffff; }
+
+/* Chữ xám vốn thiết kế cho nền tối -> đậm hơn một chút để đọc được trên nền sáng. */
+.agent-theme-scope .text-gray-200 { color: rgb(var(--u-ink) / 80%); }
+.agent-theme-scope .text-gray-300 { color: rgb(var(--u-ink) / 70%); }
+.agent-theme-scope .text-gray-400 { color: rgb(var(--u-ink) / 55%); }
+.agent-theme-scope .placeholder\:text-gray-500::placeholder { color: rgb(var(--u-ink) / 40%); }
+
+.agent-theme-scope .bg-violet-500\/15,
+.agent-theme-scope .hover\:bg-violet-500\/15:hover { background-color: rgb(var(--u-accent) / 12%); }
+.agent-theme-scope .hover\:border-violet-500\/60:hover { border-color: rgb(var(--u-accent) / 55%); }
+.agent-theme-scope .hover\:bg-violet-600\/10:hover { background-color: rgb(var(--u-accent) / 10%); }
+
+/* Nút/badge đặc (nền đậm) giữ chữ trắng thật. */
+.agent-theme-scope .bg-rose-500.text-white,
+.agent-theme-scope .bg-red-600.text-white,
+.agent-theme-scope .bg-green-600.text-white,
+.agent-theme-scope .bg-blue-600.text-white,
+.agent-theme-scope .bg-purple-600.text-white,
+.agent-theme-scope .bg-gray-600.text-white,
+.agent-theme-scope .bg-gray-700.text-white,
+.agent-theme-scope .bg-black\/60.text-white { color: #ffffff; }
+
+/* ---- Toast (shared/component/toast) ---- */
+.toast-enter {
+  animation: toastIn .3s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.toast-progress {
+  animation-name: toastProgress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes toastProgress {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}

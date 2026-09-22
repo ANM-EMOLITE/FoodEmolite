@@ -32,7 +32,7 @@ export class PageAgentCustomersComponent {
     loading = signal(false);
 
     page = signal(1);
-    pageSize = signal(10);
+    pageSize = signal(20);
     totalPages = signal(1);
     totalRecords = signal(0);
 
@@ -67,11 +67,12 @@ export class PageAgentCustomersComponent {
         {
             key: 'customerName',
             label: 'Tên khách hàng',
+            width: '200px',
             sortable: true
         },
         {
             key: 'typeText',
-            label: 'Loại',
+            label: 'Loại khách hàng',
             width: '120px',
             align: 'center',
             type: 'badge'
@@ -159,6 +160,12 @@ export class PageAgentCustomersComponent {
 
     onFilterChange(value: CustomerFilter): void {
         this.filter.set(value);
+        this.page.set(1);
+        this.loadCustomers();
+    }
+
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
         this.page.set(1);
         this.loadCustomers();
     }

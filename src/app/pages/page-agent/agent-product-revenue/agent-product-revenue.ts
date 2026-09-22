@@ -84,8 +84,9 @@ export class AgentProductRevenueComponent {
     readonly orders = signal<OrderResponse[]>([]);
 
     page = signal(1);
-    pageSize = signal(10);
+    pageSize = signal(20);
     totalPages = signal(1);
+    totalRecords = signal(0);
 
     filter = signal<ProductFilter>({ keyword: '' });
 
@@ -261,6 +262,7 @@ export class AgentProductRevenueComponent {
                 this.loadingTable.set(false);
                 this.products.set(response.items ?? []);
                 this.totalPages.set(response.totalPages);
+                this.totalRecords.set(response.totalRecords);
             },
             error: () => {
                 this.loadingTable.set(false);
@@ -295,6 +297,7 @@ export class AgentProductRevenueComponent {
                 this.loadingTable.set(false);
                 this.orders.set(response.items ?? []);
                 this.totalPages.set(response.totalPages);
+                this.totalRecords.set(response.totalRecords);
             },
             error: () => {
                 this.loadingTable.set(false);
@@ -343,6 +346,12 @@ export class AgentProductRevenueComponent {
         this.loadTable();
     }
 
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
+        this.page.set(1);
+        this.loadTable();
+    }
+
     onPageChange(page: number): void {
         this.page.set(page);
         this.loadTable();
@@ -370,7 +379,7 @@ export class AgentProductRevenueComponent {
                 categories: sorted.map(x => x.foodName),
                 labels: {
                     style: {
-                        colors: '#9ca3af',
+                        colors: '#6b7280',
                         fontSize: '12px'
                     }
                 }
@@ -386,14 +395,14 @@ export class AgentProductRevenueComponent {
                 height: 380,
                 toolbar: { show: false },
                 fontFamily: 'inherit',
-                foreColor: '#9ca3af'
+                foreColor: '#6b7280'
             },
             theme: {
-                mode: 'dark'
+                mode: 'light'
             },
-            colors: ['#a78bfa'],
+            colors: ['#7c3aed'],
             grid: {
-                borderColor: 'rgba(255,255,255,0.06)'
+                borderColor: 'rgba(0,0,0,0.08)'
             },
             plotOptions: {
                 bar: {
@@ -408,7 +417,7 @@ export class AgentProductRevenueComponent {
             yaxis: {
                 labels: {
                     style: {
-                        colors: '#9ca3af',
+                        colors: '#6b7280',
                         fontSize: '12px'
                     }
                 }

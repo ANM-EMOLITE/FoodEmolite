@@ -13,7 +13,7 @@ import { VietQrService } from '../../../common/services/vietqr.service';
 import { DropdownComponent, DropdownOption } from '../../../shared/component/dropdown/dropdown';
 import { DatePickerComponent } from "../../../shared/component/date-picker/date-picker";
 
-type ProfileTab = 'personal' | 'bank' | 'store';
+type ProfileTab = 'personal' | 'bank';
 
 @Component({
   selector: 'app-agent-info',

@@ -1,72 +1,84 @@
-<div class="flex min-h-screen bg-slate-950">
-  <section class="hidden flex-1 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 lg:block"></section>
+<div
+  class="font-dialogue relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#4c1d95] via-[#6d28d9] to-[#8b5cf6] px-4 py-10">
 
-  <section
-    class="relative flex min-h-screen w-full items-center justify-center border-slate-800 bg-slate-950 px-6 lg:w-[520px] lg:border-l">
+  <div class="animate-blob pointer-events-none absolute -top-32 -left-24 h-96 w-96 rounded-full bg-white/10 blur-3xl"></div>
+  <div class="animate-blob pointer-events-none absolute -bottom-32 -right-24 h-96 w-96 rounded-full bg-[#e879f9]/25 blur-3xl"
+    style="animation-delay: 2.5s;"></div>
+
+  <div class="relative w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl shadow-[#2e1065]/40 sm:p-10">
+
     <button type="button" routerLink="/login"
-      class="absolute left-8 top-8 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-white">
+      class="absolute left-5 top-5 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#8b5cf6] transition hover:text-[#6d28d9]">
       <span class="text-xl leading-none">‹</span>
       Quay lại
     </button>
 
-    <div class="w-full max-w-md">
-      <h1 class="text-4xl font-bold text-white">Đăng ký</h1>
-      <p class="mt-2 text-sm text-slate-400">Tạo tài khoản mới</p>
-
-      <div class="mt-8 space-y-4">
-        <input
-          class="w-full rounded-md border border-slate-700 bg-slate-900/70 px-4 py-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-slate-400"
-          type="text" placeholder="Username" [ngModel]="username()" (ngModelChange)="username.set($event)" />
-
-        <input
-          class="w-full rounded-md border border-slate-700 bg-slate-900/70 px-4 py-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-slate-400"
-          type="email" placeholder="Email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)"
-          (blur)="checkEmail()" />
-
-        @if (email() && !isEmailValid()) {
-        <p class="text-sm text-red-400">
-          Email không đúng định dạng
-        </p>
-        }
-
-        @if (isCheckingEmail()) {
-        <p class="text-sm text-slate-400">Đang kiểm tra email...</p>
-        }
-
-        <input
-          class="w-full rounded-md border border-slate-700 bg-slate-900/70 px-4 py-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-slate-400"
-          type="password" placeholder="Mật khẩu" [ngModel]="password()" (ngModelChange)="password.set($event)" />
-
-        <input
-          class="w-full rounded-md border border-slate-700 bg-slate-900/70 px-4 py-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-slate-400"
-          type="password" placeholder="Nhập lại mật khẩu" [ngModel]="confirmPassword()"
-          (ngModelChange)="confirmPassword.set($event)" />
-
-        @if (errorMessage()) {
-        <div class="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-          {{ errorMessage() }}
-        </div>
-        }
-
-        @if (successMessage()) {
-        <div class="rounded-md border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
-          {{ successMessage() }}
-        </div>
-        }
-
-        <button
-          class="flex w-full items-center justify-center rounded-md bg-white py-4 font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isLoading()" (click)="register()">
-          {{ isLoading() ? 'Đang đăng ký...' : 'Đăng ký' }}
-        </button>
-
-        <p class="pt-4 text-center text-sm text-slate-400">
-          Đã có tài khoản?
-          <a class="font-semibold text-white hover:underline" routerLink="/login">
-            Đăng nhập
-          </a>
-        </p>
+    <div class="flex items-center justify-center gap-3 pt-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7c3aed]">
+        <img src="ei2.webp" class="h-8 w-8 rounded-md object-cover" />
+      </div>
+      <div>
+        <p class="text-lg font-bold leading-none text-[#1e1b4b]">Food</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#8b5cf6]">Emolite</p>
       </div>
     </div>
-  </section>
+
+    <h1 class="mt-8 text-center text-3xl font-bold text-[#1e1b4b]">Đăng ký</h1>
+    <p class="mt-2 text-center text-sm text-[#71717a]">Tạo tài khoản mới</p>
+
+    <div class="mt-8 space-y-4">
+      <input
+        class="w-full rounded-xl border border-[#e4def7] bg-[#f5f3ff] px-4 py-3.5 text-sm text-[#1e1b4b] outline-none transition placeholder:text-[#a1a1aa] focus:border-[#6d28d9] focus:bg-white focus:ring-4 focus:ring-[#6d28d9]/10"
+        type="text" placeholder="Username" [ngModel]="username()" (ngModelChange)="username.set($event)" />
+
+      <input
+        class="w-full rounded-xl border border-[#e4def7] bg-[#f5f3ff] px-4 py-3.5 text-sm text-[#1e1b4b] outline-none transition placeholder:text-[#a1a1aa] focus:border-[#6d28d9] focus:bg-white focus:ring-4 focus:ring-[#6d28d9]/10"
+        type="email" placeholder="Email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)"
+        (blur)="checkEmail()" />
+
+      @if (email() && !isEmailValid()) {
+      <p class="text-sm text-red-500">
+        Email không đúng định dạng
+      </p>
+      }
+
+      @if (isCheckingEmail()) {
+      <p class="text-sm text-[#71717a]">Đang kiểm tra email...</p>
+      }
+
+      <input
+        class="w-full rounded-xl border border-[#e4def7] bg-[#f5f3ff] px-4 py-3.5 text-sm text-[#1e1b4b] outline-none transition placeholder:text-[#a1a1aa] focus:border-[#6d28d9] focus:bg-white focus:ring-4 focus:ring-[#6d28d9]/10"
+        type="password" placeholder="Mật khẩu" [ngModel]="password()" (ngModelChange)="password.set($event)" />
+
+      <input
+        class="w-full rounded-xl border border-[#e4def7] bg-[#f5f3ff] px-4 py-3.5 text-sm text-[#1e1b4b] outline-none transition placeholder:text-[#a1a1aa] focus:border-[#6d28d9] focus:bg-white focus:ring-4 focus:ring-[#6d28d9]/10"
+        type="password" placeholder="Nhập lại mật khẩu" [ngModel]="confirmPassword()"
+        (ngModelChange)="confirmPassword.set($event)" />
+
+      @if (errorMessage()) {
+      <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        {{ errorMessage() }}
+      </div>
+      }
+
+      @if (successMessage()) {
+      <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        {{ successMessage() }}
+      </div>
+      }
+
+      <button
+        class="flex w-full cursor-pointer items-center justify-center rounded-xl bg-[#6d28d9] py-3.5 font-semibold text-white shadow-lg shadow-[#6d28d9]/30 transition hover:-translate-y-0.5 hover:bg-[#7c3aed] hover:shadow-[#6d28d9]/40 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+        [disabled]="isLoading()" (click)="register()">
+        {{ isLoading() ? 'Đang đăng ký...' : 'Đăng ký' }}
+      </button>
+
+      <p class="pt-2 text-center text-sm text-[#71717a]">
+        Đã có tài khoản?
+        <a class="font-semibold text-[#6d28d9] hover:underline" routerLink="/login">
+          Đăng nhập
+        </a>
+      </p>
+    </div>
+  </div>
 </div>

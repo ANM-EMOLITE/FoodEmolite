@@ -45,6 +45,9 @@ export class FilterComponent implements OnInit {
 
     form!: FormGroup;
 
+    /** Giá trị mặc định lúc khởi tạo (vd. ngày hôm nay) — "Đặt lại" quay về đây thay vì xoá trống. */
+    private defaultValues: Record<string, any> = {};
+
     constructor(
         private fb: FormBuilder
     ) { }
@@ -55,8 +58,10 @@ export class FilterComponent implements OnInit {
 
         this.fields.forEach(field => {
 
+            this.defaultValues[field.key] = this.initialValues?.[field.key] ?? '';
+
             controls[field.key] = [
-                this.initialValues?.[field.key] ?? ''
+                this.defaultValues[field.key]
             ];
         });
 
@@ -87,7 +92,7 @@ export class FilterComponent implements OnInit {
         const resetValues: any = {};
 
         this.fields.forEach(field => {
-            resetValues[field.key] = '';
+            resetValues[field.key] = this.defaultValues[field.key] ?? '';
         });
 
         this.form.reset(resetValues);

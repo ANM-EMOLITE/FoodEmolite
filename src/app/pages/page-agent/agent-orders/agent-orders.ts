@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { AppTableComponent } from '../../../shared/component/table/table';
 import { FilterComponent } from '../../../shared/component/filter/filter';
 import { ToastService } from '../../../common/services/toast.service';
@@ -8,23 +9,23 @@ import { ProfileService } from '../../../common/services/profile.service';
 import { RealtimeService } from '../../../common/services/realtime.service';
 import { FilterField } from '../../../common/models/front-end/filter/filter-field.model';
 import {
+    TableAction,
     TableColumn,
     TableRow
 } from '../../../common/models/front-end/table/table-column.model';
 import {
     OrderResponse,
     OrderSearchRequest,
-    UpdateOrderStatusRequest,
     UpdatePaymentStatusRequest
 } from '../../../common/models/order.model';
-import { PopUpAgentOrderDetailComponent } from './pop-up-agent-order-detail/pop-up-agent-order-detail';
-import { ConfirmPopupComponent } from '../../../shared/component/confirm-popup/confirm-popup';
+import { buildOrdersInvoiceDocument, downloadOrdersInvoicePdf } from '../../../common/utils/order-invoice';
+import { getOrderDisplayStatus, ORDER_DISPLAY_STATUS_OPTIONS, ORDER_DISPLAY_STATUS_TEXT } from '../../../common/utils/order-status';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BaseSearchRequest } from '../../../common/models/base-search.model';
+import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 
 interface OrderFilter {
-    orderStatus: string;
-    paymentStatus: string;
+    status: string;
     fromDate: string;
     toDate: string;
     keyword: string;
@@ -34,9 +35,7 @@ interface OrderFilter {
     selector: 'app-page-agent-orders',
     imports: [
         AppTableComponent,
-        FilterComponent,
-        PopUpAgentOrderDetailComponent,
-        ConfirmPopupComponent
+        FilterComponent
     ],
     templateUrl: './agent-orders.html'
 })
@@ -46,35 +45,38 @@ export class PageAgentOrdersComponent {
     private readonly toastService = inject(ToastService);
     private readonly sanitizer = inject(DomSanitizer);
     private readonly realtimeService = inject(RealtimeService);
+    private readonly router = inject(Router);
 
     orders = signal<OrderResponse[]>([]);
-    selectedOrder = signal<OrderResponse | null>(null);
     selectedOrderIds = signal<number[]>([]);
     storeRefCode = signal<string | null>(null);
     readonly isInvoicePreviewOpen = signal(false);
     readonly invoicePreviewUrl = signal<SafeResourceUrl | null>(null);
 
-    private invoiceBlob: Blob | null = null;
+    private invoiceOrders: OrderResponse[] = [];
     private invoiceObjectUrl: string | null = null;
 
     page = signal(1);
-    pageSize = signal(30);
+    pageSize = signal(20);
     totalPages = signal(1);
+    totalRecords = signal(0);
     loading = signal(false);
     isSubmitting = signal(false);
-    isDetailOpen = signal(false);
-    isDetailRendered = signal(false);
-    isConfirmOpen = signal(false);
-    confirmTitle = signal('');
-    confirmMessage = signal('');
-    confirmAction = signal<'PAYMENT' | 'ORDER' | 'CANCEL' | null>(null);
+
+    selectedOrders = computed(() => {
+        const ids = this.selectedOrderIds();
+
+        return this.orders().filter(order => ids.includes(order.id));
+    });
+
+    // Nút xác nhận thanh toán hàng loạt chỉ bật khi có chọn dòng và tất cả đơn đã chọn đều còn chưa thanh toán (ngược lại bị disable).
+    canBulkConfirmPayment = computed(() => this.selectedOrders().length > 0 && this.selectedOrders().every(o => this.canConfirmPayment(o)));
 
     sortBy = signal('');
     asc = signal(false);
     private readonly today = new Date().toISOString().split('T')[0];
     filter = signal<OrderFilter>({
-        orderStatus: '',
-        paymentStatus: '',
+        status: '',
         fromDate: this.today,
         toDate: this.today,
         keyword: ''
@@ -89,15 +91,15 @@ export class PageAgentOrdersComponent {
             type: 'checkbox'
         },
         {
-            key: 'index',
-            label: 'STT',
-            width: '80px',
-            align: 'center'
+            key: 'orderCode',
+            label: 'Mã đơn hàng',
+            width: '140px',
+            align: 'left'
         },
         {
-            key: 'orderCode',
-            label: 'Mã đơn',
-            width: '200px',
+            key: 'customerName',
+            label: 'Tên khách hàng',
+            width: '140px',
             align: 'left'
         },
         {
@@ -108,24 +110,9 @@ export class PageAgentOrdersComponent {
             sortable: true
         },
         {
-            key: 'customerName',
-            label: 'Tên khách hàng',
-            width: '140px',
-            align: 'left'
-        },
-        {
-            key: 'orderStatusText',
-            label: 'Trạng thái đơn',
-            width: '160px',
-            align: 'center',
-            type: 'badge'
-        },
-        {
-            key: 'paymentStatusText',
-            label: 'Thanh toán',
-            width: '140px',
-            align: 'center',
-            type: 'badge'
+            key: 'promotionNames',
+            label: 'Khuyến mãi',
+            width: '160px'
         },
         {
             key: 'note',
@@ -133,10 +120,24 @@ export class PageAgentOrdersComponent {
             width: '220px'
         },
         {
+            key: 'statusText',
+            label: 'Trạng thái',
+            width: '160px',
+            align: 'center',
+            type: 'badge'
+        },
+        {
             key: 'createdAt',
             label: 'Ngày tạo',
             width: '180px',
             sortable: true
+        },
+        {
+            key: 'actions',
+            label: 'Thao tác',
+            width: '100px',
+            align: 'center',
+            type: 'actions'
         }
     ];
 
@@ -160,40 +161,11 @@ export class PageAgentOrdersComponent {
             placeholder: 'Đến ngày'
         },
         {
-            key: 'orderStatus',
-            label: 'Trạng thái đơn',
+            key: 'status',
+            label: 'Trạng thái',
             type: 'select',
             placeholder: 'Tất cả trạng thái',
-            options: [
-                {
-                    label: 'Chờ xác nhận',
-                    value: 'PENDING'
-                },
-                {
-                    label: 'Đã xác nhận',
-                    value: 'CONFIRMED'
-                },
-                {
-                    label: 'Đã huỷ',
-                    value: 'CANCELLED'
-                }
-            ]
-        },
-        {
-            key: 'paymentStatus',
-            label: 'Thanh toán',
-            type: 'select',
-            placeholder: 'Tất cả thanh toán',
-            options: [
-                {
-                    label: 'Chưa thanh toán',
-                    value: 'UNPAID'
-                },
-                {
-                    label: 'Đã thanh toán',
-                    value: 'PAID'
-                }
-            ]
+            options: ORDER_DISPLAY_STATUS_OPTIONS
         }
     ];
 
@@ -216,24 +188,18 @@ export class PageAgentOrdersComponent {
     }
 
     rows(): TableRow[] {
-        return this.orders().map((order, index) => ({
+        return this.orders().map(order => ({
             selected: this.isSelected(order.id),
-            index: (this.page() - 1) * this.pageSize() + index + 1,
             id: order.id,
             orderCode: order.orderCode,
             refCode: order.refCode,
             customerName: order.customerName,
             storeRefCode: order.storeRefCode,
             totalAmount: this.formatCurrency(order.totalAmount),
-            orderStatus: order.orderStatus,
-            orderStatusText: {
-                text: this.getOrderStatusText(order.orderStatus),
-                value: order.orderStatus
-            },
-            paymentStatus: order.paymentStatus,
-            paymentStatusText: {
-                text: this.getPaymentStatusText(order.paymentStatus),
-                value: order.paymentStatus
+            promotionNames: this.getPromotionNames(order),
+            statusText: {
+                text: ORDER_DISPLAY_STATUS_TEXT[getOrderDisplayStatus(order)],
+                value: getOrderDisplayStatus(order)
             },
             note: order.note ?? '',
             createdAt: this.formatDate(order.createdAt)
@@ -279,8 +245,7 @@ export class PageAgentOrdersComponent {
             searchParams: {
                 storeRefCode: refCode,
                 keyword: this.filter().keyword || null,
-                orderStatus: this.filter().orderStatus || null,
-                paymentStatus: this.filter().paymentStatus || null,
+                status: this.filter().status || null,
                 fromDate: this.filter().fromDate || null,
                 toDate: this.filter().toDate || null
             }
@@ -290,6 +255,7 @@ export class PageAgentOrdersComponent {
             next: response => {
                 this.orders.set(response.items);
                 this.totalPages.set(response.totalPages);
+                this.totalRecords.set(response.totalRecords);
                 this.selectedOrderIds.set([]);
                 this.loading.set(false);
             },
@@ -302,70 +268,53 @@ export class PageAgentOrdersComponent {
 
     openDetail(row: TableRow): void {
         const id = Number(row['id']);
-        const order = this.orders().find(x => x.id === id);
 
-        if (!order) {
+        if (!id) {
             return;
         }
 
-        this.selectedOrder.set(order);
-        this.isDetailRendered.set(true);
-        this.isDetailOpen.set(true);
+        this.router.navigate(['/', URL_ENDPOINT.AGENT, URL_ENDPOINT.AGENT_ORDERS, id]);
     }
 
+    /** Xem trước hoá đơn của các đơn đã chọn — hoá đơn dựng ngay ở FE từ dữ liệu đơn đang có (không gọi BE). */
     previewInvoiceSelected(): void {
-        const orderIds = this.selectedOrderIds();
+        const orders = this.selectedOrders();
 
-        if (orderIds.length === 0) return;
+        if (orders.length === 0) return;
 
-        this.isSubmitting.set(true);
+        this.clearInvoiceObjectUrl();
 
-        this.orderService.printOrders({ orderIds }).subscribe({
-            next: (blob) => {
-                this.clearInvoiceObjectUrl();
+        this.invoiceOrders = orders;
+        this.invoiceObjectUrl = URL.createObjectURL(
+            new Blob([buildOrdersInvoiceDocument(orders)], { type: 'text/html;charset=utf-8' })
+        );
 
-                this.invoiceBlob = blob;
-                this.invoiceObjectUrl = URL.createObjectURL(blob);
+        this.invoicePreviewUrl.set(
+            this.sanitizer.bypassSecurityTrustResourceUrl(this.invoiceObjectUrl)
+        );
 
-                this.invoicePreviewUrl.set(
-                    this.sanitizer.bypassSecurityTrustResourceUrl(this.invoiceObjectUrl)
-                );
-
-                this.isInvoicePreviewOpen.set(true);
-            },
-            complete: () => {
-                this.isSubmitting.set(false);
-            },
-            error: () => {
-                this.isSubmitting.set(false);
-            }
-        });
+        this.isInvoicePreviewOpen.set(true);
     }
 
     downloadInvoiceSelected(): void {
-        const orderIds = this.selectedOrderIds();
-
-        if (orderIds.length === 0) return;
-
-        this.isSubmitting.set(true);
-
-        this.orderService.printOrders({ orderIds }).subscribe({
-            next: (blob) => {
-                this.downloadBlob(blob);
-            },
-            complete: () => {
-                this.isSubmitting.set(false);
-            },
-            error: () => {
-                this.isSubmitting.set(false);
-            }
-        });
+        this.downloadInvoice(this.selectedOrders());
     }
 
     downloadCurrentPreviewInvoice(): void {
-        if (!this.invoiceBlob) return;
+        this.downloadInvoice(this.invoiceOrders);
+    }
 
-        this.downloadBlob(this.invoiceBlob);
+    private downloadInvoice(orders: OrderResponse[]): void {
+        if (orders.length === 0) return;
+
+        this.isSubmitting.set(true);
+
+        downloadOrdersInvoicePdf(orders)
+            .catch(error => {
+                console.error('Xuất hoá đơn PDF thất bại', error);
+                this.toastService.error('Không tạo được file hoá đơn');
+            })
+            .finally(() => this.isSubmitting.set(false));
     }
 
     printCurrentPreviewInvoice(): void {
@@ -390,19 +339,8 @@ export class PageAgentOrdersComponent {
     closeInvoicePreview(): void {
         this.isInvoicePreviewOpen.set(false);
         this.invoicePreviewUrl.set(null);
-        this.invoiceBlob = null;
+        this.invoiceOrders = [];
         this.clearInvoiceObjectUrl();
-    }
-
-    private downloadBlob(blob: Blob): void {
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `orders-${Date.now()}.pdf`;
-        a.click();
-
-        URL.revokeObjectURL(url);
     }
 
     private clearInvoiceObjectUrl(): void {
@@ -412,46 +350,10 @@ export class PageAgentOrdersComponent {
         }
     }
 
-    closeDetail(): void {
-        this.isDetailOpen.set(false);
-
-        setTimeout(() => {
-            this.isDetailRendered.set(false);
-            this.selectedOrder.set(null);
-        }, 200);
-    }
-
-    updateStatus(request: UpdateOrderStatusRequest): void {
-        const order = this.selectedOrder();
-
-        if (!order) return;
-
-        this.isSubmitting.set(true);
-
-        this.orderService.updateStatus(order.id, request).subscribe({
-            next: response => {
-                this.isSubmitting.set(false);
-
-                if (!response.isSuccess) {
-                    this.toastService.error(response.message);
-                    return;
-                }
-
-                this.toastService.success(response.message);
-                this.closeDetail();
-                this.loadOrders();
-            },
-            error: () => {
-                this.isSubmitting.set(false);
-                this.toastService.error('Cập nhật trạng thái đơn thất bại');
-            }
-        });
-    }
-
     toggleSelected(row: TableRow, checked: boolean): void {
         const id = Number(row['id']);
 
-        if (!id) {
+        if (!id || (checked && this.isRowCheckDisabled(row))) {
             return;
         }
 
@@ -473,143 +375,87 @@ export class PageAgentOrdersComponent {
             return;
         }
 
+        // "Chọn tất cả" chỉ tick các đơn đang chờ thanh toán; đơn đã thanh toán / đã huỷ bỏ qua.
         const ids = this.rows()
+            .filter(row => this.isSelectableRow(row))
             .map(row => Number(row['id']))
             .filter(id => !!id);
 
         this.selectedOrderIds.set(ids);
     }
 
+    /** Đơn đã huỷ bị khoá hẳn checkbox (không tick được). Đơn đã thanh toán vẫn tick riêng được, chỉ không bị "chọn tất cả" chọn vào. */
+    readonly isRowCheckDisabled = (row: TableRow): boolean => {
+        const order = this.orders().find(x => x.id === Number(row['id']));
+
+        return !order || order.orderStatus === 'CANCELLED';
+    };
+
+    readonly isSelectableRow = (row: TableRow): boolean => {
+        const order = this.orders().find(x => x.id === Number(row['id']));
+
+        return !!order && this.canConfirmPayment(order);
+    };
+
+    /** Menu thao tác của từng dòng: Xem chi tiết (luôn có) và Huỷ đơn (nếu còn huỷ được). Xác nhận thanh toán ở nút phía trên. */
+    readonly rowActions = (row: TableRow): TableAction[] => {
+        const order = this.orders().find(x => x.id === Number(row['id']));
+
+        if (!order) {
+            return [];
+        }
+
+        const actions: TableAction[] = [
+            {
+                key: 'DETAIL',
+                label: 'Xem chi tiết',
+                icon: [
+                    'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0',
+                    'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'
+                ]
+            }
+        ];
+
+        if (this.canCancel(order)) {
+            actions.push({
+                key: 'CANCEL',
+                label: 'Huỷ đơn hàng',
+                tone: 'danger',
+                icon: [
+                    'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z',
+                    'm15 9-6 6',
+                    'm9 9 6 6'
+                ]
+            });
+        }
+
+        return actions;
+    };
+
+    onRowAction(event: { row: TableRow; action: string }): void {
+        if (event.action === 'DETAIL') {
+            this.openDetail(event.row);
+            return;
+        }
+
+        const order = this.orders().find(x => x.id === Number(event.row['id']));
+
+        if (!order || event.action !== 'CANCEL') {
+            return;
+        }
+
+        this.bulkCancel([order.id]);
+    }
+
+    /** Xác nhận thanh toán các đơn đã chọn — chạy ngay, không hỏi lại. */
     confirmPaymentSelected(): void {
-        const selectedOrders = this.getSelectedOrders();
-
-        const invalidOrders = selectedOrders.filter(
-            order => order.paymentStatus === 'PAID'
-        );
-
-        if (invalidOrders.length) {
-            this.toastService.error('Có đơn đã thanh toán trong danh sách đã chọn');
-            return;
-        }
-
-        this.confirmTitle.set('Xác nhận thanh toán');
-        this.confirmMessage.set(
-            `Bạn có chắc muốn xác nhận thanh toán cho ${selectedOrders.length} đơn hàng đã chọn không?`
-        );
-        this.confirmAction.set('PAYMENT');
-        this.isConfirmOpen.set(true);
-    }
-
-    confirmOrderSelected(): void {
-        const selectedOrders = this.getSelectedOrders();
-
-        const invalidOrders = selectedOrders.filter(
-            order => order.orderStatus !== 'PENDING'
-        );
-
-        if (invalidOrders.length) {
-            this.toastService.error('Chỉ xác nhận được đơn đang chờ xác nhận');
-            return;
-        }
-
-        this.confirmTitle.set('Xác nhận đơn hàng');
-        this.confirmMessage.set(
-            `Bạn có chắc muốn xác nhận ${selectedOrders.length} đơn hàng đã chọn không?`
-        );
-        this.confirmAction.set('ORDER');
-        this.isConfirmOpen.set(true);
-    }
-
-    confirmCancelSelected(): void {
-        const selectedOrders = this.getSelectedOrders();
-
-        const invalidOrders = selectedOrders.filter(
-            order => order.orderStatus === 'CANCELLED' || order.orderStatus === 'COMPLETED'
-        );
-
-        if (invalidOrders.length) {
-            this.toastService.error('Có đơn không thể huỷ trong danh sách đã chọn');
-            return;
-        }
-
-        this.confirmTitle.set('Huỷ đơn hàng');
-        this.confirmMessage.set(
-            `Bạn có chắc muốn huỷ ${selectedOrders.length} đơn hàng đã chọn không?`
-        );
-        this.confirmAction.set('CANCEL');
-        this.isConfirmOpen.set(true);
-    }
-
-    closeConfirm(): void {
-        if (this.isSubmitting()) {
-            return;
-        }
-
-        this.isConfirmOpen.set(false);
-        this.confirmAction.set(null);
-    }
-
-    submitConfirm(): void {
-        const action = this.confirmAction();
-
-        this.isConfirmOpen.set(false);
-
-        if (action === 'PAYMENT') {
-            this.bulkUpdatePaymentSelected({
-                newStatus: 'PAID',
-                changedNote: 'Đại lý xác nhận đã thanh toán'
-            });
-            return;
-        }
-
-        if (action === 'ORDER') {
-            this.bulkUpdateSelected({
-                newStatus: 'CONFIRMED',
-                changedNote: 'Đại lý xác nhận đơn hàng'
-            });
-            return;
-        }
-
-        if (action === 'CANCEL') {
-            this.bulkCancelSelected();
-        }
-    }
-
-    private bulkUpdateSelected(request: UpdateOrderStatusRequest): void {
-        const ids = this.selectedOrderIds();
-
-        if (!ids.length) {
-            return;
-        }
-
-        this.isSubmitting.set(true);
-
-        let completed = 0;
-        let failed = 0;
-
-        ids.forEach(id => {
-            this.orderService.updateStatus(id, request).subscribe({
-                next: response => {
-                    completed++;
-
-                    if (!response.isSuccess) {
-                        failed++;
-                    }
-
-                    this.finishBulkUpdate(completed, failed, ids.length);
-                },
-                error: () => {
-                    completed++;
-                    failed++;
-                    this.finishBulkUpdate(completed, failed, ids.length);
-                }
-            });
+        this.bulkUpdatePayment(this.selectedOrders().map(order => order.id), {
+            newStatus: 'PAID',
+            changedNote: 'Đại lý xác nhận đã thanh toán'
         });
     }
 
-    private bulkUpdatePaymentSelected(request: UpdatePaymentStatusRequest): void {
-        const ids = this.selectedOrderIds();
-
+    private bulkUpdatePayment(ids: number[], request: UpdatePaymentStatusRequest): void {
         if (!ids.length) {
             return;
         }
@@ -639,9 +485,7 @@ export class PageAgentOrdersComponent {
         });
     }
 
-    private bulkCancelSelected(): void {
-        const ids = this.selectedOrderIds();
-
+    private bulkCancel(ids: number[]): void {
         if (!ids.length) {
             return;
         }
@@ -688,14 +532,23 @@ export class PageAgentOrdersComponent {
         this.loadOrders();
     }
 
-    private getSelectedOrders(): OrderResponse[] {
-        const ids = this.selectedOrderIds();
+    canConfirmPayment(order: OrderResponse): boolean {
+        return order.paymentStatus !== 'PAID' && order.orderStatus !== 'CANCELLED';
+    }
 
-        return this.orders().filter(order => ids.includes(order.id));
+    canCancel(order: OrderResponse): boolean {
+        return order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'COMPLETED' && order.paymentStatus !== 'PAID';
     }
 
     private isSelected(orderId: number): boolean {
         return this.selectedOrderIds().includes(orderId);
+    }
+
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
+        this.page.set(1);
+        this.selectedOrderIds.set([]);
+        this.loadOrders();
     }
 
     onPageChange(page: number): void {
@@ -724,36 +577,19 @@ export class PageAgentOrdersComponent {
         this.loadOrders();
     }
 
-    getOrderStatusText(status: string): string {
-        switch (status) {
-            case 'PENDING':
-                return 'Chờ xác nhận';
-            case 'CONFIRMED':
-                return 'Đã xác nhận';
-            case 'PROCESSING':
-                return 'Đang chuẩn bị';
-            case 'COMPLETED':
-                return 'Hoàn thành';
-            case 'CANCELLED':
-                return 'Đã hủy';
-            default:
-                return status;
-        }
-    }
-
-    getPaymentStatusText(status: string): string {
-        switch (status) {
-            case 'UNPAID':
-                return 'Chưa thanh toán';
-            case 'PAID':
-                return 'Đã thanh toán';
-            default:
-                return status;
-        }
-    }
-
     private formatCurrency(value: number): string {
         return `${value.toLocaleString('vi-VN')}đ`;
+    }
+
+    /** Tên các chương trình khuyến mãi đã áp dụng cho đơn (gộp theo từng món, không lặp lại). */
+    private getPromotionNames(order: OrderResponse): string {
+        const names = new Set(
+            order.items
+                .map(item => item.promotionName)
+                .filter((name): name is string => !!name)
+        );
+
+        return [...names].join(', ');
     }
 
     private formatDate(value: string): string {

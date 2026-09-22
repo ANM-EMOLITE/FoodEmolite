@@ -4,7 +4,11 @@ export interface ToastData {
   id: number;
   type: 'success' | 'error';
   message: string;
+  /** Thời gian hiện (ms) — cũng là thời gian chạy của thanh đếm ngược trên toast. */
+  duration: number;
 }
+
+const DEFAULT_DURATION = 3500;
 
 @Injectable({
   providedIn: 'root'
@@ -13,22 +17,26 @@ export class ToastService {
 
   toasts = signal<ToastData[]>([]);
 
+  private nextId = 1;
+
   show(
     type: 'success' | 'error',
-    message: string
+    message: string,
+    duration = DEFAULT_DURATION
   ) {
 
     const toast: ToastData = {
-      id: Date.now(),
+      id: this.nextId++,
       type,
-      message
+      message,
+      duration
     };
 
     this.toasts.update(x => [...x, toast]);
 
     setTimeout(() => {
       this.remove(toast.id);
-    }, 3000);
+    }, duration);
 
   }
 

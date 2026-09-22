@@ -24,6 +24,7 @@ export interface StoreFoodResponse {
   storeRefCode: string;
   storeName: string;
   foodName: string;
+  productCode: string;
   thumbnailUrl: string | null;
   description: string | null;
   price: number;
@@ -56,11 +57,14 @@ export interface StoreFoodOptionGroupRequest {
 export interface GetStoreFoodsRequest {
   storeRefCode: string;
   storeFoodCategoryId?: number | null;
+  isAvailable?: boolean | null;
 }
 
 export interface CreateStoreFoodRequest {
   storeRefCode: string;
   foodName: string;
+  /** Để trống sẽ tự sinh mã (SPxxxxx theo cửa hàng); nhập tay để đặt mã tuỳ chỉnh. */
+  productCode?: string | null;
   thumbnailFile?: File | null;
   description?: string | null;
   price: number;
@@ -71,6 +75,7 @@ export interface CreateStoreFoodRequest {
 
 export interface UpdateStoreFoodRequest {
   foodName: string;
+  productCode: string;
   thumbnailFile?: File | null;
   thumbnailUrl?: string | null;
   description?: string | null;

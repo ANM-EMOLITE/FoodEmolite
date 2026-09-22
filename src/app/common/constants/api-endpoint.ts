@@ -3,7 +3,8 @@ export const API_ENDPOINT = {
     LOGIN: 'auth/login',
     REGISTER: 'auth/register',
     VERIFY: 'auth/verify',
-    CHECK_EMAIL: 'auth/check-email'
+    CHECK_EMAIL: 'auth/check-email',
+    CHANGE_PASSWORD: 'auth/change-password'
   },
   STORE: {
     BASE: 'stores',
@@ -34,16 +35,19 @@ export const API_ENDPOINT = {
     GUEST: 'orders/guest',
     MY: 'orders/my',
     DETAIL: (id: number) => `orders/${id}`,
+    STORE_DETAIL: (id: number) => `orders/${id}/store`,
     STATUS: (id: number) => `orders/${id}/status`,
     STATUS_PAYMENT: (id: number) => `orders/${id}/payment-status`,
     ORDER_CANCEL: (id: number) => `orders/${id}/cancel`,
-    PRINT: 'orders/print',
     BY_STORE: 'orders/store/search',
     PAYMENT_STATUS: (orderCode: string) => `orders/${orderCode}/payment-status`,
     PENDING_ORDER: 'orders/pending-order'
   },
   CUSTOMER: {
     AGENT_SEARCH: 'customers/agent/search'
+  },
+  ACTIVITY_LOG: {
+    STORE_SEARCH: 'activity-logs/store/search'
   },
   REVENUE: {
     AGENT: 'revenue/agent',

@@ -1,39 +1,64 @@
-<div class="fixed right-5 top-5 z-[9999] space-y-3">
+<div class="pointer-events-none fixed inset-x-4 top-4 z-[9999] flex flex-col items-stretch gap-3 sm:inset-x-auto sm:right-5 sm:top-5 sm:w-[380px]">
   @for (toast of toastService.toasts(); track toast.id) {
   <div
-    class="flex min-w-[320px] max-w-sm items-start gap-3 rounded-xl border bg-white px-4 py-3 text-slate-900 shadow-lg transition-all duration-300 animate-in slide-in-from-right-5 fade-in zoom-in-95"
-    [class.border-emerald-200]="toast.type === 'success'"
-    [class.bg-emerald-50]="toast.type === 'success'"
-    [class.border-red-200]="toast.type === 'error'"
-    [class.bg-red-50]="toast.type === 'error'">
+    role="status"
+    class="toast-enter pointer-events-auto relative overflow-hidden rounded-2xl border border-[#ede9fe] bg-[#ffffff] shadow-xl shadow-[#2e1065]/15">
 
-    <div
-      class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-      [class.bg-emerald-100]="toast.type === 'success'"
-      [class.bg-red-100]="toast.type === 'error'">
+    <div class="flex items-start gap-3 py-3.5 pl-5 pr-3">
 
-      @if (toast.type === 'success') {
-      <svg class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M20 6L9 17l-5-5" />
-      </svg>
-      }
+      <div
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+        [class.bg-[#d1fae5]]="toast.type === 'success'"
+        [class.bg-[#fee2e2]]="toast.type === 'error'">
 
-      @if (toast.type === 'error') {
-      <svg class="h-5 w-5 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M18 6L6 18" />
-        <path d="M6 6l12 12" />
-      </svg>
-      }
+        @if (toast.type === 'success') {
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.5l4.5 4.5L19 7.5" />
+        </svg>
+        } @else {
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18" />
+          <path d="M6 6l12 12" />
+        </svg>
+        }
+      </div>
+
+      <div class="min-w-0 flex-1 pt-0.5">
+        <p
+          class="text-sm font-bold leading-5"
+          [class.text-[#047857]]="toast.type === 'success'"
+          [class.text-[#b91c1c]]="toast.type === 'error'">
+          {{ toast.type === 'success' ? 'Thành công' : 'Có lỗi xảy ra' }}
+        </p>
+
+        <p class="mt-0.5 break-words text-sm leading-5 text-[#52525b]">
+          {{ toast.message }}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        aria-label="Đóng"
+        (click)="toastService.remove(toast.id)"
+        class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#a1a1aa] transition hover:bg-[#f5f3ff] hover:text-[#6d28d9]">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18" />
+          <path d="M6 6l12 12" />
+        </svg>
+      </button>
     </div>
 
-    <div class="min-w-0 flex-1">
-      <p class="text-sm font-semibold text-slate-900">
-        {{ toast.type === 'success' ? 'Thành công' : 'Có lỗi xảy ra' }}
-      </p>
-
-      <p class="mt-0.5 text-sm leading-5 text-slate-700">
-        {{ toast.message }}
-      </p>
+    <!-- thanh đếm ngược thời gian tự đóng -->
+    <div class="h-1 w-full bg-[#f5f3ff]">
+      <div
+        class="toast-progress h-full origin-left"
+        [class.bg-[#10b981]]="toast.type === 'success'"
+        [class.bg-[#ef4444]]="toast.type === 'error'"
+        [style.animation-duration.ms]="toast.duration">
+      </div>
     </div>
   </div>
   }

@@ -12,12 +12,16 @@ import { PageUserStoresComponent } from './pages/page-user/user-stores/user-stor
 import { PageUserStoreFoodsComponent } from './pages/page-user/user-store-foods/user-store-foods';
 import { PageUserOrderHistoryComponent } from './pages/page-user/user-histories/user-histories';
 import { PageAgentOrdersComponent } from './pages/page-agent/agent-orders/agent-orders';
+import { PageAgentOrderDetailComponent } from './pages/page-agent/agent-orders/agent-order-detail/agent-order-detail';
 import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-revenue';
 import { PageOrderSuccessComponent } from './pages/page-user/order-success/order-success';
 import { PageAgentFoodCategoriesComponent } from './pages/page-agent/agent-food-categories/agent-food-categories';
 import { PageAgentPromotionsComponent } from './pages/page-agent/agent-promotions/agent-promotions';
 import { AgentProductRevenueComponent } from './pages/page-agent/agent-product-revenue/agent-product-revenue';
 import { PageAgentCustomersComponent } from './pages/page-agent/agent-customers/agent-customers';
+import { PageAgentActivityLogsComponent } from './pages/page-agent/agent-activity-logs/agent-activity-logs';
+import { PageAgentSettingsComponent } from './pages/page-agent/agent-settings/agent-settings';
+import { PageAgentStoreInfoComponent } from './pages/page-agent/agent-store-info/agent-store-info';
 
 export const routes: Routes = [
   {
@@ -77,6 +81,13 @@ export const routes: Routes = [
         }
       },
       {
+        path: URL_ENDPOINT.AGENT_ORDER_DETAIL,
+        component: PageAgentOrderDetailComponent,
+        data: {
+          title: 'Chi tiết đơn hàng'
+        }
+      },
+      {
         path: URL_ENDPOINT.AGENT_PROMOTIONS,
         component: PageAgentPromotionsComponent,
         data: {
@@ -102,6 +113,27 @@ export const routes: Routes = [
         component: PageAgentCustomersComponent,
         data: {
           title: 'Danh sách khách hàng'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_ACTIVITY_LOGS,
+        component: PageAgentActivityLogsComponent,
+        data: {
+          title: 'Lịch sử hoạt động'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_SETTINGS,
+        component: PageAgentSettingsComponent,
+        data: {
+          title: 'Cài đặt'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_STORE,
+        component: PageAgentStoreInfoComponent,
+        data: {
+          title: 'Thông tin cửa hàng'
         }
       },
     ]

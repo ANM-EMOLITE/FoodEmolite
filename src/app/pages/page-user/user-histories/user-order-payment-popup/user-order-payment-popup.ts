@@ -1,5 +1,6 @@
 import {
     Component,
+    computed,
     effect,
     inject,
     input,
@@ -36,8 +37,25 @@ export class UserOrderPaymentPopupComponent {
         });
     }
 
+    isCancelled = computed(() => this.order().orderStatus === 'CANCELLED');
+    isCash = computed(() => this.order().paymentMethod === 'CASH');
+
+    /** Chỉ đơn chuyển khoản, chưa thanh toán và chưa bị hủy mới cần hiện mã QR. */
+    showQr = computed(() =>
+        !this.isCancelled()
+        && !this.isCash()
+        && this.order().paymentStatus !== 'PAID'
+    );
+
     loadPaymentInfo(): void {
         this.paymentInfo.set(null);
+
+        // Đơn hủy / tiền mặt không có thông tin chuyển khoản để hiện (BE cũng từ chối).
+        if (this.isCancelled() || this.isCash()) {
+            this.loading.set(false);
+            return;
+        }
+
         this.loading.set(true);
 
         this.profileService.getStorePaymentInfo(

@@ -92,11 +92,11 @@
 
     <div class="mt-4">
       @if (activeTab() === 'PRODUCT') {
-      <app-table [columns]="productColumns" [rows]="productRows()" [currentPage]="page()" [totalPages]="totalPages()"
+      <app-table [columns]="productColumns" [rows]="productRows()" [currentPage]="page()" [totalPages]="totalPages()" [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
         [loading]="loadingTable()" emptyText="Chưa có dữ liệu" (pageChange)="onPageChange($event)">
       </app-table>
       } @else {
-      <app-table [columns]="orderColumns" [rows]="orderRows()" [currentPage]="page()" [totalPages]="totalPages()"
+      <app-table [columns]="orderColumns" [rows]="orderRows()" [currentPage]="page()" [totalPages]="totalPages()" [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
         [loading]="loadingTable()" emptyText="Chưa có đơn hàng đã thanh toán" (pageChange)="onPageChange($event)">
       </app-table>
       }

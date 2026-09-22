@@ -55,7 +55,7 @@ export class PageAgentFoodCategoriesComponent {
 
     page = signal(1);
 
-    pageSize = signal(10);
+    pageSize = signal(20);
 
     totalPages = signal(1);
 
@@ -254,6 +254,12 @@ export class PageAgentFoodCategoriesComponent {
                     );
                 }
             });
+    }
+
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
+        this.page.set(1);
+        this.loadCategories();
     }
 
     onPageChange(

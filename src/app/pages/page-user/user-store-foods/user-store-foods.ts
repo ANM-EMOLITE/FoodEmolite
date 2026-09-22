@@ -89,6 +89,16 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     foods = signal<StoreFoodResponse[]>([]);
     cart = signal<CartItem[]>([]);
 
+    /** Danh sách món để hiển thị — món hết hàng bị đẩy xuống cuối, không đổi thứ tự trong `foods()` gốc. */
+    sortedFoods = computed(() =>
+        [...this.foods()].sort((a, b) => (a.quantity === 0 ? 1 : 0) - (b.quantity === 0 ? 1 : 0))
+    );
+
+    /** Danh sách giỏ hàng để hiển thị — món đã hết hàng bị đẩy xuống cuối, không đổi thứ tự trong `cart()` gốc. */
+    sortedCart = computed(() =>
+        [...this.cart()].sort((a, b) => (a.food.quantity === 0 ? 1 : 0) - (b.food.quantity === 0 ? 1 : 0))
+    );
+
     loading = signal(false);
     ordering = signal(false);
     isMobileCartOpen = signal(false);
@@ -111,8 +121,6 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
         this.cart().reduce((total, item) => total + item.quantity, 0)
     );
 
-    /** Tổng tiền giỏ hàng theo giá GỐC (chưa áp khuyến mãi) — dùng để xét điều kiện "mua tối thiểu"
-     * của từng CT (FIXED_PRICE/PRODUCT_DISCOUNT), khớp với cách BE tính (tránh vòng lặp phụ thuộc). */
     originalSubtotal = computed(() =>
         this.cart().reduce((total, item) => {
             const optionAmount = item.selectedOptions.reduce((sum, option) => sum + option.additionalPrice, 0);
@@ -896,6 +904,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
                     return;
                 }
                 this.cart.set([]);
+                this.orderNote.set('');
                 this.selectedGifts.set([]);
                 this.selectedStoreWideDiscounts.set([]);
                 this.appliedPromoCode.set(null);
@@ -1009,9 +1018,19 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     private startPaymentPolling(orderCode: string) {
+        clearInterval(this.paymentInterval);
+
         this.paymentInterval = setInterval(() => {
             this.orderService.getPaymentStatus(orderCode).subscribe({
                 next: res => {
+                    if (res.isSuccess && res.data === 'CANCELLED') {
+                        clearInterval(this.paymentInterval);
+
+                        this.isQrPopupOpen.set(false);
+                        this.toastService.error('Đơn hàng đã bị hủy');
+                        return;
+                    }
+
                     if (res.isSuccess && res.data === 'PAID') {
                         clearInterval(this.paymentInterval);
 
@@ -1031,7 +1050,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
                     this.toastService.error('Lỗi kiểm tra thanh toán');
                 }
             });
-        }, 3000);
+        }, 1500);
     }
 
     private animateFly(foodId: number) {

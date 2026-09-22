@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppTableComponent } from '../../../shared/component/table/table';
 import { FilterComponent } from '../../../shared/component/filter/filter';
@@ -23,6 +23,7 @@ import { PopUpAgentFoodAddComponent } from './pop-up-agent-food-add/pop-up-agent
 import { PopUpAgentFoodDetailComponent } from './pop-up-agent-food-detail/pop-up-agent-food-detail';
 import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
+import { exportStoreFoodsExcel } from '../../../common/utils/store-food-export';
 
 interface StoreFoodFilter {
     foodName: string;
@@ -52,14 +53,18 @@ export class PageAgentFoodsComponent {
 
     storeFoods = signal<StoreFoodResponse[]>([]);
     selectedFood = signal<StoreFoodResponse | null>(null);
+    selectedFoodIds = signal<number[]>([]);
     storeRefCode = signal<string | null>(null);
 
     page = signal(1);
-    pageSize = signal(30);
+    pageSize = signal(20);
     totalPages = signal(1);
+    totalRecords = signal(0);
     loading = signal(false);
     isSubmitting = signal(false);
     isDetailLoading = signal(false);
+    isExporting = signal(false);
+    isExportMenuOpen = signal(false);
 
     isAddOpen = signal(false);
     isDetailOpen = signal(false);
@@ -86,23 +91,23 @@ export class PageAgentFoodsComponent {
 
     columns: TableColumn[] = [
         {
-            key: 'index',
-            label: 'STT',
-            width: '80px',
-            align: 'center'
-        },
-        {
-            key: 'thumbnailUrl',
-            label: 'Ảnh',
-            width: '40px',
+            key: 'selected',
+            label: '',
+            width: '50px',
             align: 'center',
-            type: 'image'
+            type: 'checkbox'
         },
         {
             key: 'foodName',
-            label: 'Tên món',
-            width: '180px',
+            label: 'Tên sản phẩm',
+            width: '260px',
+            type: 'product',
             sortable: true
+        },
+        {
+            key: 'category',
+            label: 'Danh mục',
+            width: '150px'
         },
         {
             key: 'price',
@@ -126,9 +131,18 @@ export class PageAgentFoodsComponent {
             sortable: true
         },
         {
-            key: 'isAvailable',
+            key: 'inStock',
             label: 'Trạng thái',
-            width: '150px',
+            width: '130px',
+            align: 'center',
+            type: 'status',
+            trueText: 'Còn hàng',
+            falseText: 'Hết hàng'
+        },
+        {
+            key: 'isAvailable',
+            label: 'Hiển thị',
+            width: '130px',
             align: 'center',
             type: 'toggle'
         },
@@ -157,16 +171,16 @@ export class PageAgentFoodsComponent {
             },
             {
                 key: 'isAvailable',
-                label: 'Trạng thái',
+                label: 'Hiển thị',
                 type: 'select',
-                placeholder: 'Tất cả trạng thái',
+                placeholder: 'Tất cả',
                 options: [
                     {
-                        label: 'Đang bán',
+                        label: 'Đang hiển thị',
                         value: true
                     },
                     {
-                        label: 'Ngừng bán',
+                        label: 'Đã ẩn',
                         value: false
                     }
                 ]
@@ -204,21 +218,23 @@ export class PageAgentFoodsComponent {
     }
 
     rows(): TableRow[] {
-        return this.storeFoods().map((food, index) => {
-            // Bảng quản lý món của agent — không có ngữ cảnh giỏ hàng thật, nên coi như đã đạt mọi điều
-            // kiện "mua tối thiểu" để agent luôn thấy giá khuyến mãi đã cấu hình cho món này.
+        return this.storeFoods().map(food => {
             const pricing = getPromotionalPrice(
                 food.id, food.price, this.activePromotions(),
                 Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER
             );
 
             return {
-                index: (this.page() - 1) * this.pageSize() + index + 1,
+                selected: this.isSelected(food.id),
                 id: food.id,
                 refCode: food.refCode,
                 storeRefCode: food.storeRefCode,
-                thumbnailUrl: food.thumbnailUrl,
-                foodName: food.foodName,
+                foodName: {
+                    text: food.foodName,
+                    sub: food.productCode,
+                    image: food.thumbnailUrl
+                },
+                category: this.getCategoryName(food.storeFoodCategoryId),
                 price: pricing.hasPromotion
                     ? `${this.formatCurrency(pricing.effectivePrice)} (gốc ${this.formatCurrency(pricing.originalPrice)})`
                     : this.formatCurrency(food.price),
@@ -227,6 +243,7 @@ export class PageAgentFoodsComponent {
                     : { text: '—', value: '' },
                 quantity: food.quantity,
                 description: food.description ?? '',
+                inStock: food.quantity > 0,
                 isAvailable: food.isAvailable
             };
         });
@@ -318,11 +335,13 @@ export class PageAgentFoodsComponent {
             this.page(),
             this.pageSize(),
             this.sortBy() || null,
-            this.asc()
+            this.asc(),
+            this.getIsAvailableFilter()
         ).subscribe({
             next: response => {
                 this.storeFoods.set(response.items);
                 this.totalPages.set(response.totalPages);
+                this.totalRecords.set(response.totalRecords);
                 this.loading.set(false);
             },
             error: () => {
@@ -376,6 +395,94 @@ export class PageAgentFoodsComponent {
         });
     }
 
+    toggleExportMenu(event: Event): void {
+        event.stopPropagation();
+        this.isExportMenuOpen.update(open => !open);
+    }
+
+    @HostListener('document:click')
+    closeExportMenu(): void {
+        this.isExportMenuOpen.set(false);
+    }
+
+    toggleSelected(row: TableRow, checked: boolean): void {
+        const id = Number(row['id']);
+
+        if (!id) return;
+
+        if (checked) {
+            this.selectedFoodIds.set([...new Set([...this.selectedFoodIds(), id])]);
+            return;
+        }
+
+        this.selectedFoodIds.set(this.selectedFoodIds().filter(selectedId => selectedId !== id));
+    }
+
+    toggleAllSelected(checked: boolean): void {
+        this.selectedFoodIds.set(checked ? this.storeFoods().map(f => f.id) : []);
+    }
+
+    private isSelected(foodId: number): boolean {
+        return this.selectedFoodIds().includes(foodId);
+    }
+
+    /**
+     * Xuất Excel: có chọn dòng thì chỉ xuất các dòng đã chọn (trong trang hiện tại); không chọn dòng
+     * nào thì xuất toàn bộ sản phẩm đang khớp bộ lọc, xuyên suốt mọi trang.
+     */
+    exportSelectedExcel(): void {
+        const selectedIds = this.selectedFoodIds();
+
+        if (selectedIds.length > 0) {
+            const foods = this.storeFoods().filter(f => selectedIds.includes(f.id));
+            this.runExport(foods);
+            return;
+        }
+
+        const refCode = this.storeRefCode();
+
+        if (!refCode) return;
+
+        this.isExporting.set(true);
+
+        this.storeFoodService.getByStoreRefCode(
+            refCode,
+            this.filter().categoryId || null,
+            1,
+            Math.max(this.totalRecords(), 1),
+            this.sortBy() || null,
+            this.asc(),
+            this.getIsAvailableFilter()
+        ).subscribe({
+            next: response => {
+                this.isExporting.set(false);
+                this.runExport(response.items);
+            },
+            error: () => {
+                this.isExporting.set(false);
+                this.toastService.error('Không tải được danh sách để xuất Excel');
+            }
+        });
+    }
+
+    private runExport(foods: StoreFoodResponse[]): void {
+        if (foods.length === 0) {
+            this.toastService.error('Không có sản phẩm nào để xuất');
+            return;
+        }
+
+        this.isExporting.set(true);
+
+        const categoryNameById = new Map(this.categoryDropdownOptions.map(x => [x.value, x.label]));
+
+        exportStoreFoodsExcel(foods, categoryNameById)
+            .catch(error => {
+                console.error('Xuất Excel thất bại', error);
+                this.toastService.error('Không xuất được file Excel');
+            })
+            .finally(() => this.isExporting.set(false));
+    }
+
     openDetail(row: TableRow): void {
         const id = Number(row['id']);
 
@@ -423,6 +530,7 @@ export class PageAgentFoodsComponent {
 
         const request: UpdateStoreFoodRequest = {
             foodName: food.foodName,
+            productCode: food.productCode,
             description: food.description,
             price: food.price,
             quantity: food.quantity,
@@ -515,14 +623,23 @@ export class PageAgentFoodsComponent {
         });
     }
 
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
+        this.page.set(1);
+        this.selectedFoodIds.set([]);
+        this.loadStoreFoods();
+    }
+
     onPageChange(page: number): void {
         this.page.set(page);
+        this.selectedFoodIds.set([]);
         this.loadStoreFoods();
     }
 
     onFilterChange(value: StoreFoodFilter): void {
         this.filter.set(value);
         this.page.set(1);
+        this.selectedFoodIds.set([]);
         this.loadStoreFoods();
     }
 
@@ -535,10 +652,20 @@ export class PageAgentFoodsComponent {
         }
 
         this.page.set(1);
+        this.selectedFoodIds.set([]);
         this.loadStoreFoods();
     }
 
     private formatCurrency(value: number): string {
         return `${value.toLocaleString('vi-VN')}đ`;
+    }
+
+    private getCategoryName(categoryId: number): string {
+        return this.categoryDropdownOptions.find(x => x.value === categoryId)?.label ?? '—';
+    }
+
+    private getIsAvailableFilter(): boolean | null {
+        const value = this.filter().isAvailable;
+        return value === '' ? null : value;
     }
 }

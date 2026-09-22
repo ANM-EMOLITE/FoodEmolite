@@ -37,6 +37,12 @@
           </div>
 
           <div>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Mã sản phẩm</label>
+            <input type="text" [(ngModel)]="form().productCode" placeholder="Để trống sẽ tự sinh mã"
+              class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+          </div>
+
+          <div>
             <label class="mb-1 block text-sm font-medium text-gray-300">Giá</label>
             <input type="number" [(ngModel)]="form().price"
               class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
