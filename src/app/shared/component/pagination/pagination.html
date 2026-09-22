@@ -1,79 +1,141 @@
 @if (variant() === 'admin') {
 
-<div class="flex items-center justify-end gap-2 border-t border-[#322a4a] bg-[#1a1628] px-4 py-3">
+<div class="flex flex-wrap items-center justify-between gap-3 border-t border-[#e4def7] bg-[#faf8ff] px-4 py-3">
 
-  <button
-    (click)="prev()"
-    [disabled]="currentPage() === 1"
-    class="flex h-9 w-9 items-center justify-center rounded-lg
-           border border-[#322a4a]
-           bg-[#171322]
-           text-violet-300
-           transition
-           hover:border-violet-500
-           hover:bg-violet-500/10
-           disabled:cursor-not-allowed
-           disabled:opacity-30">
+  <!-- trái: tóm tắt + chọn số bản ghi / trang -->
+  <div class="flex items-center gap-3">
 
-    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-    </svg>
+    @if (showSummary()) {
 
-  </button>
-
-  @for (page of pages(); track $index) {
-
-    @if (page === '...') {
-
-    <span class="flex h-9 w-9 items-center justify-center text-sm text-gray-500">
-      ...
+    <span class="text-sm text-[#71717a]">
+      {{ rangeText() }}
     </span>
 
-    }
-
-    @else {
-
     <button
-      (click)="go(page)"
-      class="h-9 w-9 rounded-lg text-sm font-medium transition"
+      type="button"
+      (click)="toggleSizeMenu($event)"
+      class="flex h-9 cursor-pointer items-center gap-2 rounded-lg border bg-[#ffffff] px-3 text-sm font-medium text-[#1e1b4b] transition hover:border-[#6d28d9]"
+      [class.border-[#6d28d9]]="sizeMenu()"
+      [class.border-[#e4def7]]="!sizeMenu()">
 
-      [class.bg-violet-600]="page === currentPage()"
-      [class.text-white]="page === currentPage()"
+      {{ pageSize() }} / trang
 
-      [class.border]="page !== currentPage()"
-      [class.border-[#322a4a]]="page !== currentPage()"
-      [class.bg-[#171322]]="page !== currentPage()"
-      [class.text-gray-300]="page !== currentPage()"
-      [class.hover:border-violet-500]="page !== currentPage()"
-      [class.hover:bg-violet-500/10]="page !== currentPage()">
-
-      {{ page }}
+      <svg
+        class="h-4 w-4 text-[#8b5cf6] transition-transform duration-150"
+        [class.rotate-180]="sizeMenu()"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
 
     </button>
 
     }
 
-  }
+  </div>
+
+  <!-- phải: các nút trang -->
+  <div class="flex items-center gap-2">
+
+    <button
+      (click)="prev()"
+      [disabled]="currentPage() === 1"
+      class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-[#e4def7] bg-[#ffffff] text-[#6d28d9] transition hover:border-[#6d28d9] hover:bg-[#f5f3ff] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#e4def7] disabled:hover:bg-[#ffffff]">
+
+      <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+
+    </button>
+
+    @for (page of pages(); track $index) {
+
+      @if (page === '...') {
+
+      <span class="flex h-9 w-9 items-center justify-center text-sm text-[#a1a1aa]">
+        ...
+      </span>
+
+      }
+
+      @else {
+
+      <button
+        (click)="go(page)"
+        class="h-9 min-w-9 cursor-pointer rounded-lg px-2 text-sm font-medium transition"
+
+        [class.bg-[#6d28d9]]="page === currentPage()"
+        [class.text-[#ffffff]]="page === currentPage()"
+        [class.shadow-md]="page === currentPage()"
+        [class.shadow-[#6d28d9]/30]="page === currentPage()"
+
+        [class.border]="page !== currentPage()"
+        [class.border-[#e4def7]]="page !== currentPage()"
+        [class.bg-[#ffffff]]="page !== currentPage()"
+        [class.text-[#1e1b4b]]="page !== currentPage()"
+        [class.hover:border-[#6d28d9]]="page !== currentPage()"
+        [class.hover:bg-[#f5f3ff]]="page !== currentPage()">
+
+        {{ page }}
+
+      </button>
+
+      }
+
+    }
+
+    <button
+      (click)="next()"
+      [disabled]="currentPage() >= totalPages()"
+      class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-[#e4def7] bg-[#ffffff] text-[#6d28d9] transition hover:border-[#6d28d9] hover:bg-[#f5f3ff] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#e4def7] disabled:hover:bg-[#ffffff]">
+
+      <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+      </svg>
+
+    </button>
+
+  </div>
+
+</div>
+
+@if (sizeMenu(); as menu) {
+
+<div
+  class="fixed z-50 rounded-xl border border-[#e4def7] bg-[#ffffff] p-1 shadow-xl"
+  [style.top.px]="menu.top"
+  [style.left.px]="menu.left"
+  [style.min-width.px]="menu.width"
+  (click)="$event.stopPropagation()">
+
+  @for (size of pageSizeOptions(); track size) {
 
   <button
-    (click)="next()"
-    [disabled]="currentPage() === totalPages()"
-    class="flex h-9 w-9 items-center justify-center rounded-lg
-           border border-[#322a4a]
-           bg-[#171322]
-           text-violet-300
-           transition
-           hover:border-violet-500
-           hover:bg-violet-500/10
-           disabled:cursor-not-allowed
-           disabled:opacity-30">
+    type="button"
+    (click)="selectSize(size, $event)"
+    class="flex h-9 w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-3 text-left text-sm font-medium transition hover:bg-[#f5f3ff]"
+    [class.text-[#6d28d9]]="size === pageSize()"
+    [class.text-[#1e1b4b]]="size !== pageSize()">
 
-    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    {{ size }} / trang
+
+    @if (size === pageSize()) {
+    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
     </svg>
+    }
 
   </button>
 
+  }
+
 </div>
+
+}
 
 }

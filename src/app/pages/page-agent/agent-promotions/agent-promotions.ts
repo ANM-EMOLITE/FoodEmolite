@@ -56,8 +56,9 @@ export class PageAgentPromotionsComponent {
     foodOptions = signal<DropdownOption[]>([]);
 
     page = signal(1);
-    pageSize = signal(10);
+    pageSize = signal(20);
     totalPages = signal(1);
+    totalRecords = signal(0);
     loading = signal(false);
     isSubmitting = signal(false);
 
@@ -90,6 +91,7 @@ export class PageAgentPromotionsComponent {
         {
             key: 'name',
             label: 'Tên chương trình',
+            width: '200px',
             sortable: true
         },
         {
@@ -271,6 +273,7 @@ export class PageAgentPromotionsComponent {
             next: response => {
                 this.promotions.set(response.items);
                 this.totalPages.set(response.totalPages);
+                this.totalRecords.set(response.totalRecords);
                 this.loading.set(false);
             },
             error: () => {
@@ -429,6 +432,12 @@ export class PageAgentPromotionsComponent {
                 this.toastService.error('Thao tác thất bại');
             }
         });
+    }
+
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
+        this.page.set(1);
+        this.loadPromotions();
     }
 
     onPageChange(page: number): void {

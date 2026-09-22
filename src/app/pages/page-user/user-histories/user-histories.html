@@ -104,17 +104,9 @@
                             <div class="mt-4 flex flex-wrap gap-2">
                                 <span class="inline-flex items-center rounded-full px-3 py-1
                                            text-xs font-semibold
-                                           ring-1 ring-inset" [class]="getOrderStatusBadgeClass(order.orderStatus)">
+                                           ring-1 ring-inset" [class]="getStatusBadgeClass(order)">
 
-                                    {{ getOrderStatusText(order.orderStatus) }}
-
-                                </span>
-                                <span class="inline-flex items-center rounded-full px-3 py-1
-                                           text-xs font-semibold
-                                           ring-1 ring-inset"
-                                    [class]="getPaymentStatusBadgeClass(order.paymentStatus)">
-
-                                    {{ getPaymentStatusText(order.paymentStatus) }}
+                                    {{ getStatusText(order) }}
 
                                 </span>
                             </div>

@@ -19,11 +19,30 @@ export class PageUserStoresComponent {
 
   stores = signal<StoreResponse[]>([]);
   loading = signal(false);
+  keyword = signal('');
 
   page = signal(1);
   pageSize = signal(20);
 
   featuredStore = computed<StoreResponse | null>(() => this.stores()[0] ?? null);
+
+  filteredStores = computed<StoreResponse[]>(() => {
+    const keyword = this.normalize(this.keyword());
+
+    if (!keyword) {
+      return this.stores();
+    }
+
+    return this.stores().filter(store =>
+      this.normalize(`${store.storeName} ${store.address ?? ''} ${store.description ?? ''}`).includes(keyword)
+    );
+  });
+
+  readonly steps = [
+    { title: 'Chọn cửa hàng', desc: 'Tìm quán bạn thích trong danh sách bên dưới.' },
+    { title: 'Chọn món', desc: 'Xem thực đơn, thêm món và nhận khuyến mãi.' },
+    { title: 'Đặt & thanh toán', desc: 'Tiền mặt hoặc quét mã QR chuyển khoản.' }
+  ];
 
   constructor() {
     this.loadStores();
@@ -49,6 +68,14 @@ export class PageUserStoresComponent {
     });
   }
 
+  onKeywordInput(event: Event): void {
+    this.keyword.set((event.target as HTMLInputElement).value);
+  }
+
+  clearKeyword(): void {
+    this.keyword.set('');
+  }
+
   openStoreFoods(store: StoreResponse): void {
     this.selectedStoreService.setStore(store);
     this.router.navigate([
@@ -57,5 +84,16 @@ export class PageUserStoresComponent {
       URL_ENDPOINT.USER_STORE_FOODS,
       URL_ENDPOINT.USER_ORDER
     ]);
+  }
+
+  /** Bỏ dấu + hạ chữ thường để tìm kiếm tiếng Việt không phân biệt dấu. */
+  private normalize(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .toLowerCase()
+      .trim();
   }
 }

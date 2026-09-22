@@ -1,0 +1,33 @@
+<div class="space-y-3">
+  <div>
+    <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+      Lịch Sử Hoạt Động
+    </h1>
+
+    <p class="mt-2 text-md leading-4 text-gray-500">
+      Các thao tác liên quan đến cửa hàng của bạn ({{ totalRecords() }} bản ghi)
+    </p>
+  </div>
+
+  <app-filter
+    [fields]="filterFields"
+    [initialValues]="filter()"
+    (filterChange)="onFilterChange($event)">
+  </app-filter>
+  <div></div>
+  <app-table
+    [columns]="columns"
+    [rows]="rows()"
+    [currentPage]="page()"
+    [totalPages]="totalPages()"
+    [totalRecords]="totalRecords()"
+    [pageSize]="pageSize()"
+    [loading]="loading()"
+    [sortBy]="'createdAt'"
+    [asc]="asc()"
+    emptyText="Chưa có hoạt động nào"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (sortChange)="onSortChange()">
+  </app-table>
+</div>

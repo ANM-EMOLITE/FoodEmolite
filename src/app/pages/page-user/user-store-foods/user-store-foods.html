@@ -117,14 +117,14 @@
                 @if (loading()) {
                 <div class="flex flex-col items-center justify-center py-16">
                     <div class="relative">
-                        <div class="absolute inset-0 rounded-full bg-[#1179EA]/20 blur-xl">
+                        <div class="absolute inset-0 rounded-full bg-[#6d28d9]/20 blur-xl">
                         </div>
 
                         <div class="relative h-12 w-12 animate-spin rounded-full
              border-[3px]
-             border-[#1179EA]/15
-             border-t-[#1179EA]
-             border-r-[#1179EA]">
+             border-[#6d28d9]/15
+             border-t-[#6d28d9]
+             border-r-[#6d28d9]">
                         </div>
                     </div>
                     <p class="mt-5 text-sm tracking-wide text-white/50">
@@ -152,15 +152,17 @@
         md:grid-cols-3
         lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
 
-                    @for (food of foods(); track food.id; let i = $index) {
-                    <button type="button" (click)="flyToCart(food)" [style.animation-delay.ms]="i * 30" class="food-card animate-fade-up bg-white/3 hover:bg-violet-500/10
+                    @for (food of sortedFoods(); track food.id; let i = $index) {
+                    <button type="button" (click)="flyToCart(food)" [disabled]="food.quantity === 0" [style.animation-delay.ms]="i * 30" class="food-card animate-fade-up bg-white/3 hover:bg-violet-500/10
            border border-white/5 hover:border-violet-500/25
            rounded-2xl
            p-3 md:p-4
            shadow-none hover:shadow-xl hover:shadow-violet-950/30
            transition-all duration-200
            hover:-translate-y-1
-           group text-left cursor-pointer">
+           group text-left cursor-pointer
+           disabled:cursor-not-allowed disabled:pointer-events-none"
+                        [class.opacity-50]="food.quantity === 0">
 
                         <div class="relative mb-3 md:mb-4">
                             <div class="aspect-4/3 rounded-xl overflow-hidden border border-gray-100 bg-white/5">
@@ -186,6 +188,15 @@
                             </span>
                             }
                             }
+
+                            @if (food.quantity === 0) {
+                            <div class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/70">
+                                <span
+                                    class="-rotate-6 rounded-md bg-red-600 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-white shadow-lg">
+                                    Hết hàng
+                                </span>
+                            </div>
+                            }
                         </div>
 
                         <div class="flex items-center justify-between gap-2">
@@ -195,7 +206,7 @@
 
                             @if (hasOptions(food)) {
                             <span
-                                class="flex shrink-0 items-center gap-1 rounded-full bg-[#1179EA]/20 px-2 py-0.5 text-[10px] font-semibold text-[#1179EA]">
+                                class="flex shrink-0 items-center gap-1 rounded-full bg-[#6d28d9]/20 px-2 py-0.5 text-[10px] font-semibold text-[#6d28d9]">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                                     stroke-linejoin="round">
@@ -231,10 +242,10 @@
                                     </span>
                                 </span>
                                 }
-                                <span class="flex items-center gap-1 text-sm font-bold text-[#1179EA]">
+                                <span class="flex items-center gap-1 text-sm font-bold text-[#6d28d9]">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
-                                        stroke-linejoin="round" class="text-[#1179EA]/70">
+                                        stroke-linejoin="round" class="text-[#6d28d9]/70">
                                         <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                                     </svg>
                                     {{ formatCurrency(pricing.effectivePrice) }}
@@ -242,6 +253,7 @@
                             </span>
                             }
 
+                            @if (food.quantity > 0) {
                             <div class="w-8 h-8 rounded-full
                    bg-violet-600
                    flex items-center justify-center
@@ -259,6 +271,7 @@
                                 </svg>
 
                             </div>
+                            }
                         </div>
 
                     </button>
@@ -267,12 +280,14 @@
 
                 <div class="sm:hidden">
 
-                    @for (food of foods(); track food.id; let i = $index) {
-                    <button type="button" (click)="flyToCart(food)" [style.animation-delay.ms]="i * 25" class="animate-fade-up flex w-full items-center gap-3 border-b border-white/5 py-3
+                    @for (food of sortedFoods(); track food.id; let i = $index) {
+                    <button type="button" (click)="flyToCart(food)" [disabled]="food.quantity === 0" [style.animation-delay.ms]="i * 25" class="animate-fade-up flex w-full items-center gap-3 border-b border-white/5 py-3
                    text-left transition
                    active:scale-[0.99]
                    last:border-b-0
-                   cursor-pointer">
+                   cursor-pointer
+                   disabled:cursor-not-allowed disabled:pointer-events-none"
+                        [class.opacity-50]="food.quantity === 0">
 
                         <div class="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl border border-white/5 bg-white/5">
 
@@ -299,6 +314,15 @@
                                 Khuyến mãi
                             </span>
                             }
+                            }
+
+                            @if (food.quantity === 0) {
+                            <div class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/70">
+                                <span
+                                    class="-rotate-6 rounded bg-red-600 px-1.5 py-0.5 text-[7px] font-extrabold uppercase tracking-wider text-white shadow">
+                                    Hết hàng
+                                </span>
+                            </div>
                             }
 
                         </div>
@@ -342,7 +366,7 @@
                                     {{ getDiscountBadgeText(pricing) }}
                                 </span>
                                 }
-                                <span class="text-sm font-bold text-[#1179EA]">
+                                <span class="text-sm font-bold text-[#6d28d9]">
                                     {{ formatCurrency(pricing.effectivePrice) }}
                                 </span>
                             </p>
@@ -406,10 +430,10 @@
                 </div>
                 }
 
-                @for (item of cart(); track item.id; let i = $index) {
+                @for (item of sortedCart(); track item.id; let i = $index) {
 
                 <div class="animate-fade-up border-b border-white/5 py-3 first:pt-0 last:border-b-0"
-                    [style.animation-delay.ms]="i * 30">
+                    [style.animation-delay.ms]="i * 30" [class.opacity-50]="item.food.quantity === 0">
 
                     <div class="flex gap-3">
 
@@ -432,7 +456,7 @@
                                     {{ formatCurrency(pricing.originalPrice) }}
                                 </span>
                                 }
-                                <span class="text-sm font-medium text-[#1179EA]">
+                                <span class="text-sm font-medium text-[#6d28d9]">
                                     {{ formatCurrency(pricing.effectivePrice) }}
                                 </span>
                             </p>
@@ -499,12 +523,13 @@
                             </button>
 
                             <input type="text" inputmode="numeric" pattern="[0-9]*" [value]="item.quantity"
+                                [disabled]="item.food.quantity === 0"
                                 (input)="onQuantityInput(item.id, $any($event.target))"
                                 (keydown)="blockInvalidQuantityKey($event)"
-                                class="h-8 w-14 border-x border-white/10 bg-transparent text-center text-sm font-medium text-white outline-none" />
+                                class="h-8 w-14 border-x border-white/10 bg-transparent text-center text-sm font-medium text-white outline-none disabled:cursor-not-allowed" />
 
-                            <button type="button" (click)="increase(item.id)"
-                                class="flex h-8 w-8 items-center justify-center text-white/70 transition hover:bg-violet-500/10 cursor-pointer">
+                            <button type="button" (click)="increase(item.id)" [disabled]="item.food.quantity === 0"
+                                class="flex h-8 w-8 items-center justify-center text-white/70 transition hover:bg-violet-500/10 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
                                     stroke-linejoin="round">
@@ -514,7 +539,7 @@
 
                         </div>
 
-                        <p class="text-sm font-semibold text-[#1179EA]">
+                        <p class="text-sm font-semibold text-[#6d28d9]">
                             {{ formatCurrency(getItemAmount(item)) }}
                         </p>
 
@@ -665,7 +690,7 @@
                         Tổng tiền
                     </span>
 
-                    <span class="text-lg font-bold text-[#1179EA]">
+                    <span class="text-lg font-bold text-[#6d28d9]">
                         {{ formatCurrency(totalAmount()) }}
                     </span>
                 </div>
@@ -762,9 +787,9 @@
         </div>
         }
 
-        @for (item of cart(); track item.id) {
+        @for (item of sortedCart(); track item.id) {
 
-        <div class="border-b border-white/5 py-3 first:pt-0 last:border-b-0">
+        <div class="border-b border-white/5 py-3 first:pt-0 last:border-b-0" [class.opacity-50]="item.food.quantity === 0">
 
             <div class="flex gap-3">
 
@@ -787,7 +812,7 @@
                             {{ formatCurrency(pricing.originalPrice) }}
                         </span>
                         }
-                        <span class="text-sm font-medium text-[#1179EA]">
+                        <span class="text-sm font-medium text-[#6d28d9]">
                             {{ formatCurrency(pricing.effectivePrice) }}
                         </span>
                     </p>
@@ -851,12 +876,13 @@
                     </button>
 
                     <input type="text" inputmode="numeric" pattern="[0-9]*" [value]="item.quantity"
+                        [disabled]="item.food.quantity === 0"
                         (input)="onQuantityInput(item.id, $any($event.target))"
                         (keydown)="blockInvalidQuantityKey($event)"
-                        class="h-8 w-14 border-x border-white/10 bg-transparent text-center text-sm font-medium text-white outline-none" />
+                        class="h-8 w-14 border-x border-white/10 bg-transparent text-center text-sm font-medium text-white outline-none disabled:cursor-not-allowed" />
 
-                    <button type="button" (click)="increase(item.id)"
-                        class="flex h-8 w-8 items-center justify-center text-white/70 transition hover:bg-violet-500/10 cursor-pointer">
+                    <button type="button" (click)="increase(item.id)" [disabled]="item.food.quantity === 0"
+                        class="flex h-8 w-8 items-center justify-center text-white/70 transition hover:bg-violet-500/10 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 5v14M5 12h14" />
@@ -865,7 +891,7 @@
 
                 </div>
 
-                <p class="text-sm font-semibold text-[#1179EA]">
+                <p class="text-sm font-semibold text-[#6d28d9]">
                     {{ formatCurrency(getItemAmount(item)) }}
                 </p>
 
@@ -1018,7 +1044,7 @@
                 Tổng tiền
             </span>
 
-            <span class="text-lg font-bold text-[#1179EA]">
+            <span class="text-lg font-bold text-[#6d28d9]">
                 {{ formatCurrency(totalAmount()) }}
             </span>
 
@@ -1061,7 +1087,6 @@
 </aside>
 }
 
-<!-- Popup A: Nhập tên khách (chỉ hiện khi chưa có tên) -->
 @if (isGuestNameOpen()) {
 <div class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-[#130f21] p-5 shadow-2xl">
@@ -1102,7 +1127,6 @@
 </div>
 }
 
-<!-- Popup B: Cảnh báo xác nhận đặt đơn (luôn hiện, không còn phần nhập tên) -->
 @if (isConfirmOrderOpen()) {
 <div class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-[#130f21] p-5 shadow-2xl">
@@ -1146,11 +1170,8 @@
 
 @if (isQrPopupOpen()) {
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+    <div class="w-full max-w-sm overflow-hidden rounded-3xl border border-violet-500/15 bg-[#1a1035] shadow-2xl shadow-violet-900/40">
 
-    <div
-        class="w-full max-w-sm overflow-hidden rounded-3xl border border-violet-500/15 bg-[#1a1035] shadow-2xl shadow-violet-900/40">
-
-        <!-- Header -->
         <div class="border-b border-white/5 px-6 pt-6 pb-5">
 
             <span class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-violet-400">

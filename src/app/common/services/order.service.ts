@@ -10,7 +10,6 @@ import {
     CreateOrderResponse,
     OrderResponse,
     OrderSearchRequest,
-    PrintOrdersRequest,
     UpdateOrderStatusRequest,
     UpdatePaymentStatusRequest
 } from '../models/order.model';
@@ -69,6 +68,15 @@ export class OrderService {
         );
     }
 
+    /** Chi tiết đơn hàng cho đại lý — lọc theo cửa hàng của đại lý thay vì theo khách hàng đặt đơn. */
+    getStoreDetail(
+        id: number
+    ): Observable<BaseResponse<OrderResponse>> {
+        return this.apiService.get<BaseResponse<OrderResponse>>(
+            API_ENDPOINT.ORDER.STORE_DETAIL(id)
+        );
+    }
+
     getStorePaymentInfo(orderCode: string) {
         return this.apiService.get<any>(
             API_ENDPOINT.PROFILE.STORE_PAYMENT(orderCode)
@@ -111,13 +119,6 @@ export class OrderService {
         return this.apiService.put<BaseResponse<string>, null>(
             API_ENDPOINT.ORDER.ORDER_CANCEL(id),
             null
-        );
-    }
-
-    printOrders(request: PrintOrdersRequest): Observable<Blob> {
-        return this.apiService.postBlob(
-            API_ENDPOINT.ORDER.PRINT,
-            request
         );
     }
 

@@ -20,6 +20,12 @@ export interface LoginResponse {
   expiredAt: string;
 }
 
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 export interface CurrentUserResponse {
   id: number;
   refCode: string;

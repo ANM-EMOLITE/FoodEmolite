@@ -1,0 +1,185 @@
+<div class="space-y-4">
+    <div class="flex items-center gap-3">
+        <button type="button" (click)="goBack()" title="Quay lại danh sách đơn hàng"
+            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[#322a4a] text-gray-400 transition hover:bg-violet-500/15 hover:text-violet-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6" />
+            </svg>
+        </button>
+
+        <div>
+            <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+                Chi Tiết Đơn Hàng
+            </h1>
+
+            <p class="mt-1 text-sm leading-4 text-gray-500">
+                Thông tin đơn hàng, khách hàng và danh sách món đã đặt
+            </p>
+        </div>
+    </div>
+
+    @if (loading()) {
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-8 text-center text-sm text-gray-400">
+        Đang tải...
+    </div>
+    } @else if (!order()) {
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-8 text-center text-sm text-gray-400">
+        Không tìm thấy đơn hàng
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[380px_1fr] lg:items-start">
+        <div class="space-y-4">
+            <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+                <h3 class="text-sm font-semibold text-violet-200">
+                    Thông tin đơn hàng
+                </h3>
+
+                <div class="mt-4 space-y-3 text-sm">
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Mã đơn</span>
+                        <span class="text-right font-medium text-white">{{ order()!.orderCode }}</span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Khách hàng</span>
+                        <span class="text-right font-medium text-white">{{ order()!.customerName }}</span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Thời gian tạo</span>
+                        <span class="text-right font-medium text-white">{{ formatDate(order()!.createdAt) }}</span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Phương thức thanh toán</span>
+                        <span class="text-right font-medium text-white">
+                            {{ order()!.paymentMethod === 'CASH' ? 'Tiền mặt' : 'Chuyển khoản' }}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="text-gray-400">Trạng thái</span>
+                        <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusBadgeClass()">
+                            {{ statusText() }}
+                        </span>
+                    </div>
+
+                    @if (order()!.note) {
+                    <div class="border-t border-[#322a4a] pt-3">
+                        <p class="text-gray-400">Ghi chú</p>
+                        <p class="mt-1 text-white">{{ order()!.note }}</p>
+                    </div>
+                    }
+
+                    @if (totalDiscount() > 0) {
+                    <div class="flex justify-between gap-3 border-t border-[#322a4a] pt-6">
+                        <span class="text-red-500">Tiền KM</span>
+                        <span class="font-medium text-red-500">- {{ formatCurrency(totalDiscount()) }}</span>
+                    </div>
+                    }
+
+                    <div class="flex justify-between gap-3 border-t border-[#322a4a] pt-3">
+                        <span class="text-gray-400">Tổng tiền</span>
+                        <span class="text-base font-bold text-violet-300">{{ formatCurrency(order()!.totalAmount) }}</span>
+                    </div>
+
+                    @if (canCancel() || canConfirmPayment()) {
+                    <div class="space-y-2 border-t border-[#322a4a] pt-3">
+                        @if (canConfirmPayment()) {
+                        <button type="button" (click)="confirmPayment()" [disabled]="isSubmitting()"
+                            class="flex w-full items-center justify-center gap-2 rounded-lg border border-green-600 bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
+                            Xác nhận thanh toán
+                        </button>
+                        }
+
+                        @if (canCancel()) {
+                        <button type="button" (click)="cancelOrder()" [disabled]="isSubmitting()"
+                            class="flex w-full items-center justify-center gap-2 rounded-lg border border-red-600 bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">
+                            Huỷ đơn hàng
+                        </button>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-[#322a4a] bg-[#171322] overflow-hidden">
+            <table class="w-full border-collapse text-sm text-gray-200">
+                <thead class="bg-[#1a1628]">
+                    <tr>
+                        <th class="border-b border-[#322a4a] px-4 py-3 text-left font-semibold uppercase text-violet-200" style="width: 200px;">Sản Phẩm</th>
+                        <th class="border-b border-[#322a4a] px-4 py-3 text-center font-semibold uppercase text-violet-200" style="width: 80px;">Số Lượng</th>
+                        <th class="border-b border-[#322a4a] px-4 py-3 text-right font-semibold uppercase text-violet-200" style="width: 130px;">Đơn Giá</th>
+                        <th class="border-b border-[#322a4a] px-4 py-3 text-center font-semibold uppercase text-violet-200" style="width: 130px;">Khuyến Mãi</th>
+                        <th class="border-b border-[#322a4a] px-4 py-3 text-right font-semibold uppercase text-violet-200" style="width: 130px;">Thành Tiền</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (item of order()!.items; track item.id) {
+                    <tr class="border-b border-[#322a4a] last:border-b-0">
+                        <td class="px-4 py-3 align-middle">
+                            <div class="flex items-center gap-3">
+                                <div class="h-11 w-11 shrink-0 overflow-hidden rounded-md border border-[#322a4a] bg-[#1a1628]">
+                                    @if (item.thumbnailUrl) {
+                                    <img [src]="item.thumbnailUrl" [alt]="item.foodName" class="h-full w-full object-cover" />
+                                    } @else {
+                                    <div class="flex h-full w-full items-center justify-center text-gray-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                                            <circle cx="9" cy="9" r="2" />
+                                            <path d="m21 15-5-5L5 21" />
+                                        </svg>
+                                    </div>
+                                    }
+                                </div>
+
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-medium text-white">{{ item.foodName }}</p>
+
+                                    @if (item.productCode) {
+                                    <p class="mt-0.5 text-xs text-gray-500">{{ item.productCode }}</p>
+                                    }
+
+                                    @if (item.options && item.options.length > 0) {
+                                    <div class="mt-1 space-y-0.5">
+                                        @for (option of item.options; track option.id) {
+                                        <p class="text-xs text-gray-400">
+                                            {{ option.optionGroupName }}: {{ option.optionName }}
+                                            @if (option.additionalPrice > 0) {
+                                            <span class="text-violet-300">(+{{ formatCurrency(option.additionalPrice) }})</span>
+                                            }
+                                        </p>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-center align-middle">{{ item.quantity }}</td>
+                        <td class="px-4 py-3 text-right align-middle">{{ formatCurrency(item.unitPrice) }}</td>
+                        <td class="px-4 py-3 text-center align-middle">
+                            @if (item.promotionName) {
+                            <span class="font-medium text-emerald-400">-{{ formatCurrency((item.originalUnitPrice - item.unitPrice) * item.quantity) }}</span>
+                            } @else {
+                            <span class="text-gray-600">—</span>
+                            }
+                        </td>
+                        <td class="px-4 py-3 text-right align-middle font-semibold text-white">{{ formatCurrency(item.totalPrice) }}</td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500">
+                            Đơn hàng không có món nào
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+</div>

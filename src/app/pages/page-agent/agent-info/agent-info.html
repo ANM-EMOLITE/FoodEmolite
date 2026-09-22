@@ -5,7 +5,7 @@
         Thông Tin Đại Lý
       </h1>
       <p class="mt-2 text-md leading-4 text-gray-500">
-        Quản lý thông tin cá nhân, tài khoản ngân hàng và cửa hàng
+        Quản lý thông tin cá nhân và tài khoản ngân hàng
       </p>
     </div>
   </div>
@@ -34,12 +34,6 @@
         [class.text-violet-700]="activeTab() === 'bank'" [class.border-b-2]="activeTab() === 'bank'"
         [class.border-violet-600]="activeTab() === 'bank'" [class.text-gray-500]="activeTab() !== 'bank'">
         Thông tin tài khoản ngân hàng
-      </button>
-
-      <button type="button" (click)="setTab('store')" class="px-5 py-3 text-sm font-medium transition"
-        [class.text-violet-700]="activeTab() === 'store'" [class.border-b-2]="activeTab() === 'store'"
-        [class.border-violet-600]="activeTab() === 'store'" [class.text-gray-500]="activeTab() !== 'store'">
-        Thông tin cửa hàng
       </button>
     </div>
 
@@ -194,47 +188,6 @@
           </div>
           }
         </div>
-      </div>
-      }
-
-      @if (activeTab() === 'store') {
-      <div>
-        @if (profile()?.store) {
-        <div class="grid gap-6 md:grid-cols-[180px_1fr]">
-          <div class="h-36 overflow-hidden rounded-md border border-white/5 bg-blue-50">
-            @if (profile()?.store?.thumbnailUrl) {
-            <img [src]="profile()?.store?.thumbnailUrl" class="h-full w-full object-cover" />
-            }
-          </div>
-
-          <div class="grid gap-4 md:grid-cols-2">
-            <div>
-              <p class="text-sm text-white">Tên cửa hàng</p>
-              <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.storeName }}</p>
-            </div>
-
-            <div>
-              <p class="text-sm text-white">Số điện thoại</p>
-              <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.phoneNumber || '-' }}</p>
-            </div>
-
-            <div class="md:col-span-2">
-              <p class="text-sm text-white">Địa chỉ</p>
-              <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.address || '-' }}</p>
-            </div>
-
-            <div class="md:col-span-2">
-              <p class="text-sm text-white">Mô tả</p>
-              <p class="mt-1 text-sm text-gray-500">{{ profile()?.store?.description || '-' }}</p>
-            </div>
-          </div>
-        </div>
-        } @else {
-        <div
-          class="rounded-md border border-dashed border-blue-200 bg-blue-50 px-4 py-8 text-center text-sm text-blue-500">
-          Chưa có thông tin cửa hàng
-        </div>
-        }
       </div>
       }
     </div>

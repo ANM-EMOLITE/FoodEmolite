@@ -5,10 +5,11 @@ import {
   UpdateStoreFoodRequest
 } from '../../../../common/models/store-food.model';
 import { DropdownComponent, DropdownOption } from '../../../../shared/component/dropdown/dropdown';
+import { CheckboxComponent } from '../../../../shared/component/checkbox/checkbox';
 
 @Component({
   selector: 'app-pop-up-agent-food-detail',
-  imports: [FormsModule, DropdownComponent],
+  imports: [FormsModule, DropdownComponent, CheckboxComponent],
   templateUrl: './pop-up-agent-food-detail.html'
 })
 export class PopUpAgentFoodDetailComponent implements OnChanges {
@@ -25,6 +26,7 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
 
   form = signal<UpdateStoreFoodRequest>({
     foodName: '',
+    productCode: '',
     thumbnailFile: null,
     thumbnailUrl: null,
     description: '',
@@ -39,6 +41,7 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
     if (changes['food'] && this.food) {
       this.form.set({
         foodName: this.food.foodName,
+        productCode: this.food.productCode,
         thumbnailFile: null,
         thumbnailUrl: this.food.thumbnailUrl,
         description: this.food.description,

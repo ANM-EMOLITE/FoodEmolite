@@ -4,6 +4,7 @@ import { API_ENDPOINT } from '../constants/api-endpoint';
 import { ApiService } from '../constants/api.service';
 import {
   BaseResponse,
+  ChangePasswordRequest,
   CurrentUserResponse,
   LoginRequest,
   LoginResponse,
@@ -91,6 +92,15 @@ export class AuthService {
         this.logout();
         return of(null);
       })
+    );
+  }
+
+  changePassword(
+    request: ChangePasswordRequest
+  ): Observable<BaseResponse<string>> {
+    return this.apiService.put<BaseResponse<string>, ChangePasswordRequest>(
+      API_ENDPOINT.AUTH.CHANGE_PASSWORD,
+      request
     );
   }
 

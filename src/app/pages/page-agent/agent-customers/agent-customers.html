@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-3">
   <div>
     <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
       Danh Sách Khách Hàng
@@ -9,22 +9,12 @@
     </p>
   </div>
 
-  <app-filter
-    [fields]="filterFields"
-    [initialValues]="filter()"
-    (filterChange)="onFilterChange($event)">
+  <app-filter [fields]="filterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
   </app-filter>
   <div></div>
-  <app-table
-    [columns]="columns"
-    [rows]="rows()"
-    [currentPage]="page()"
-    [totalPages]="totalPages()"
-    [loading]="loading()"
-    [sortBy]="sortBy()"
-    [asc]="asc()"
-    emptyText="Chưa có khách hàng nào"
-    (pageChange)="onPageChange($event)"
-    (sortChange)="onSortChange($event)">
+  <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
+    [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
+    [loading]="loading()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Chưa có khách hàng nào"
+    (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
   </app-table>
 </div>

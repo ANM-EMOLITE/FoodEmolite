@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-3">
   <div class="flex items-start justify-between gap-4">
     <div>
       <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
@@ -17,7 +17,7 @@
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
           <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
         </svg>
-        Tạo link đặt món
+        Tạo Link
       </button>
 
       <button type="button" (click)="openCreateModal()" [disabled]="!storeRefCode()"
@@ -29,8 +29,40 @@
           <path d="M8 12h8" />
           <path d="M12 8v8" />
         </svg>
-        Thêm món ăn
+        Thêm Sản Phẩm
       </button>
+
+      <div class="relative">
+        <button type="button" (click)="toggleExportMenu($event)" [disabled]="!storeRefCode() || isExporting()"
+          title="Thao tác"
+          class="flex h-10.5 w-10.5 items-center justify-center rounded-md border border-violet-600 text-violet-400 transition hover:bg-violet-600/10 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" x2="21" y1="6" y2="6" />
+            <line x1="8" x2="21" y1="12" y2="12" />
+            <line x1="8" x2="21" y1="18" y2="18" />
+            <line x1="3" x2="3.01" y1="6" y2="6" />
+            <line x1="3" x2="3.01" y1="12" y2="12" />
+            <line x1="3" x2="3.01" y1="18" y2="18" />
+          </svg>
+        </button>
+
+        @if (isExportMenuOpen()) {
+        <div (click)="$event.stopPropagation()"
+          class="absolute right-0 top-[calc(100%+6px)] z-20 w-44 rounded-md border border-[#322a4a] bg-[#171322] shadow-xl">
+          <button type="button" (click)="exportSelectedExcel(); isExportMenuOpen.set(false)"
+            class="flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-md px-3 text-left text-sm font-medium text-gray-200 transition hover:bg-violet-500/10">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 15V3" />
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <path d="m7 10 5 5 5-5" />
+            </svg>
+            Xuất File
+          </button>
+        </div>
+        }
+      </div>
     </div>
   </div>
 
@@ -38,9 +70,11 @@
   </app-filter>
   <div></div>
   <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
+    [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
     [loading]="loading() || isDetailLoading()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Không có món ăn"
-    (rowClick)="openDetail($event)" (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)"
-    (toggleChange)="onToggleAvailable($event)">
+    [rowClickToggle]="true" (rowDblClick)="openDetail($event)"
+    (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)" (toggleChange)="onToggleAvailable($event)"
+    (rowCheckChange)="toggleSelected($event.row, $event.checked)" (allCheckChange)="toggleAllSelected($event)">
   </app-table>
 </div>
 

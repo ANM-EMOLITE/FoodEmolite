@@ -7,8 +7,9 @@
             </h2>
 
             <p class="mt-1 text-sm text-white/40">
-                {{ order().paymentStatus === 'PAID'
-                ? 'Đơn hàng đã được thanh toán'
+                {{ isCancelled() ? 'Đơn hàng đã bị hủy'
+                : order().paymentStatus === 'PAID' ? 'Đơn hàng đã được thanh toán'
+                : isCash() ? 'Thanh toán tiền mặt khi nhận món'
                 : 'Quét mã QR để thanh toán' }}
             </p>
         </div>
@@ -35,12 +36,43 @@
 
         } @else {
 
-        @if (paymentInfo()) {
-
         <div class="space-y-4">
 
+            @if (isCancelled()) {
 
-            @if (order().paymentStatus !== 'PAID') {
+            <div class="rounded-2xl
+                        border border-red-500/20
+                        bg-red-500/10
+                        p-4">
+
+                <p class="text-sm font-semibold text-red-400">
+                    Đơn hàng đã bị hủy
+                </p>
+
+                <p class="mt-1 text-sm text-red-300/70">
+                    Đơn hàng này không còn cần thanh toán.
+                </p>
+
+            </div>
+
+            } @else if (isCash() && order().paymentStatus !== 'PAID') {
+
+            <div class="rounded-2xl
+                        border border-emerald-500/20
+                        bg-emerald-500/10
+                        p-4">
+
+                <p class="text-sm font-semibold text-emerald-400">
+                    Thanh toán tiền mặt
+                </p>
+
+                <p class="mt-1 text-sm text-emerald-300/70">
+                    Vui lòng thanh toán {{ formatCurrency(order().totalAmount) }} khi nhận món.
+                </p>
+
+            </div>
+
+            } @else if (showQr() && paymentInfo()) {
 
             <div class="rounded-2xl
                         border border-white/5
@@ -63,7 +95,7 @@
             </div>
 
 
-            } @else {
+            } @else if (order().paymentStatus === 'PAID') {
 
 
             <div class="rounded-2xl
@@ -84,8 +116,7 @@
 
             }
 
-
-
+            @if (paymentInfo()) {
             <div class="rounded-2xl
                         border border-white/5
                         bg-white/[0.03]
@@ -147,7 +178,7 @@
                 </div>
 
             </div>
-
+            }
 
 
 
@@ -316,8 +347,6 @@
 
 
         </div>
-
-        }
 
         }
 

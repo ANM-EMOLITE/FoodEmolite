@@ -70,9 +70,14 @@ export interface OrderItemResponse {
   orderId: number;
   storeFoodId: number;
   foodName: string;
+  productCode: string | null;
+  thumbnailUrl: string | null;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  originalUnitPrice: number;
+  promotionId: number | null;
+  promotionName: string | null;
   options: OrderItemOptionResponse[];
 }
 
@@ -86,15 +91,13 @@ export interface OrderItemOptionResponse {
   additionalPrice: number;
 }
 
-export interface PrintOrdersRequest {
-  orderIds: number[];
-}
-
 export interface OrderSearchRequest {
   keyword?: string | null;
   storeRefCode?: string | null;
   orderStatus?: string | null;
   paymentStatus?: string | null;
+  /** Trạng thái gộp: UNPAID | PAID | CANCELLED (đơn huỷ luôn tính là CANCELLED). */
+  status?: string | null;
   fromDate?: string | null;
   toDate?: string | null;
 }

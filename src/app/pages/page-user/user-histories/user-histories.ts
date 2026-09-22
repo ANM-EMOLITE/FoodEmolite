@@ -8,6 +8,11 @@ import { Router } from '@angular/router';
 import { OrderService } from '../../../common/services/order.service';
 import { ToastService } from '../../../common/services/toast.service';
 import { OrderResponse } from '../../../common/models/order.model';
+import {
+    getOrderDisplayStatus,
+    getOrderDisplayStatusBadgeClass,
+    ORDER_DISPLAY_STATUS_TEXT
+} from '../../../common/utils/order-status';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { PaginationComponent } from '../../../shared/component/pagination/pagination';
 import { UserOrderPaymentPopupComponent } from './user-order-payment-popup/user-order-payment-popup';
@@ -90,59 +95,11 @@ export class PageUserOrderHistoryComponent {
         return new Date(value).toLocaleString('vi-VN');
     }
 
-    getOrderStatusText(status: string): string {
-        switch (status) {
-            case 'PENDING':
-                return 'Chờ xác nhận';
-            case 'CONFIRMED':
-                return 'Đã xác nhận';
-            case 'PROCESSING':
-                return 'Đang chuẩn bị';
-            case 'COMPLETED':
-                return 'Hoàn thành';
-            case 'CANCELLED':
-                return 'Đã hủy';
-            default:
-                return status;
-        }
+    getStatusText(order: OrderResponse): string {
+        return ORDER_DISPLAY_STATUS_TEXT[getOrderDisplayStatus(order)];
     }
 
-    getPaymentStatusText(status: string): string {
-        switch (status) {
-            case 'UNPAID':
-                return 'Chưa thanh toán';
-            case 'PAID':
-                return 'Đã thanh toán';
-            default:
-                return status;
-        }
-    }
-
-    getOrderStatusBadgeClass(status: string): string {
-        switch (status) {
-            case 'PENDING':
-                return 'bg-yellow-50 text-yellow-700 ring-yellow-600/20';
-            case 'CONFIRMED':
-                return 'bg-blue-50 text-blue-700 ring-blue-600/20';
-            case 'PROCESSING':
-                return 'bg-purple-50 text-purple-700 ring-purple-600/20';
-            case 'COMPLETED':
-                return 'bg-green-50 text-green-700 ring-green-600/20';
-            case 'CANCELLED':
-                return 'bg-red-50 text-red-700 ring-red-600/20';
-            default:
-                return 'bg-gray-50 text-gray-700 ring-gray-600/20';
-        }
-    }
-
-    getPaymentStatusBadgeClass(status: string): string {
-        switch (status) {
-            case 'UNPAID':
-                return 'bg-orange-50 text-orange-700 ring-orange-600/20';
-            case 'PAID':
-                return 'bg-emerald-50 text-emerald-700 ring-emerald-600/20';
-            default:
-                return 'bg-gray-50 text-gray-700 ring-gray-600/20';
-        }
+    getStatusBadgeClass(order: OrderResponse): string {
+        return getOrderDisplayStatusBadgeClass(getOrderDisplayStatus(order));
     }
 }

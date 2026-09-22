@@ -2,7 +2,7 @@
   <div class="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
     <button type="button" class="brand-mark flex shrink-0 items-center gap-3 text-left cursor-pointer">
 
-      <div class="flex h-12 w-12 items-center justify-center rounded-md bg-violet-600 text-sm font-bold text-white">
+      <div (click)="goStores()" class="flex h-12 w-12 items-center justify-center rounded-md bg-violet-600 text-sm font-bold text-white">
         <img src="ei2.webp" class="h-8 w-8 rounded-md object-cover" />
       </div>
 
@@ -116,11 +116,10 @@
         </div>
         }
 
-        <button type="button" (click)="goLogin()" class="header-cta relative flex items-center gap-2 rounded-xl
+        <button type="button" (click)="goLogin()" class="header-cta relative flex items-center gap-2 rounded-lg
                border border-violet-500/30
                bg-violet-600 h-10 w-30 justify-center
                text-sm font-semibold text-white
-               shadow-lg shadow-violet-600/25
                transition-all duration-200
                hover:-translate-y-0.5
                hover:bg-violet-500

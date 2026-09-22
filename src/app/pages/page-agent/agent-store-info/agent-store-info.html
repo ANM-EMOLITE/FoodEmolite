@@ -1,0 +1,61 @@
+<div class="space-y-6">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+        Thông Tin Cửa Hàng
+      </h1>
+      <p class="mt-2 text-md leading-4 text-gray-500">
+        Thông tin cửa hàng của đại lý
+      </p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+  <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+    {{ errorMessage() }}
+  </div>
+  }
+
+  <div class="rounded-md border border-white/5 bg-[#171322] p-6">
+    @if (loading()) {
+    <div class="py-8 text-center text-sm text-gray-500">
+      Đang tải...
+    </div>
+    } @else if (profile()?.store) {
+    <div class="grid gap-6 md:grid-cols-[180px_1fr]">
+      <div class="h-36 overflow-hidden rounded-md border border-white/5 bg-blue-50">
+        @if (profile()?.store?.thumbnailUrl) {
+        <img [src]="profile()?.store?.thumbnailUrl" class="h-full w-full object-cover" />
+        }
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <p class="text-sm text-white">Tên cửa hàng</p>
+          <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.storeName }}</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-white">Số điện thoại</p>
+          <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.phoneNumber || '-' }}</p>
+        </div>
+
+        <div class="md:col-span-2">
+          <p class="text-sm text-white">Địa chỉ</p>
+          <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.address || '-' }}</p>
+        </div>
+
+        <div class="md:col-span-2">
+          <p class="text-sm text-white">Mô tả</p>
+          <p class="mt-1 text-sm text-gray-500">{{ profile()?.store?.description || '-' }}</p>
+        </div>
+      </div>
+    </div>
+    } @else {
+    <div
+      class="rounded-md border border-dashed border-blue-200 bg-blue-50 px-4 py-8 text-center text-sm text-blue-500">
+      Chưa có thông tin cửa hàng
+    </div>
+    }
+  </div>
+</div>

@@ -37,21 +37,11 @@
             </div>
 
             <button type="button"
-                class="rounded-lg border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
-                [disabled]="selectedOrderIds().length === 0 || isSubmitting()" (click)="confirmPaymentSelected()">
+                class="rounded-md border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="!canBulkConfirmPayment() || isSubmitting()" (click)="confirmPaymentSelected()">
                 Xác nhận thanh toán
             </button>
 
-            <button type="button"
-                class="rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                [disabled]="selectedOrderIds().length === 0 || isSubmitting()" (click)="confirmOrderSelected()">
-                Xác nhận đơn hàng
-            </button>
-            <button type="button"
-                class="rounded-lg border border-red-600 bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                [disabled]="selectedOrderIds().length === 0 || isSubmitting()" (click)="confirmCancelSelected()">
-                Huỷ đơn hàng
-            </button>
         </div>
     </div>
 
@@ -59,66 +49,62 @@
     </app-filter>
     <div></div>
     <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
+        [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
         [loading]="loading() || isSubmitting()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Không có đơn hàng"
-        (rowClick)="openDetail($event)" (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)"
-        (rowCheckChange)="toggleSelected($event.row, $event.checked)" (allCheckChange)="toggleAllSelected($event)">
+        [rowActions]="rowActions" [rowClickToggle]="true" [rowSelectable]="isSelectableRow"
+        [rowCheckDisabled]="isRowCheckDisabled" (actionClick)="onRowAction($event)" (pageChange)="onPageChange($event)"
+        (sortChange)="onSortChange($event)" (rowCheckChange)="toggleSelected($event.row, $event.checked)"
+        (allCheckChange)="toggleAllSelected($event)">
     </app-table>
 </div>
 
-@if (isDetailRendered() && selectedOrder()) {
-<app-pop-up-agent-order-detail [order]="selectedOrder()!" [isOpen]="isDetailOpen()" [isSubmitting]="isSubmitting()"
-    (closed)="closeDetail()" (submitted)="updateStatus($event)">
-</app-pop-up-agent-order-detail>
-}
-
-@if (isConfirmOpen()) {
-<app-confirm-popup [title]="confirmTitle()" [message]="confirmMessage()" confirmText="Xác nhận" cancelText="Huỷ"
-    [isSubmitting]="isSubmitting()" (confirmed)="submitConfirm()" (cancelled)="closeConfirm()">
-</app-confirm-popup>
-}
-
 @if (isInvoicePreviewOpen()) {
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-    <div class="flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-white shadow-xl">
-        <div class="flex items-center justify-between border-b px-5 py-4">
+    <div class="flex h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+        <div class="flex items-center justify-between border-b-[0.5px] px-5 py-4">
             <div>
                 <h2 class="text-base font-semibold text-gray-900">
-                    Xem trước hoá đơn
+                    Danh Sách Đơn Hàng
                 </h2>
                 <p class="mt-1 text-sm text-gray-500">
-                    Kiểm tra hoá đơn trước khi in hoặc tải xuống
+                    Kiểm tra danh sách trước khi in hoặc tải xuống
                 </p>
             </div>
 
-            <button type="button" class="rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-100"
-                (click)="closeInvoicePreview()">
+            <button type="button" class="rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 cursor-pointer" (click)="closeInvoicePreview()">
                 Đóng
             </button>
         </div>
 
         <div class="flex-1 bg-gray-100">
             @if (invoicePreviewUrl()) {
-            <iframe class="h-full w-full" [src]="invoicePreviewUrl()" type="application/pdf"></iframe>
-            }
+            <iframe class="h-full w-full" [src]="invoicePreviewUrl()"></iframe>
+            }   
         </div>
 
         <div class="flex justify-end gap-2 border-t px-5 py-4">
             <button type="button"
-                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                (click)="closeInvoicePreview()">
-                Huỷ
-            </button>
-
-            <button type="button"
-                class="rounded-lg border border-gray-700 bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                class="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 cursor-pointer"
                 (click)="downloadCurrentPreviewInvoice()">
-                Tải hoá đơn
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-arrow-down-to-line preview-icon">
+                    <path d="M12 17V3" />
+                    <path d="m6 11 6 6 6-6" />
+                    <path d="M19 21H5" />
+                </svg>
             </button>
 
             <button type="button"
-                class="rounded-lg border border-purple-600 bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 cursor-pointer"
                 (click)="printCurrentPreviewInvoice()">
-                In
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-printer preview-icon">
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                    <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
+                    <rect x="6" y="14" width="12" height="8" rx="1" />
+                </svg>
             </button>
         </div>
     </div>

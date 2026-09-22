@@ -21,6 +21,7 @@ export class PopUpAgentFoodAddComponent {
   form = signal<CreateStoreFoodRequest>({
     storeRefCode: '',
     foodName: '',
+    productCode: '',
     thumbnailFile: null,
     description: '',
     price: 0,
