@@ -1,0 +1,43 @@
+<div class="space-y-3">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+        Thông Báo
+      </h1>
+
+      <p class="mt-2 text-md leading-4 text-gray-500">
+        Tất cả thông báo của cửa hàng ({{ unreadCount() }} chưa đọc)
+      </p>
+    </div>
+
+    <button type="button" (click)="markAllRead()" [disabled]="!unreadCount() || isSubmitting()"
+      class="flex items-center gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 7 17l-5-5" />
+        <path d="m22 10-7.5 7.5L13 16" />
+      </svg>
+      Đánh dấu tất cả đã đọc
+    </button>
+  </div>
+
+  <app-filter
+    [fields]="filterFields"
+    [initialValues]="filter()"
+    (filterChange)="onFilterChange($event)">
+  </app-filter>
+  <div></div>
+  <app-table
+    [columns]="columns"
+    [rows]="rows()"
+    [currentPage]="page()"
+    [totalPages]="totalPages()"
+    [totalRecords]="totalRecords()"
+    [pageSize]="pageSize()"
+    [loading]="loading()"
+    emptyText="Chưa có thông báo nào"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (rowClick)="openNotification($event)">
+  </app-table>
+</div>

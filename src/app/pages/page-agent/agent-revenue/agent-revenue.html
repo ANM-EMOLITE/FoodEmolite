@@ -19,7 +19,7 @@
         </label>
 
         <div class="relative">
-          <button type="button" (click)="toggleFromDatePicker()" class="flex h-[42px] w-full cursor-pointer items-center justify-between
+          <button type="button" (click)="toggleFromDatePicker()" class="flex h-10.5 w-full cursor-pointer items-center justify-between
              rounded-lg border border-[#322a4a]
              bg-[#1a1628]
              px-3 text-left text-sm
@@ -47,7 +47,7 @@
 
           @if (openFromDatePicker) {
 
-          <div class="absolute left-0 top-full z-50 mt-2 w-[280px]
+          <div class="absolute left-0 top-full z-50 mt-2 w-70
              rounded-xl border border-[#322a4a]
              bg-[#171322]
              p-3 shadow-2xl">
@@ -102,7 +102,7 @@
 
             <div class="grid grid-cols-7 gap-1">
 
-             @for(day of getCalendarDays(fromCalendarMonth, fromCalendarYear); track day.value) {
+              @for(day of getCalendarDays(fromCalendarMonth, fromCalendarYear); track day.value) {
 
               <button type="button" (click)="selectFromDate(day.value)"
                 class="flex h-8 cursor-pointer items-center justify-center rounded-lg text-sm transition"
@@ -151,15 +151,14 @@
         </label>
 
         <div class="relative">
-          <button type="button" (click)="toggleToDatePicker()" class="flex h-[42px] w-full cursor-pointer items-center justify-between
+          <button type="button" (click)="toggleToDatePicker()" class="flex h-10.5 w-full cursor-pointer items-center justify-between
              rounded-lg border border-[#322a4a]
              bg-[#1a1628]
              px-3 text-left text-sm
              outline-none transition
              hover:border-violet-500/60
              focus:border-violet-500
-             focus:ring-2 focus:ring-violet-500/20" [class.text-gray-500]="!toDate()"
-            [class.text-white]="toDate()">
+             focus:ring-2 focus:ring-violet-500/20" [class.text-gray-500]="!toDate()" [class.text-white]="toDate()">
 
             <span>
               {{
@@ -179,7 +178,7 @@
 
           @if (openToDatePicker) {
 
-          <div class="absolute left-0 top-full z-50 mt-2 w-[280px]
+          <div class="absolute left-0 top-full z-50 mt-2 w-70
              rounded-xl border border-[#322a4a]
              bg-[#171322]
              p-3 shadow-2xl">
@@ -201,7 +200,7 @@
               </button>
 
               <div class="text-sm font-semibold text-violet-200">
-                Tháng {{ toCalendarMonth  + 1 }} / {{ calendarYear }}
+                Tháng {{ toCalendarMonth + 1 }} / {{ calendarYear }}
               </div>
 
               <button type="button" (click)="nextMonth()" class="flex h-8 w-8 cursor-pointer items-center justify-center
@@ -311,16 +310,46 @@
 
   </div>
 
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
     <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5 shadow-lg">
 
       <div class="flex items-center justify-between">
 
         <div>
 
-          <p class="text-sm text-gray-400">
-            Tổng số đơn hàng
+          <p class="text-sm text-gray-400 uppercase">
+            Tổng doanh thu
+          </p>
+
+          <h3 class="mt-2 text-2xl font-semibold text-white">
+            {{ formatCurrency(totalRevenue()) }}
+          </h3>
+
+        </div>
+
+        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#10b981]/10 text-[#10b981]">
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+
+            <path d="M12 1v22" />
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
+
+          </svg>
+
+        </div>
+
+      </div>
+
+    </div>
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5 shadow-lg">
+
+      <div class="flex items-center justify-between">
+
+        <div>
+
+          <p class="text-sm text-gray-400 uppercase">
+            Đơn Hàng
           </p>
 
           <h3 class="mt-2 text-2xl font-semibold text-white">
@@ -329,7 +358,7 @@
 
         </div>
 
-        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-violet-500/10 text-violet-300">
+        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#0ea5e9]/10 text-[#0ea5e9]">
 
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="2">
@@ -352,23 +381,24 @@
 
         <div>
 
-          <p class="text-sm text-gray-400">
-            Tổng doanh thu
+          <p class="text-sm text-gray-400 uppercase">
+            Đơn Hàng Huỷ
           </p>
 
-          <h3 class="mt-2 text-2xl font-semibold text-white">
-            {{ formatCurrency(totalRevenue()) }}
+          <h3 class="mt-2 text-2xl font-semibold text-[#ef4444]">
+            {{ totalCancelledOrders() }}
           </h3>
 
         </div>
 
-        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-violet-500/10 text-violet-300">
+        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#ef4444]/10 text-[#ef4444]">
 
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 
-            <path d="M12 1v22" />
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
+            <circle cx="12" cy="12" r="10" />
+            <path d="m15 9-6 6" />
+            <path d="m9 9 6 6" />
 
           </svg>
 
@@ -434,7 +464,7 @@
         <apx-chart [series]="lineChartOptions.series!" [chart]="lineChartOptions.chart!"
           [xaxis]="lineChartOptions.xaxis!" [yaxis]="lineChartOptions.yaxis!" [stroke]="lineChartOptions.stroke!"
           [dataLabels]="lineChartOptions.dataLabels!" [tooltip]="lineChartOptions.tooltip!"
-          [fill]="lineChartOptions.fill!">
+          [fill]="lineChartOptions.fill!" [colors]="lineChartOptions.colors!">
         </apx-chart>
 
         }
@@ -485,7 +515,8 @@
         <apx-chart [series]="donutChartOptions.series!" [chart]="donutChartOptions.chart!"
           [labels]="donutChartOptions.labels!" [legend]="donutChartOptions.legend!"
           [tooltip]="donutChartOptions.tooltip!" [dataLabels]="donutChartOptions.dataLabels!"
-          [plotOptions]="donutChartOptions.plotOptions!" [responsive]="donutChartOptions.responsive!">
+          [plotOptions]="donutChartOptions.plotOptions!" [responsive]="donutChartOptions.responsive!"
+          [colors]="donutChartOptions.colors!">
         </apx-chart>
 
         }

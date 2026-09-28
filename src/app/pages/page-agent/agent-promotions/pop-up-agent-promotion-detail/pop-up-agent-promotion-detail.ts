@@ -1,5 +1,13 @@
-import { Component, input, output } from '@angular/core';
-import { PromotionResponse } from '../../../../common/models/promotion.model';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { PromotionResponse, PromotionStatsResponse } from '../../../../common/models/promotion.model';
+import { PromotionService } from '../../../../common/services/promotion.service';
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+interface TimeProgress {
+    percent: number;
+    label: string;
+}
 
 const DAY_LABELS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
@@ -19,6 +27,73 @@ export class PopUpAgentPromotionDetailComponent {
     cancel = output<number>();
     delete = output<number>();
     edit = output<PromotionResponse>();
+
+    private readonly promotionService = inject(PromotionService);
+
+    readonly stats = signal<PromotionStatsResponse | null>(null);
+    readonly statsLoading = signal(false);
+
+    private loadedStatsId: number | null = null;
+
+    constructor() {
+        // Chỉ tải lại thống kê khi đổi sang chương trình khác (cập nhật trạng thái realtime không cần gọi lại).
+        effect(() => {
+            const id = this.promotion().id;
+
+            if (id === this.loadedStatsId) {
+                return;
+            }
+
+            this.loadedStatsId = id;
+            this.loadStats(id);
+        });
+    }
+
+    private loadStats(id: number): void {
+        this.stats.set(null);
+        this.statsLoading.set(true);
+
+        this.promotionService.getStats(id).subscribe({
+            next: response => {
+                if (this.promotion().id !== id) {
+                    return;
+                }
+
+                this.stats.set(response.isSuccess ? response.data : null);
+                this.statsLoading.set(false);
+            },
+            error: () => {
+                this.statsLoading.set(false);
+            }
+        });
+    }
+
+    /** Tiến độ thời gian chạy chương trình — chỉ có khi chương trình có ngày kết thúc. */
+    getTimeProgress(promotion: PromotionResponse): TimeProgress | null {
+        if (!promotion.endDate) {
+            return null;
+        }
+
+        const start = new Date(`${promotion.startDate}T00:00:00`).getTime();
+        const end = new Date(`${promotion.endDate}T00:00:00`).getTime() + DAY_MS;
+        const now = Date.now();
+        const totalDays = Math.max(1, Math.round((end - start) / DAY_MS));
+
+        if (now < start) {
+            return { percent: 0, label: `Bắt đầu sau ${Math.ceil((start - now) / DAY_MS)} ngày · tổng ${totalDays} ngày` };
+        }
+
+        if (now >= end) {
+            return { percent: 100, label: `Đã hết hạn · ${totalDays} ngày` };
+        }
+
+        const elapsedDays = Math.floor((now - start) / DAY_MS) + 1;
+
+        return {
+            percent: Math.min(100, Math.round((now - start) / (end - start) * 100)),
+            label: `Ngày ${elapsedDays}/${totalDays} · còn ${Math.ceil((end - now) / DAY_MS)} ngày`
+        };
+    }
 
     close(): void {
         this.closed.emit();

@@ -7,7 +7,8 @@ import { BaseSearchRequest } from '../models/base-search.model';
 import {
     CreatePromotionRequest,
     PromotionResponse,
-    PromotionSearchRequest
+    PromotionSearchRequest,
+    PromotionStatsResponse
 } from '../models/promotion.model';
 
 @Injectable({
@@ -31,6 +32,12 @@ export class PromotionService {
     getDetail(id: number): Observable<BaseResponse<PromotionResponse>> {
         return this.apiService.get<BaseResponse<PromotionResponse>>(
             API_ENDPOINT.PROMOTION.DETAIL(id)
+        );
+    }
+
+    getStats(id: number): Observable<BaseResponse<PromotionStatsResponse>> {
+        return this.apiService.get<BaseResponse<PromotionStatsResponse>>(
+            API_ENDPOINT.PROMOTION.STATS(id)
         );
     }
 

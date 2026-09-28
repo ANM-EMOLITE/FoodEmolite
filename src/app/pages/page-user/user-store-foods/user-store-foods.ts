@@ -15,6 +15,7 @@ import { OrderService } from '../../../common/services/order.service';
 import { AuthService } from '../../../common/services/auth.service';
 import { PromotionService } from '../../../common/services/promotion.service';
 import { RealtimeService } from '../../../common/services/realtime.service';
+import { PosSearchService } from '../../../common/services/pos-search.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
 import { PromotionResponse } from '../../../common/models/promotion.model';
 import { PaymentMethod, SelectedGiftRequest, SelectedStoreWideDiscountRequest } from '../../../common/models/order.model';
@@ -70,6 +71,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     private readonly guestService = inject(GuestService)
     private readonly promotionService = inject(PromotionService);
     private readonly realtimeService = inject(RealtimeService);
+    private readonly posSearchService = inject(PosSearchService);
     private paymentInterval: any;
     private nextCartItemId = 1;
 
@@ -89,10 +91,14 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     foods = signal<StoreFoodResponse[]>([]);
     cart = signal<CartItem[]>([]);
 
-    /** Danh sách món để hiển thị — món hết hàng bị đẩy xuống cuối, không đổi thứ tự trong `foods()` gốc. */
-    sortedFoods = computed(() =>
-        [...this.foods()].sort((a, b) => (a.quantity === 0 ? 1 : 0) - (b.quantity === 0 ? 1 : 0))
-    );
+    /** Danh sách món để hiển thị — lọc theo ô tìm kiếm của POS (nếu có), món hết hàng bị đẩy xuống cuối, không đổi thứ tự trong `foods()` gốc. */
+    sortedFoods = computed(() => {
+        const keyword = this.posSearchService.keyword().trim().toLowerCase();
+
+        return this.foods()
+            .filter(food => !keyword || food.foodName.toLowerCase().includes(keyword))
+            .sort((a, b) => (a.quantity === 0 ? 1 : 0) - (b.quantity === 0 ? 1 : 0));
+    });
 
     /** Danh sách giỏ hàng để hiển thị — món đã hết hàng bị đẩy xuống cuối, không đổi thứ tự trong `cart()` gốc. */
     sortedCart = computed(() =>

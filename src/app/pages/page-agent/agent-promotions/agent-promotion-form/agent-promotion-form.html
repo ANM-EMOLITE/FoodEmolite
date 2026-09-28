@@ -1,0 +1,436 @@
+<div class="space-y-4">
+  <div class="flex items-center gap-3">
+    <button type="button" (click)="goBack()" title="Quay lại danh sách khuyến mãi"
+      class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[#322a4a] text-gray-400 transition hover:bg-violet-500/15 hover:text-violet-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </button>
+
+    <div>
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+        {{ isEditMode() ? 'Chỉnh Sửa Khuyến Mãi' : 'Tạo Khuyến Mãi' }}
+      </h1>
+      <p class="mt-1 text-sm leading-4 text-gray-500">
+        {{ isEditMode() ? 'Chương trình đang ở dạng nháp — chỉnh sửa xong bấm "Lưu & kích hoạt" để áp dụng' : 'Chọn loại chương trình, thời gian, điều kiện và các món áp dụng' }}
+      </p>
+    </div>
+  </div>
+
+  @if (loading()) {
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-8 text-center text-sm text-gray-400">
+    Đang tải...
+  </div>
+  } @else {
+  <div class="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_320px] xl:items-start">
+
+    <!-- ===== Cột trái: form ===== -->
+    <div class="space-y-4">
+
+      <!-- 1. Loại chương trình -->
+      <section class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+        <h3 class="text-sm font-semibold text-violet-200">1. Loại chương trình</h3>
+
+        <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          @for (type of typeOptions; track type.value) {
+          <button type="button" (click)="selectType(type.value)"
+            class="rounded-lg border px-4 py-3 text-left transition"
+            [class.border-violet-500]="form().promotionType === type.value"
+            [class.bg-violet-500/15]="form().promotionType === type.value"
+            [class.border-[#322a4a]]="form().promotionType !== type.value">
+            <span class="block text-sm font-semibold"
+              [class.text-violet-300]="form().promotionType === type.value"
+              [class.text-gray-200]="form().promotionType !== type.value">
+              {{ type.label }}
+            </span>
+            <span class="mt-1 block text-xs text-gray-500">{{ type.description }}</span>
+          </button>
+          }
+        </div>
+      </section>
+
+      <!-- 2. Thông tin chung -->
+      <section class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+        <h3 class="text-sm font-semibold text-violet-200">2. Thông tin chung</h3>
+
+        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_220px]">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Tên chương trình <span class="text-red-400">*</span></label>
+            <input type="text" [ngModel]="form().name" (ngModelChange)="patchForm({ name: $event })"
+              placeholder="Ví dụ: Đồng giá 29k mọi món"
+              class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Mã khuyến mãi</label>
+            <input type="text" [ngModel]="form().promotionCode" (ngModelChange)="patchForm({ promotionCode: $event })"
+              placeholder="Không bắt buộc, vd: SALE29"
+              class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm uppercase text-white placeholder:normal-case placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="mb-1 block text-sm font-medium text-gray-300">Mô tả</label>
+            <textarea rows="2" [ngModel]="form().description" (ngModelChange)="patchForm({ description: $event })"
+              placeholder="Mô tả ngắn cho khách hàng (không bắt buộc)"
+              class="w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 py-2 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Thời gian áp dụng -->
+      <section class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+        <h3 class="text-sm font-semibold text-violet-200">3. Thời gian áp dụng</h3>
+
+        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Ngày bắt đầu <span class="text-red-400">*</span></label>
+            <app-date-picker [value]="form().startDate" placeholder="Chọn ngày bắt đầu"
+              (valueChange)="patchForm({ startDate: $event })">
+            </app-date-picker>
+          </div>
+
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="block text-sm font-medium text-gray-300">Ngày kết thúc</label>
+              <label class="flex cursor-pointer items-center gap-1.5 text-xs text-gray-400">
+                <app-checkbox [checked]="form().hasEndDate" (changed)="patchForm({ hasEndDate: $event })" />
+                Có ngày kết thúc
+              </label>
+            </div>
+
+            @if (form().hasEndDate) {
+            <app-date-picker [value]="form().endDate" placeholder="Chọn ngày kết thúc"
+              (valueChange)="patchForm({ endDate: $event })">
+            </app-date-picker>
+            } @else {
+            <div class="flex h-[42px] items-center rounded-lg border border-dashed border-[#322a4a] px-3 text-sm text-gray-500">
+              Không giới hạn
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Khung giờ</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" (click)="patchForm({ allDay: true })"
+                class="h-[42px] rounded-lg border text-sm font-medium transition"
+                [class.border-violet-500]="form().allDay" [class.bg-violet-500/15]="form().allDay"
+                [class.text-violet-300]="form().allDay" [class.border-[#322a4a]]="!form().allDay"
+                [class.text-gray-400]="!form().allDay">
+                Cả ngày
+              </button>
+              <button type="button" (click)="patchForm({ allDay: false })"
+                class="h-[42px] rounded-lg border text-sm font-medium transition"
+                [class.border-violet-500]="!form().allDay" [class.bg-violet-500/15]="!form().allDay"
+                [class.text-violet-300]="!form().allDay" [class.border-[#322a4a]]="form().allDay"
+                [class.text-gray-400]="form().allDay">
+                Theo khung giờ
+              </button>
+            </div>
+
+            @if (!form().allDay) {
+            <div class="mt-2 flex items-center gap-2">
+              <input type="time" [ngModel]="form().startTime" (ngModelChange)="patchForm({ startTime: $event })"
+                class="h-[42px] flex-1 rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+              <span class="text-gray-500">–</span>
+              <input type="time" [ngModel]="form().endTime" (ngModelChange)="patchForm({ endTime: $event })"
+                class="h-[42px] flex-1 rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+            </div>
+            }
+          </div>
+
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="block text-sm font-medium text-gray-300">Ngày trong tuần</label>
+              <div class="flex gap-2 text-xs">
+                <button type="button" (click)="setDaysPreset('ALL')" class="text-violet-300 hover:text-violet-200">Cả tuần</button>
+                <span class="text-gray-600">·</span>
+                <button type="button" (click)="setDaysPreset('WEEKDAYS')" class="text-violet-300 hover:text-violet-200">T2–T6</button>
+                <span class="text-gray-600">·</span>
+                <button type="button" (click)="setDaysPreset('WEEKEND')" class="text-violet-300 hover:text-violet-200">Cuối tuần</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-7 gap-1.5">
+              @for (label of dayLabels; track $index) {
+              <button type="button" (click)="toggleDay($index)"
+                class="h-[42px] rounded-lg border text-sm font-medium transition"
+                [class.border-violet-500]="form().selectedDays[$index]"
+                [class.bg-violet-500/15]="form().selectedDays[$index]"
+                [class.text-violet-300]="form().selectedDays[$index]"
+                [class.border-[#322a4a]]="!form().selectedDays[$index]"
+                [class.text-gray-500]="!form().selectedDays[$index]">
+                {{ label }}
+              </button>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Điều kiện -->
+      <section class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+        <h3 class="text-sm font-semibold text-violet-200">
+          4. Điều kiện áp dụng
+          @if (form().promotionType === 'BUY_X_GET_Y') {
+          <span class="ml-1 font-normal text-amber-400">(bắt buộc — đây là điều kiện "Mua X")</span>
+          }
+        </h3>
+
+        <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          @for (cond of conditionOptions; track cond.value) {
+          <button type="button" (click)="patchForm({ conditionType: cond.value })"
+            [disabled]="cond.value === 'NONE' && form().promotionType === 'BUY_X_GET_Y'"
+            class="h-[42px] rounded-lg border text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
+            [class.border-violet-500]="form().conditionType === cond.value"
+            [class.bg-violet-500/15]="form().conditionType === cond.value"
+            [class.text-violet-300]="form().conditionType === cond.value"
+            [class.border-[#322a4a]]="form().conditionType !== cond.value"
+            [class.text-gray-400]="form().conditionType !== cond.value">
+            {{ cond.label }}
+          </button>
+          }
+        </div>
+
+        @if (form().conditionType === 'MIN_ORDER_AMOUNT') {
+        <div class="mt-3 sm:w-1/2">
+          <label class="mb-1 block text-xs text-gray-400">Giá trị đơn hàng tối thiểu (đ)</label>
+          <input type="number" min="0" step="1000" [ngModel]="form().conditionMinAmount"
+            (ngModelChange)="patchForm({ conditionMinAmount: $event })" placeholder="Vd: 100000"
+            class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+        </div>
+        }
+
+        @if (form().conditionType === 'MIN_QUANTITY') {
+        <div class="mt-3 sm:w-1/2">
+          <label class="mb-1 block text-xs text-gray-400">Số lượng món tối thiểu</label>
+          <input type="number" min="1" [ngModel]="form().conditionMinQuantity"
+            (ngModelChange)="patchForm({ conditionMinQuantity: $event })" placeholder="Vd: 2"
+            class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+        </div>
+        }
+      </section>
+
+      <!-- 5. Món áp dụng & mức khuyến mãi -->
+      <section class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+        <h3 class="text-sm font-semibold text-violet-200">
+          5. {{ form().promotionType === 'BUY_X_GET_Y' ? 'Món quà tặng (Y)' : 'Món áp dụng & mức khuyến mãi' }}
+        </h3>
+
+        @if (form().promotionType === 'PRODUCT_DISCOUNT') {
+        <label class="mt-3 flex cursor-pointer items-start gap-2.5 rounded-lg border border-[#322a4a] bg-[#1a1628] p-3">
+          <span class="mt-0.5"><app-checkbox [checked]="form().applyToAllProducts" (changed)="patchForm({ applyToAllProducts: $event })" /></span>
+          <span>
+            <span class="block text-sm font-medium text-gray-200">Áp dụng cho toàn bộ sản phẩm (khách tự chọn 1 món)</span>
+            <span class="block text-xs text-gray-500">
+              Không cần chọn danh sách món — lúc thanh toán khách chọn 1 món bất kỳ để nhận giảm giá.
+              Mỗi khách (theo tài khoản hoặc thiết bị) chỉ dùng được 1 lần.
+            </span>
+          </span>
+        </label>
+        }
+
+        <!-- Mức khuyến mãi dùng chung -->
+        @if (!usesFoodList() || syncValues()) {
+        <div class="mt-3 rounded-lg border border-violet-500/40 bg-violet-500/5 p-3">
+          <p class="mb-2 text-xs font-medium text-violet-300">
+            {{ usesFoodList() ? 'Mức áp dụng chung cho tất cả món đã chọn' : 'Mức giảm' }}
+          </p>
+          <ng-container *ngTemplateOutlet="valueInputs; context: { $implicit: sharedValue(), shared: true, id: 0 }"></ng-container>
+        </div>
+        }
+
+        @if (usesFoodList()) {
+        <!-- Thanh công cụ danh sách món -->
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <div class="relative min-w-[200px] flex-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input type="text" [ngModel]="foodKeyword()" (ngModelChange)="foodKeyword.set($event)" placeholder="Tìm món..."
+              class="h-[38px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] pl-9 pr-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+          </div>
+
+          <label class="flex cursor-pointer items-center gap-1.5 text-xs text-gray-400">
+            <app-checkbox [checked]="showSelectedOnly()" (changed)="showSelectedOnly.set($event)" />
+            Chỉ hiện món đã chọn
+          </label>
+
+          <label class="flex cursor-pointer items-center gap-1.5 text-xs text-gray-400"
+            title="Tắt để nhập mức khác nhau cho từng món">
+            <app-checkbox [checked]="syncValues()" (changed)="setSyncValues($event)" />
+            Cùng một mức cho tất cả món
+          </label>
+        </div>
+
+        <div class="mt-3 overflow-hidden rounded-lg border border-[#322a4a]">
+          <div class="flex items-center justify-between gap-3 border-b border-[#322a4a] bg-[#1a1628] px-3 py-2">
+            <label class="flex cursor-pointer items-center gap-2 text-sm text-gray-300">
+              <app-checkbox [checked]="allFilteredSelected()" [indeterminate]="someFilteredSelected()" [disabled]="!filteredFoods().length" (changed)="toggleSelectAllFiltered()" />
+              Chọn tất cả {{ foodKeyword() ? 'món đang lọc' : 'món' }}
+            </label>
+
+            <div class="flex items-center gap-3 text-xs">
+              <span class="text-gray-400">Đã chọn <span class="font-semibold text-violet-300">{{ selectedCount() }}</span> / {{ foods().length }} món</span>
+              @if (selectedCount()) {
+              <button type="button" (click)="clearSelection()" class="text-gray-400 hover:text-red-300">Bỏ chọn</button>
+              }
+            </div>
+          </div>
+
+          <div class="custom-scroll max-h-[420px] overflow-y-auto">
+            @for (food of filteredFoods(); track food.id) {
+            <div class="flex flex-wrap items-center gap-3 border-t border-[#322a4a] px-3 py-2.5 transition first:border-t-0"
+              [class.bg-violet-500/5]="isSelected(food.id)">
+              <label class="flex min-w-[180px] flex-1 cursor-pointer items-center gap-2.5">
+                <app-checkbox [checked]="isSelected(food.id)" (changed)="toggleFood(food.id)" />
+                <span class="min-w-0">
+                  <span class="block truncate text-sm text-gray-200">{{ food.name }}</span>
+                  <span class="block text-xs text-gray-500">
+                    @if (isSelected(food.id) && previewPrice(food) !== null) {
+                    <span class="line-through">{{ formatCurrency(food.price) }}</span>
+                    <span class="ml-1 font-medium text-emerald-400">{{ formatCurrency(previewPrice(food)!) }}</span>
+                    @if (form().promotionType === 'FIXED_PRICE' && previewPrice(food)! >= food.price) {
+                    <span class="ml-1 text-amber-400">(không rẻ hơn giá gốc)</span>
+                    }
+                    } @else {
+                    {{ formatCurrency(food.price) }}
+                    }
+                  </span>
+                </span>
+              </label>
+
+              @if (isSelected(food.id) && !syncValues()) {
+              <div class="w-full sm:w-auto">
+                <ng-container *ngTemplateOutlet="valueInputs; context: { $implicit: valueOf(food.id), shared: false, id: food.id }"></ng-container>
+              </div>
+              }
+            </div>
+            } @empty {
+            <div class="px-3 py-6 text-center text-sm text-gray-500">
+              {{ foods().length ? 'Không có món phù hợp' : 'Cửa hàng chưa có món nào' }}
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </section>
+    </div>
+
+    <!-- ===== Cột phải: tóm tắt & lưu ===== -->
+    <aside class="space-y-3 xl:sticky xl:top-4">
+      <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+        <h3 class="text-sm font-semibold text-violet-200">Tóm tắt</h3>
+
+        <dl class="mt-4 space-y-3 text-sm">
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Tên</dt>
+            <dd class="text-right font-medium text-white">{{ form().name || '—' }}</dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Loại</dt>
+            <dd class="text-right font-medium text-white">{{ typeLabel() }}</dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Thời gian</dt>
+            <dd class="text-right font-medium text-white">{{ scheduleSummary() }}</dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Khung giờ</dt>
+            <dd class="text-right font-medium text-white">{{ timeSummary() }}</dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Ngày áp dụng</dt>
+            <dd class="text-right font-medium text-white">{{ daysSummary() }}</dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Điều kiện</dt>
+            <dd class="text-right font-medium text-white">{{ conditionSummary() }}</dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Món áp dụng</dt>
+            <dd class="text-right font-medium text-white">
+              {{ usesFoodList() ? selectedCount() + ' món' : 'Toàn bộ sản phẩm' }}
+            </dd>
+          </div>
+          <div class="flex justify-between gap-3">
+            <dt class="text-gray-400">Mức KM</dt>
+            <dd class="text-right font-medium text-emerald-400">{{ valueSummary() }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <button type="button" (click)="submit(false)" [disabled]="isSubmitting()"
+          class="rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ isSubmitting() ? 'Đang lưu...' : 'Lưu & kích hoạt' }}
+        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" (click)="submit(true)" [disabled]="isSubmitting()"
+            class="rounded-md border border-[#322a4a] bg-[#1a1628] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:border-violet-500 hover:bg-violet-500/10 disabled:cursor-not-allowed disabled:opacity-50">
+            Lưu nháp
+          </button>
+          <button type="button" (click)="goBack()"
+            class="rounded-md border border-[#322a4a] bg-[#1a1628] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:border-violet-500 hover:bg-violet-500/10">
+            Huỷ
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+  }
+</div>
+
+<!-- Ô nhập mức khuyến mãi — dùng cho mức chung (shared) và cho từng món -->
+<ng-template #valueInputs let-value let-shared="shared" let-id="id">
+  @switch (form().promotionType) {
+  @case ('FIXED_PRICE') {
+  <div class="flex items-center gap-2">
+    <input type="number" min="0" step="1000" [ngModel]="value.fixedPrice"
+      (ngModelChange)="shared ? patchShared({ fixedPrice: $event }) : patchItem(id, { fixedPrice: $event })"
+      placeholder="Giá đồng giá (đ)"
+      class="h-[38px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500 sm:w-44" />
+  </div>
+  }
+  @case ('PRODUCT_DISCOUNT') {
+  <div class="flex flex-wrap items-center gap-2">
+    <div class="inline-flex overflow-hidden rounded-lg border border-[#322a4a]">
+      <button type="button"
+        (click)="shared ? patchShared({ discountType: 'PERCENT' }) : patchItem(id, { discountType: 'PERCENT' })"
+        class="h-[36px] px-3 text-sm transition"
+        [class.bg-violet-500/20]="value.discountType === 'PERCENT'" [class.text-violet-300]="value.discountType === 'PERCENT'"
+        [class.text-gray-400]="value.discountType !== 'PERCENT'">%</button>
+      <button type="button"
+        (click)="shared ? patchShared({ discountType: 'AMOUNT' }) : patchItem(id, { discountType: 'AMOUNT' })"
+        class="h-[36px] border-l border-[#322a4a] px-3 text-sm transition"
+        [class.bg-violet-500/20]="value.discountType === 'AMOUNT'" [class.text-violet-300]="value.discountType === 'AMOUNT'"
+        [class.text-gray-400]="value.discountType !== 'AMOUNT'">đ</button>
+    </div>
+
+    <input type="number" min="0" [ngModel]="value.discountValue"
+      (ngModelChange)="shared ? patchShared({ discountValue: $event }) : patchItem(id, { discountValue: $event })"
+      [placeholder]="value.discountType === 'PERCENT' ? '% giảm' : 'Số tiền giảm'"
+      class="h-[38px] w-28 rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+
+    @if (value.discountType === 'PERCENT') {
+    <input type="number" min="0" step="1000" [ngModel]="value.maxDiscountAmount"
+      (ngModelChange)="shared ? patchShared({ maxDiscountAmount: $event }) : patchItem(id, { maxDiscountAmount: $event })"
+      placeholder="Giảm tối đa (đ)"
+      class="h-[38px] w-36 rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+    }
+  </div>
+  }
+  @case ('BUY_X_GET_Y') {
+  <div class="flex items-center gap-2">
+    <span class="text-xs text-gray-400">Số lượng tặng</span>
+    <input type="number" min="1" [ngModel]="value.giftQuantity"
+      (ngModelChange)="shared ? patchShared({ giftQuantity: $event }) : patchItem(id, { giftQuantity: $event })"
+      class="h-[38px] w-24 rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white outline-none transition hover:border-violet-500/60 focus:border-violet-500" />
+  </div>
+  }
+  }
+</ng-template>

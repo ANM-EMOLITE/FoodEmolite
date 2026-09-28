@@ -8,6 +8,7 @@ import { LayoutAgentComponent } from './layouts/layout-agent/layout-agent';
 import { PageAgentInfoComponent } from './pages/page-agent/agent-info/agent-info';
 import { PageAgentFoodsComponent } from './pages/page-agent/agent-foods/agent-foods';
 import { LayoutUserComponent } from './layouts/layout-user/layout-user';
+import { LayoutPosComponent } from './layouts/layout-pos/layout-pos';
 import { PageUserStoresComponent } from './pages/page-user/user-stores/user-stores';
 import { PageUserStoreFoodsComponent } from './pages/page-user/user-store-foods/user-store-foods';
 import { PageUserOrderHistoryComponent } from './pages/page-user/user-histories/user-histories';
@@ -17,10 +18,12 @@ import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-re
 import { PageOrderSuccessComponent } from './pages/page-user/order-success/order-success';
 import { PageAgentFoodCategoriesComponent } from './pages/page-agent/agent-food-categories/agent-food-categories';
 import { PageAgentPromotionsComponent } from './pages/page-agent/agent-promotions/agent-promotions';
+import { PageAgentPromotionFormComponent } from './pages/page-agent/agent-promotions/agent-promotion-form/agent-promotion-form';
 import { AgentProductRevenueComponent } from './pages/page-agent/agent-product-revenue/agent-product-revenue';
 import { PageAgentCustomersComponent } from './pages/page-agent/agent-customers/agent-customers';
 import { PageAgentActivityLogsComponent } from './pages/page-agent/agent-activity-logs/agent-activity-logs';
 import { PageAgentSettingsComponent } from './pages/page-agent/agent-settings/agent-settings';
+import { PageAgentNotificationsComponent } from './pages/page-agent/agent-notifications/agent-notifications';
 import { PageAgentStoreInfoComponent } from './pages/page-agent/agent-store-info/agent-store-info';
 
 export const routes: Routes = [
@@ -95,6 +98,20 @@ export const routes: Routes = [
         }
       },
       {
+        path: URL_ENDPOINT.AGENT_PROMOTION_CREATE,
+        component: PageAgentPromotionFormComponent,
+        data: {
+          title: 'Tạo khuyến mãi'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_PROMOTION_EDIT,
+        component: PageAgentPromotionFormComponent,
+        data: {
+          title: 'Chỉnh sửa khuyến mãi'
+        }
+      },
+      {
         path: URL_ENDPOINT.AGENT_REVENUE,
         component: AgentRevenueComponent,
         data: {
@@ -123,6 +140,13 @@ export const routes: Routes = [
         }
       },
       {
+        path: URL_ENDPOINT.AGENT_NOTIFICATIONS,
+        component: PageAgentNotificationsComponent,
+        data: {
+          title: 'Thông báo'
+        }
+      },
+      {
         path: URL_ENDPOINT.AGENT_SETTINGS,
         component: PageAgentSettingsComponent,
         data: {
@@ -136,6 +160,20 @@ export const routes: Routes = [
           title: 'Thông tin cửa hàng'
         }
       },
+    ]
+  },
+
+  {
+    path: URL_ENDPOINT.POS,
+    component: LayoutPosComponent,
+    children: [
+      {
+        path: '',
+        component: PageUserStoreFoodsComponent,
+        data: {
+          title: 'Bán hàng tại quầy'
+        }
+      }
     ]
   },
 

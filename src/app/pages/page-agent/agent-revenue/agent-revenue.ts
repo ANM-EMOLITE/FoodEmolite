@@ -29,6 +29,7 @@ import {
 } from '../../../common/models/revenue.model';
 
 import { DropdownComponent, DropdownOption } from '../../../shared/component/dropdown/dropdown';
+import { ORDER_DISPLAY_STATUS_TEXT, OrderDisplayStatus } from '../../../common/utils/order-status';
 
 export type LineChartOptions = {
     series: ApexAxisChartSeries;
@@ -39,7 +40,17 @@ export type LineChartOptions = {
     dataLabels: ApexDataLabels;
     tooltip: ApexTooltip;
     fill: ApexFill;
+    colors: string[];
 };
+
+/** Màu dùng chung cho thẻ số liệu và biểu đồ — thẻ nào màu gì thì series tương ứng trên chart cùng màu đó. */
+const CHART_COLORS = {
+    revenue: '#10b981',
+    orders: '#0ea5e9',
+    PAID: '#10b981',
+    UNPAID: '#f59e0b',
+    CANCELLED: '#ef4444'
+} as const;
 
 export type DonutChartOptions = {
     series: ApexNonAxisChartSeries;
@@ -50,6 +61,7 @@ export type DonutChartOptions = {
     dataLabels: ApexDataLabels;
     plotOptions: ApexPlotOptions;
     responsive: ApexResponsive[];
+    colors: string[];
 };
 
 @Component({
@@ -99,6 +111,7 @@ export class AgentRevenueComponent {
     ];
 
     readonly totalOrders = signal(0);
+    readonly totalCancelledOrders = signal(0);
     readonly totalRevenue = signal(0);
 
     lineChartOptions: Partial<LineChartOptions> = this.getDefaultLineChartOptions();
@@ -122,6 +135,7 @@ export class AgentRevenueComponent {
                     if (!res.isSuccess || !res.data) {
                         this.data.set(null);
                         this.totalOrders.set(0);
+                        this.totalCancelledOrders.set(0);
                         this.totalRevenue.set(0);
                         this.updateCharts(null);
                         return;
@@ -129,6 +143,7 @@ export class AgentRevenueComponent {
 
                     this.data.set(res.data);
                     this.totalOrders.set(res.data.totalOrders);
+                    this.totalCancelledOrders.set(res.data.totalCancelledOrders ?? 0);
                     this.totalRevenue.set(res.data.totalRevenue);
                     this.updateCharts(res.data);
                 },
@@ -199,7 +214,8 @@ export class AgentRevenueComponent {
         this.donutChartOptions = {
             ...this.getDefaultDonutChartOptions(),
             series: pieItems.map(x => x.value),
-            labels: pieItems.map(x => this.getStatusLabel(x.label))
+            labels: pieItems.map(x => this.getStatusLabel(x.label)),
+            colors: pieItems.map(x => CHART_COLORS[x.label as keyof typeof CHART_COLORS] ?? '#a78bfa')
         };
     }
 
@@ -226,6 +242,7 @@ export class AgentRevenueComponent {
                 },
                 fontFamily: 'inherit'
             },
+            colors: [CHART_COLORS.revenue, CHART_COLORS.orders],
             stroke: {
                 curve: 'smooth',
                 width: [3, 2]
@@ -278,6 +295,7 @@ export class AgentRevenueComponent {
         return {
             series: [],
             labels: [],
+            colors: [],
             chart: {
                 type: 'donut',
                 height: 330,
@@ -531,20 +549,7 @@ export class AgentRevenueComponent {
         );
     }
 
-    private readonly orderStatusMap: Record<string, string> = {
-        PENDING: 'Chờ xác nhận',
-        CONFIRMED: 'Đã xác nhận',
-        CANCELLED: 'Đã huỷ'
-    };
-
-    private readonly paymentStatusMap: Record<string, string> = {
-        UNPAID: 'Chưa thanh toán',
-        PAID: 'Đã thanh toán'
-    };
-
     private getStatusLabel(value: string): string {
-        return this.orderStatusMap[value] ??
-            this.paymentStatusMap[value] ??
-            value;
+        return ORDER_DISPLAY_STATUS_TEXT[value as OrderDisplayStatus] ?? value;
     }
 }

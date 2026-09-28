@@ -98,6 +98,10 @@ export interface OrderSearchRequest {
   paymentStatus?: string | null;
   /** Trạng thái gộp: UNPAID | PAID | CANCELLED (đơn huỷ luôn tính là CANCELLED). */
   status?: string | null;
+  /** Loại khuyến mãi đã áp trong đơn: FIXED_PRICE | PRODUCT_DISCOUNT | BUY_X_GET_Y | NONE (không có khuyến mãi). */
+  promotionType?: string | null;
+  /** Từ khoá lọc theo tên / mã khuyến mãi đã áp trong đơn. */
+  promotionKeyword?: string | null;
   fromDate?: string | null;
   toDate?: string | null;
 }
