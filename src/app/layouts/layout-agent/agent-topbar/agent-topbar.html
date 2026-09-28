@@ -1,28 +1,49 @@
 <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/5 bg-[#0f0d1a] px-6">
+  @if (isPosMode()) {
+  <div class="relative w-1/3">
+    <svg xmlns="http://www.w3.org/2000/svg"
+      class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+    <input type="text" [value]="posSearchService.keyword()"
+      (input)="posSearchService.keyword.set($any($event.target).value)" placeholder="Tìm món..."
+      class="h-10 w-full rounded-lg border border-[#322a4a] bg-[#1a1628] pl-9 pr-9 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+    @if (posSearchService.keyword()) {
+    <button type="button" (click)="posSearchService.keyword.set('')" title="Xoá tìm kiếm"
+      class="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-white/5 hover:text-white">
+      ✕
+    </button>
+    }
+  </div>
+  } @else {
   <div>
     <h1 class="text-sm text-violet-400 font-medium tracking-widest">
       {{ title() }}
     </h1>
   </div>
+  }
 
-  <div class="relative">
-    <button
-      type="button"
-      (click)="toggleNotifications()"
-      class="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-300 transition hover:bg-white/5 hover:text-white"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-4-5.65V5a2 2 0 1 0-4 0v.35A6 6 0 0 0 6 11v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
-      </svg>
+  <div class="flex items-center gap-2">
+    <div class="relative">
+      <button type="button" (click)="toggleNotifications()"
+        class="relative flex h-10 w-10 items-center cursor-pointer justify-center rounded-full text-gray-300 transition hover:bg-white/5 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-4-5.65V5a2 2 0 1 0-4 0v.35A6 6 0 0 0 6 11v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
+        </svg>
 
-      @if (unreadCount() > 0) {
-        <span class="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
+        @if (unreadCount() > 0) {
+        <span
+          class="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
           {{ unreadCount() }}
         </span>
-      }
-    </button>
+        }
+      </button>
 
-    @if (isNotificationsOpen()) {
+      @if (isNotificationsOpen()) {
       <div class="absolute right-0 mt-2 w-80 rounded-xl border border-white/10 bg-[#161226] shadow-xl">
         <div class="border-b border-white/5 px-4 py-3">
           <h2 class="text-sm font-semibold text-white">Đơn hàng mới</h2>
@@ -30,22 +51,61 @@
 
         <div class="max-h-96 overflow-y-auto">
           @if (notifications().length === 0) {
-            <p class="px-4 py-6 text-center text-xs text-gray-500">Chưa có đơn hàng mới</p>
+          <p class="px-4 py-6 text-center text-xs text-gray-500">Chưa có đơn hàng mới</p>
           } @else {
-            @for (notification of notifications(); track notification.id) {
-              <div class="border-b border-white/5 px-4 py-3 last:border-b-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-white">{{ notification.orderCode }}</span>
-                  <span class="text-xs text-gray-500">{{ formatTime(notification.createdAt) }}</span>
-                </div>
-                <p class="mt-1 text-xs text-gray-400">
-                  {{ notification.customerName }} · {{ formatCurrency(notification.totalAmount) }}
-                </p>
-              </div>
-            }
+          @for (notification of notifications(); track notification.id) {
+          <button type="button" (click)="openNotification(notification)"
+            class="block w-full border-b border-white/5 px-4 py-3 text-left transition last:border-b-0 hover:bg-white/5"
+            [class.bg-violet-500/5]="!notification.isRead">
+            <div class="flex items-center justify-between gap-2">
+              <span class="flex items-center gap-1.5 text-sm font-medium text-white">
+                @if (!notification.isRead) {
+                <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span>
+                }
+                {{ notification.orderCode }}
+              </span>
+              <span class="shrink-0 text-xs text-gray-500">{{ formatTime(notification.createdAt) }}</span>
+            </div>
+            <p class="mt-1 text-xs text-gray-400">
+              {{ notification.customerName }} · {{ formatCurrency(notification.totalAmount) }}
+            </p>
+          </button>
+          }
           }
         </div>
+
+        <button type="button" (click)="viewAllNotifications()"
+          class="block w-full border-t border-white/5 px-4 py-2.5 text-center text-xs font-medium text-violet-300 transition hover:bg-white/5 hover:text-violet-200">
+          Xem tất cả thông báo
+        </button>
       </div>
-    }
+      }
+    </div>
+    <button type="button" (click)="togglePosMode()" [disabled]="!storeRefCode()"
+      [title]="isPosMode() ? 'Quay về trang quản lý cửa hàng' : 'Mở màn hình bán hàng tại quầy'"
+      class="flex h-9 max-w-60 items-center cursor-pointer gap-2 rounded-md px-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50"
+      [class.bg-violet-600]="!isPosMode()" [class.text-white]="!isPosMode()" [class.hover:bg-violet-500]="!isPosMode()"
+      [class.border]="isPosMode()" [class.border-[#322a4a]]="isPosMode()" [class.text-violet-300]="isPosMode()"
+      [class.hover:bg-violet-500/10]="isPosMode()">
+      @if (isPosMode()) {
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-store preview-icon">
+        <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
+        <path
+          d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
+        <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
+      </svg>
+      <span class="truncate">{{ storeName() || 'Cửa hàng' }}</span>
+      } @else {
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="20" height="14" x="2" y="3" rx="2" />
+        <path d="M8 21h8" />
+        <path d="M12 17v4" />
+      </svg>
+      POS
+      }
+    </button>
   </div>
 </header>

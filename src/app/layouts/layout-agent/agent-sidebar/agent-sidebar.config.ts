@@ -34,9 +34,9 @@ export const AGENT_NAV_GROUPS: AgentNavGroup[] = [
         label: 'Thông Tin Cửa Hàng',
         path: URL_ENDPOINT.AGENT_STORE,
         icon: [
-          { d: 'M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20' },
-          { d: 'M9 7h6' },
-          { d: 'M9 11h6' }
+          { d: 'M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5' },
+          { d: 'M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244' },
+          { d: 'M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05' }
         ]
       }
     ]
@@ -56,9 +56,9 @@ export const AGENT_NAV_GROUPS: AgentNavGroup[] = [
         label: 'Sản Phẩm',
         path: URL_ENDPOINT.AGENT_FOODS,
         icon: [
-          { d: 'M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5' },
-          { d: 'M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244' },
-          { d: 'M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05' }
+          { d: 'M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2' },
+          { d: 'M7 2v20' },
+          { d: 'M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7' }
         ]
       },
     ]
@@ -109,7 +109,7 @@ export const AGENT_NAV_GROUPS: AgentNavGroup[] = [
         ]
       },
       {
-        label: 'Báo cáo',
+        label: 'Báo Cáo Đơn Hàng',
         path: URL_ENDPOINT.AGENT_PRODUCT_REVENUE,
         icon: [
           { d: 'M18 20V10' },
@@ -129,6 +129,14 @@ export const AGENT_NAV_GROUPS: AgentNavGroup[] = [
           { d: 'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8' },
           { d: 'M3 3v5h5' },
           { d: 'M12 7v5l4 2' }
+        ]
+      },
+      {
+        label: 'Thông Báo',
+        path: URL_ENDPOINT.AGENT_NOTIFICATIONS,
+        icon: [
+          { d: 'M10.268 21a2 2 0 0 0 3.464 0' },
+          { d: 'M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326' }
         ]
       },
       {

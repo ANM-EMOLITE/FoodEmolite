@@ -26,6 +26,8 @@ import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 
 interface OrderFilter {
     status: string;
+    promotionType: string;
+    promotionKeyword: string;
     fromDate: string;
     toDate: string;
     keyword: string;
@@ -74,11 +76,12 @@ export class PageAgentOrdersComponent {
 
     sortBy = signal('');
     asc = signal(false);
-    private readonly today = new Date().toISOString().split('T')[0];
     filter = signal<OrderFilter>({
         status: '',
-        fromDate: this.today,
-        toDate: this.today,
+        promotionType: '',
+        promotionKeyword: '',
+        fromDate: '',
+        toDate: '',
         keyword: ''
     });
 
@@ -166,6 +169,24 @@ export class PageAgentOrdersComponent {
             type: 'select',
             placeholder: 'Tất cả trạng thái',
             options: ORDER_DISPLAY_STATUS_OPTIONS
+        },
+        {
+            key: 'promotionType',
+            label: 'Loại khuyến mãi',
+            type: 'select',
+            placeholder: 'Tất cả loại KM',
+            options: [
+                { label: 'Đồng giá', value: 'FIXED_PRICE' },
+                { label: 'Giảm giá sản phẩm', value: 'PRODUCT_DISCOUNT' },
+                { label: 'Mua X tặng Y', value: 'BUY_X_GET_Y' },
+                { label: 'Không có khuyến mãi', value: 'NONE' }
+            ]
+        },
+        {
+            key: 'promotionKeyword',
+            label: 'Tên khuyến mãi',
+            type: 'text',
+            placeholder: 'Tên / mã khuyến mãi ...'
         }
     ];
 
@@ -246,6 +267,8 @@ export class PageAgentOrdersComponent {
                 storeRefCode: refCode,
                 keyword: this.filter().keyword || null,
                 status: this.filter().status || null,
+                promotionType: this.filter().promotionType || null,
+                promotionKeyword: this.filter().promotionKeyword || null,
                 fromDate: this.filter().fromDate || null,
                 toDate: this.filter().toDate || null
             }

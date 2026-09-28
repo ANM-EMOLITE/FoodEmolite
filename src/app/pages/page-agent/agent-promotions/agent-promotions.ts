@@ -6,21 +6,19 @@ import { ConfirmPopupComponent } from '../../../shared/component/confirm-popup/c
 import { ToastService } from '../../../common/services/toast.service';
 import { PromotionService } from '../../../common/services/promotion.service';
 import { ProfileService } from '../../../common/services/profile.service';
-import { StoreFoodService } from '../../../common/services/store-food.service';
 import { RealtimeService } from '../../../common/services/realtime.service';
+import { Router } from '@angular/router';
+import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { FilterField } from '../../../common/models/front-end/filter/filter-field.model';
 import {
     TableColumn,
     TableRow
 } from '../../../common/models/front-end/table/table-column.model';
 import {
-    CreatePromotionRequest,
     PromotionResponse,
     PromotionSearchRequest
 } from '../../../common/models/promotion.model';
 import { BaseSearchRequest } from '../../../common/models/base-search.model';
-import { DropdownOption } from '../../../shared/component/dropdown/dropdown';
-import { PopUpAgentPromotionAddComponent } from './pop-up-agent-promotion-add/pop-up-agent-promotion-add';
 import { PopUpAgentPromotionDetailComponent } from './pop-up-agent-promotion-detail/pop-up-agent-promotion-detail';
 
 interface PromotionFilter {
@@ -37,7 +35,6 @@ type ConfirmActionType = 'PAUSE' | 'RESUME' | 'CANCEL' | 'DELETE';
         AppTableComponent,
         FilterComponent,
         ConfirmPopupComponent,
-        PopUpAgentPromotionAddComponent,
         PopUpAgentPromotionDetailComponent
     ],
     templateUrl: './agent-promotions.html'
@@ -45,15 +42,13 @@ type ConfirmActionType = 'PAUSE' | 'RESUME' | 'CANCEL' | 'DELETE';
 export class PageAgentPromotionsComponent {
     private readonly promotionService = inject(PromotionService);
     private readonly profileService = inject(ProfileService);
-    private readonly storeFoodService = inject(StoreFoodService);
     private readonly toastService = inject(ToastService);
     private readonly realtimeService = inject(RealtimeService);
+    private readonly router = inject(Router);
 
     promotions = signal<PromotionResponse[]>([]);
     selectedPromotion = signal<PromotionResponse | null>(null);
-    editingPromotion = signal<PromotionResponse | null>(null);
     storeRefCode = signal<string | null>(null);
-    foodOptions = signal<DropdownOption[]>([]);
 
     page = signal(1);
     pageSize = signal(20);
@@ -62,7 +57,6 @@ export class PageAgentPromotionsComponent {
     loading = signal(false);
     isSubmitting = signal(false);
 
-    isAddOpen = signal(false);
     isDetailOpen = signal(false);
     isDetailRendered = signal(false);
 
@@ -218,31 +212,11 @@ export class PageAgentPromotionsComponent {
                 }
 
                 this.storeRefCode.set(response.data.store.refCode);
-                this.loadFoodOptions();
                 this.loadPromotions();
             },
             error: () => {
                 this.loading.set(false);
                 this.toastService.error('Không tải được thông tin đại lý');
-            }
-        });
-    }
-
-    loadFoodOptions(): void {
-        const refCode = this.storeRefCode();
-
-        if (!refCode) {
-            return;
-        }
-
-        this.storeFoodService.getByStoreRefCode(refCode, null, 1, 200).subscribe({
-            next: response => {
-                this.foodOptions.set(
-                    response.items.map(food => ({
-                        label: `${food.foodName} (${this.formatCurrency(food.price)})`,
-                        value: food.id
-                    }))
-                );
             }
         });
     }
@@ -283,49 +257,13 @@ export class PageAgentPromotionsComponent {
         });
     }
 
-    openCreateModal(): void {
-        this.editingPromotion.set(null);
-        this.isAddOpen.set(true);
+    openCreatePage(): void {
+        this.router.navigate(['/', URL_ENDPOINT.AGENT, URL_ENDPOINT.AGENT_PROMOTIONS, 'new']);
     }
 
     openEditFromDetail(promotion: PromotionResponse): void {
         this.closeDetail();
-        this.editingPromotion.set(promotion);
-        this.isAddOpen.set(true);
-    }
-
-    closeCreateModal(): void {
-        this.isAddOpen.set(false);
-        this.editingPromotion.set(null);
-    }
-
-    savePromotion(request: CreatePromotionRequest): void {
-        const editing = this.editingPromotion();
-
-        this.isSubmitting.set(true);
-
-        const save$ = editing
-            ? this.promotionService.update(editing.id, request)
-            : this.promotionService.create(request);
-
-        save$.subscribe({
-            next: response => {
-                this.isSubmitting.set(false);
-
-                if (!response.isSuccess) {
-                    this.toastService.error(response.message);
-                    return;
-                }
-
-                this.toastService.success(response.message);
-                this.closeCreateModal();
-                this.loadPromotions();
-            },
-            error: () => {
-                this.isSubmitting.set(false);
-                this.toastService.error(editing ? 'Cập nhật chương trình khuyến mãi thất bại' : 'Tạo chương trình khuyến mãi thất bại');
-            }
-        });
+        this.router.navigate(['/', URL_ENDPOINT.AGENT, URL_ENDPOINT.AGENT_PROMOTIONS, promotion.id, 'edit']);
     }
 
     openDetail(row: TableRow): void {

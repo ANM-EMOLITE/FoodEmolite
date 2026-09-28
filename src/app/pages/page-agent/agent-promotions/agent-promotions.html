@@ -12,7 +12,7 @@
 
     <button
       type="button"
-      (click)="openCreateModal()"
+      (click)="openCreatePage()"
       class="flex items-center justify-between gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -45,16 +45,6 @@
     (rowClick)="openDetail($event)">
   </app-table>
 </div>
-
-@if (isAddOpen()) {
-  <app-pop-up-agent-promotion-add
-    [foodOptions]="foodOptions()"
-    [isSubmitting]="isSubmitting()"
-    [editingPromotion]="editingPromotion()"
-    (closed)="closeCreateModal()"
-    (submitted)="savePromotion($event)">
-  </app-pop-up-agent-promotion-add>
-}
 
 @if (isDetailRendered() && selectedPromotion()) {
   <app-pop-up-agent-promotion-detail

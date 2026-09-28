@@ -105,3 +105,14 @@ export interface PromotionSearchRequest {
     promotionType?: string | null;
     status?: string | null;
 }
+
+/** Thống kê hiệu quả chương trình — chỉ tính các đơn chưa huỷ. */
+export interface PromotionStatsResponse {
+    orderCount: number;
+    /** Tổng số lượng món được áp chương trình (quà tặng cũng tính). */
+    usageCount: number;
+    revenue: number;
+    paidRevenue: number;
+    /** Tổng tiền đã giảm cho khách: Σ (giá gốc − giá bán) × số lượng. */
+    discountAmount: number;
+}

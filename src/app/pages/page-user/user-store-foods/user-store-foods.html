@@ -131,7 +131,7 @@
                         Đang tải món ăn...
                     </p>
                 </div>
-                } @else if (foods().length === 0) {
+                } @else if (sortedFoods().length === 0) {
                 <div class="flex flex-col items-center justify-center py-20 text-center">
                     <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
@@ -142,7 +142,7 @@
                         </svg>
                     </div>
                     <p class="mt-4 text-sm text-white/40">
-                        Chưa có món ăn nào trong danh mục này
+                        {{ foods().length ? 'Không tìm thấy món phù hợp' : 'Chưa có món ăn nào trong danh mục này' }}
                     </p>
                 </div>
                 } @else {

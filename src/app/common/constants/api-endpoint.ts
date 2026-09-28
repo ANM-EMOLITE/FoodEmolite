@@ -46,6 +46,11 @@ export const API_ENDPOINT = {
   CUSTOMER: {
     AGENT_SEARCH: 'customers/agent/search'
   },
+  STORE_NOTIFICATION: {
+    BASE: 'store-notifications',
+    READ: (id: number) => `store-notifications/${id}/read`,
+    READ_ALL: 'store-notifications/read-all'
+  },
   ACTIVITY_LOG: {
     STORE_SEARCH: 'activity-logs/store/search'
   },
@@ -58,6 +63,7 @@ export const API_ENDPOINT = {
     BASE: 'promotions',
     SEARCH: 'promotions/search',
     DETAIL: (id: number) => `promotions/${id}`,
+    STATS: (id: number) => `promotions/${id}/stats`,
     PAUSE: (id: number) => `promotions/${id}/pause`,
     RESUME: (id: number) => `promotions/${id}/resume`,
     CANCEL: (id: number) => `promotions/${id}/cancel`,

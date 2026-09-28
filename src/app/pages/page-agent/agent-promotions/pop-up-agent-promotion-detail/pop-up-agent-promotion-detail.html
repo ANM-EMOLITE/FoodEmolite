@@ -23,6 +23,60 @@
         </div>
 
         <div class="min-h-0 flex-1 space-y-5 overflow-y-auto p-5">
+            <!-- Thống kê hiệu quả -->
+            <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-violet-200">Thống kê</h3>
+                    <span class="text-xs text-gray-500">Không tính đơn đã huỷ</span>
+                </div>
+
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                    <div class="rounded-md border border-[#322a4a] bg-[#171322] p-3">
+                        <p class="text-xs text-gray-400">Đơn sử dụng</p>
+                        <p class="mt-1 text-lg font-semibold text-white">
+                            {{ statsLoading() ? '…' : (stats()?.orderCount ?? 0).toLocaleString('vi-VN') }}
+                        </p>
+                    </div>
+
+                    <div class="rounded-md border border-[#322a4a] bg-[#171322] p-3">
+                        <p class="text-xs text-gray-400">Lượt sử dụng (món)</p>
+                        <p class="mt-1 text-lg font-semibold text-white">
+                            {{ statsLoading() ? '…' : (stats()?.usageCount ?? 0).toLocaleString('vi-VN') }}
+                        </p>
+                    </div>
+
+                    <div class="rounded-md border border-[#322a4a] bg-[#171322] p-3">
+                        <p class="text-xs text-gray-400">Doanh thu đơn sử dụng</p>
+                        <p class="mt-1 text-lg font-semibold text-emerald-400">
+                            {{ statsLoading() ? '…' : formatCurrency(stats()?.revenue ?? 0) }}
+                        </p>
+                        @if (!statsLoading() && stats()) {
+                        <p class="mt-0.5 text-xs text-gray-500">Đã thanh toán: {{ formatCurrency(stats()!.paidRevenue) }}</p>
+                        }
+                    </div>
+
+                    <div class="rounded-md border border-[#322a4a] bg-[#171322] p-3">
+                        <p class="text-xs text-gray-400">Tổng tiền đã giảm</p>
+                        <p class="mt-1 text-lg font-semibold text-amber-400">
+                            {{ statsLoading() ? '…' : formatCurrency(stats()?.discountAmount ?? 0) }}
+                        </p>
+                    </div>
+                </div>
+
+                @if (getTimeProgress(promotion()); as progress) {
+                <div class="mt-3">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-400">Tiến độ chương trình</span>
+                        <span class="font-medium text-violet-300">{{ progress.percent }}%</span>
+                    </div>
+                    <div class="mt-1.5 h-2 overflow-hidden rounded-full bg-violet-500/15">
+                        <div class="h-full rounded-full bg-violet-500 transition-all" [style.width.%]="progress.percent"></div>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">{{ progress.label }}</p>
+                </div>
+                }
+            </div>
+
             <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-violet-200">

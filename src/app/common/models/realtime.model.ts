@@ -1,4 +1,6 @@
 export interface NewOrderNotification {
+    /** Id thông báo đã lưu ở BE (bảng store_notifications). */
+    notificationId: number;
     orderId: number;
     orderCode: string;
     storeRefCode: string;
