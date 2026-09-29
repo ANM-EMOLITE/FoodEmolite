@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastService } from '../../../../common/services/toast.service';
@@ -6,6 +7,8 @@ import { OrderService } from '../../../../common/services/order.service';
 import { OrderResponse } from '../../../../common/models/order.model';
 import { getOrderDisplayStatus, ORDER_DISPLAY_STATUS_TEXT } from '../../../../common/utils/order-status';
 import { URL_ENDPOINT } from '../../../../common/constants/url-endpoint';
+import { ORDER_SOURCE_TEXT, OrderType } from '../../../../common/enums/order.enum';
+import { getFullDeliveryAddress, getGoogleMapsUrl, getMapQuery } from '../../../../common/utils/delivery-address';
 
 @Component({
     selector: 'app-page-agent-order-detail',
@@ -17,10 +20,55 @@ export class PageAgentOrderDetailComponent {
     private readonly router = inject(Router);
     private readonly orderService = inject(OrderService);
     private readonly toastService = inject(ToastService);
+    private readonly sanitizer = inject(DomSanitizer);
 
     readonly order = signal<OrderResponse | null>(null);
     readonly loading = signal(false);
     readonly isSubmitting = signal(false);
+
+    readonly orderSourceText = computed(() => {
+        const order = this.order();
+
+        return order ? ORDER_SOURCE_TEXT[order.orderSource] ?? order.orderSource : '';
+    });
+
+    readonly isDelivery = computed(() => this.order()?.orderType === OrderType.Delivery);
+
+    readonly fullDeliveryAddress = computed(() => {
+        const order = this.order();
+
+        return order ? getFullDeliveryAddress(order) : '';
+    });
+
+    readonly googleMapsUrl = computed(() => {
+        const order = this.order();
+
+        return order ? getGoogleMapsUrl(order) : null;
+    });
+
+    /** Bản đồ xem trước ngay trong trang (dạng nhúng không cần API key). */
+    readonly mapEmbedUrl = computed<SafeResourceUrl | null>(() => {
+        const order = this.order();
+
+        const query = order ? getMapQuery(order) : '';
+
+        return query
+            ? this.sanitizer.bypassSecurityTrustResourceUrl(`https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`)
+            : null;
+    });
+
+    copyDeliveryAddress(): void {
+        const order = this.order();
+
+        if (!order) return;
+
+        const text = [this.fullDeliveryAddress(), order.deliveryPhone].filter(Boolean).join(' - ');
+
+        navigator.clipboard?.writeText(text).then(
+            () => this.toastService.success('Đã sao chép địa chỉ'),
+            () => this.toastService.error('Không sao chép được')
+        );
+    }
 
     readonly statusText = computed(() => {
         const order = this.order();

@@ -1,0 +1,84 @@
+<div class="min-h-full bg-[#0f0d1a] text-white">
+    <div class="mx-auto w-full max-w-6xl p-4 sm:p-6">
+        <div class="space-y-5 rounded-2xl border border-white/10 bg-[#130f21] p-5 shadow-sm">
+
+            <div class="flex items-start gap-3 border-b border-white/5 pb-4">
+                <button type="button" (click)="back()" title="Quay lại"
+                    class="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-white/10 text-white/60 transition hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
+                </button>
+
+                <div>
+                    <h1 class="text-lg font-bold text-white">Thông tin nhận hàng</h1>
+                    <p class="mt-0.5 text-sm text-white/40">
+                        Không bắt buộc — thông tin được lưu trên máy này và tự gửi kèm khi bạn đặt đơn.
+                    </p>
+                </div>
+            </div>
+
+            <app-delivery-address-form layout="split" [(value)]="draft">
+            <!-- Tên khách vãng lai được nhập lần đầu khi đặt đơn; đã có tên (đã đặt đơn) thì sửa ở đây -->
+            @if (!isLoggedIn() && guestName()) {
+            <div>
+                <p class="mb-1.5 text-sm font-medium text-white/80">Tên khách hàng</p>
+
+                @if (!isEditingName()) {
+                <div class="flex items-center gap-2">
+                    <span class="text-base font-semibold text-white">
+                        {{ guestName() }}
+                    </span>
+
+                    <button type="button" (click)="startEditName()" title="Sửa tên"
+                        class="cursor-pointer text-violet-400 hover:text-violet-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16.862 3.487a2.1 2.1 0 1 1 2.97 2.97L7.5 18.79l-4 1 1-4L16.862 3.487z" />
+                        </svg>
+                    </button>
+                </div>
+                } @else {
+                <div class="flex items-center gap-2">
+                    <input type="text" [value]="nameEdit()" (input)="nameEdit.set($any($event.target).value)"
+                        (keyup.enter)="saveName()" (keyup.escape)="cancelEditName()" placeholder="Nhập tên của bạn"
+                        class="w-full max-w-xs rounded-xl border border-violet-500/40 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30" />
+
+                    <button type="button" (click)="saveName()" [disabled]="savingName()" title="Lưu"
+                        class="cursor-pointer text-emerald-600 hover:opacity-80 disabled:opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                    </button>
+
+                    <button type="button" (click)="cancelEditName()" title="Huỷ"
+                        class="cursor-pointer text-red-400 hover:opacity-80">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                    </button>
+                </div>
+                }
+            </div>
+
+            }
+            </app-delivery-address-form>
+
+            <div class="flex justify-end gap-3 border-t border-white/5 pt-4">
+                <button type="button" (click)="back()"
+                    class="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10">
+                    Huỷ
+                </button>
+                <button type="button" (click)="save()"
+                    class="cursor-pointer rounded-xl bg-violet-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-violet-500">
+                    Lưu thông tin
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

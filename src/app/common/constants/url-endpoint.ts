@@ -26,5 +26,7 @@ export const URL_ENDPOINT = {
   USER_STORES: 'welcome',
   USER_STORE_FOODS: 'store-foods',
   USER_ORDER: 'order',
-  USER_HISTORY: 'history'
+  USER_HISTORY: 'history',
+  /** Thông tin nhận hàng (tên, SĐT, địa chỉ, ghim bản đồ) — mở từ icon trên topbar user. */
+  USER_DELIVERY_INFO: 'delivery-info'
 } as const;

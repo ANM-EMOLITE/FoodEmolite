@@ -11,11 +11,11 @@ import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { UserProfilePopupComponent } from "../pop-up-user-profile/pop-up-user-profile";
 import { ProfileService } from '../../../common/services/profile.service';
 import { GuestService } from '../../../common/services/guest.service';
-import { FormsModule } from '@angular/forms';
+import { DeliveryInfoService } from '../../../common/services/delivery-info.service';
 
 @Component({
   selector: 'app-user-topbar',
-  imports: [UserProfilePopupComponent, FormsModule],
+  imports: [UserProfilePopupComponent],
   templateUrl: './user-topbar.html'
 })
 export class UserTopbarComponent {
@@ -26,6 +26,7 @@ export class UserTopbarComponent {
   private readonly el = inject(ElementRef<HTMLElement>);
   private readonly profileService = inject(ProfileService);
   private readonly guestService = inject(GuestService)
+  readonly deliveryInfoService = inject(DeliveryInfoService);
 
   isUserMenuOpen = signal(false);
   isProfilePopupOpen = signal(false);
@@ -33,8 +34,6 @@ export class UserTopbarComponent {
   profileName = signal('');
   profileAvatar = signal('');
   guestName = signal('');
-  isEditingGuest = signal(false);
-  guestNameEdit = '';
 
   constructor() {
     if (this.authService.isLoggedIn()) {
@@ -61,8 +60,9 @@ export class UserTopbarComponent {
       }
     });
   }
+  /** Ưu tiên tên trong GuestService — sửa ở trang "Thông tin nhận hàng" là topbar cập nhật theo. */
   get guestDisplayName(): string {
-    return this.guestName();
+    return this.guestService.customerName() || this.guestName();
   }
   loadGuestProfile(): void {
     const deviceId = this.guestService.getGuestToken();
@@ -80,37 +80,12 @@ export class UserTopbarComponent {
     });
   }
 
-  startEditGuest(): void {
-    this.guestNameEdit = this.guestName();
-    this.isEditingGuest.set(true);
-  }
-  cancelEditGuest(): void {
-    this.guestNameEdit = this.guestName();
-    this.isEditingGuest.set(false);
-  }
-  saveGuest(): void {
-    const deviceId = this.guestService.getGuestToken();
-
-    if (!deviceId || !this.guestNameEdit.trim()) {
-      return;
-    }
-
-    this.profileService
-      .updateGuestProfile(deviceId, this.guestNameEdit.trim())
-      .subscribe({
-        next: () => {
-          this.guestName.set(this.guestNameEdit.trim());
-          this.isEditingGuest.set(false);
-        }
-      });
-  }
-
   get displayName(): string {
     return this.profileName() || this.authService.currentUser()?.username || 'User';
   }
 
   get guestAvatarLetter(): string {
-    return this.guestName().charAt(0).toUpperCase();
+    return this.guestDisplayName.charAt(0).toUpperCase();
   }
 
   get avatarLetter(): string {
@@ -138,6 +113,16 @@ export class UserTopbarComponent {
       '/',
       URL_ENDPOINT.USER,
       URL_ENDPOINT.USER_STORES
+    ]);
+  }
+
+  goDeliveryInfo(): void {
+    this.isUserMenuOpen.set(false);
+
+    this.router.navigate([
+      '/',
+      URL_ENDPOINT.USER,
+      URL_ENDPOINT.USER_DELIVERY_INFO
     ]);
   }
 

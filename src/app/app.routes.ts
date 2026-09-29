@@ -12,6 +12,7 @@ import { LayoutPosComponent } from './layouts/layout-pos/layout-pos';
 import { PageUserStoresComponent } from './pages/page-user/user-stores/user-stores';
 import { PageUserStoreFoodsComponent } from './pages/page-user/user-store-foods/user-store-foods';
 import { PageUserOrderHistoryComponent } from './pages/page-user/user-histories/user-histories';
+import { PageUserDeliveryInfoComponent } from './pages/page-user/user-delivery-info/user-delivery-info';
 import { PageAgentOrdersComponent } from './pages/page-agent/agent-orders/agent-orders';
 import { PageAgentOrderDetailComponent } from './pages/page-agent/agent-orders/agent-order-detail/agent-order-detail';
 import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-revenue';
@@ -171,7 +172,9 @@ export const routes: Routes = [
         path: '',
         component: PageUserStoreFoodsComponent,
         data: {
-          title: 'Bán hàng tại quầy'
+          title: 'Bán hàng tại quầy',
+          // Đơn tại quầy — không cần địa chỉ giao hàng
+          isPos: true
         }
       }
     ]
@@ -202,6 +205,13 @@ export const routes: Routes = [
         component: PageUserOrderHistoryComponent,
         data: {
           title: 'Lịch sử'
+        }
+      },
+      {
+        path: URL_ENDPOINT.USER_DELIVERY_INFO,
+        component: PageUserDeliveryInfoComponent,
+        data: {
+          title: 'Thông tin nhận hàng'
         }
       }
     ]

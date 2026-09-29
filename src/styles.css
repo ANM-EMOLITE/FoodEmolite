@@ -344,6 +344,46 @@
 .agent-theme-scope .bg-gray-700.text-white,
 .agent-theme-scope .bg-black\/60.text-white { color: #ffffff; }
 
+/* ---- Cột thao tác dính bên phải của bảng (shared/component/table) ----
+   Nền phải đặc để che nội dung cuộn bên dưới; hover phủ cùng lớp tím mờ như cả dòng
+   (hover:bg-violet-400/15) nên đúng ở cả theme tối lẫn sáng.
+   Bóng vẽ bằng ::before (gradient bên trái cột) vì bảng border-collapse không hiển thị box-shadow của ô. */
+.table-sticky-action-head,
+.table-sticky-action {
+  position: sticky;
+  right: 0;
+}
+
+.table-sticky-action-head::before,
+.table-sticky-action::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -14px;
+  width: 14px;
+  pointer-events: none;
+  background: linear-gradient(to left, rgb(0 0 0 / 35%), transparent);
+}
+
+.table-sticky-action-head { z-index: 20; }
+
+.table-sticky-action {
+  z-index: 5;
+  background-color: #171322;
+}
+
+tr:hover > .table-sticky-action {
+  background-image: linear-gradient(rgb(167 139 250 / 15%), rgb(167 139 250 / 15%));
+}
+
+.user-theme-scope .table-sticky-action { background-color: #ffffff; }
+
+.user-theme-scope .table-sticky-action-head::before,
+.user-theme-scope .table-sticky-action::before {
+  background: linear-gradient(to left, rgb(76 29 149 / 10%), transparent);
+}
+
 /* ---- Toast (shared/component/toast) ---- */
 .toast-enter {
   animation: toastIn .3s cubic-bezier(.2, .8, .2, 1) both;

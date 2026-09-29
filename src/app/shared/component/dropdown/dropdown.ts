@@ -20,6 +20,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilterValue } from '../../../common/models/front-end/filter/filter-field.model';
+import { normalizeVnText } from '../../../common/utils/vn-text';
 
 export interface DropdownOption {
   label: string;
@@ -123,12 +124,11 @@ export class DropdownComponent
   }
 
   onSearch(): void {
-    const q =
-      this.searchQuery.toLowerCase().trim();
+    const q = normalizeVnText(this.searchQuery);
 
     this.filteredOptions = q
       ? this.options.filter(o =>
-          o.label.toLowerCase().includes(q))
+          normalizeVnText(o.label).includes(q))
       : [...this.options];
   }
 

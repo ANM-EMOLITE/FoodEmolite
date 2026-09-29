@@ -47,6 +47,11 @@
                     </div>
 
                     <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Nguồn đơn</span>
+                        <span class="text-right font-medium text-white">{{ orderSourceText() }}</span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
                         <span class="text-gray-400">Thời gian tạo</span>
                         <span class="text-right font-medium text-white">{{ formatDate(order()!.createdAt) }}</span>
                     </div>
@@ -103,6 +108,57 @@
                     }
                 </div>
             </div>
+
+            @if (isDelivery()) {
+            <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+                <h3 class="text-sm font-semibold text-violet-200">
+                    Giao hàng
+                </h3>
+
+                @if (!order()!.deliveryPhone && !fullDeliveryAddress() && order()!.deliveryLatitude == null) {
+                <p class="mt-4 text-sm text-gray-400">Khách chưa cung cấp thông tin nhận hàng.</p>
+                } @else {
+                <div class="mt-4 space-y-3 text-sm">
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">SĐT nhận hàng</span>
+                        @if (order()!.deliveryPhone) {
+                        <a [href]="'tel:' + order()!.deliveryPhone"
+                            class="text-right font-medium text-violet-300 hover:underline">{{ order()!.deliveryPhone }}</a>
+                        } @else {
+                        <span class="text-right text-gray-500">—</span>
+                        }
+                    </div>
+
+                    <div>
+                        <p class="text-gray-400">Địa chỉ</p>
+                        <p class="mt-1 text-white">{{ fullDeliveryAddress() || '—' }}</p>
+                        @if (order()!.deliveryLatitude != null) {
+                        <p class="mt-1 text-xs text-emerald-300">Khách đã ghim vị trí trên bản đồ — bản đồ bên dưới chỉ tới đúng vị trí này</p>
+                        }
+                    </div>
+
+                    @if (mapEmbedUrl(); as embedUrl) {
+                    <iframe [src]="embedUrl" title="Bản đồ vị trí giao hàng" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        class="h-56 w-full rounded-lg border border-[#322a4a]"></iframe>
+                    }
+
+                    <div class="flex gap-2">
+                        @if (googleMapsUrl(); as mapsUrl) {
+                        <a [href]="mapsUrl" target="_blank" rel="noopener noreferrer"
+                            class="flex flex-1 items-center justify-center gap-2 rounded-lg border border-violet-600 bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700">
+                            Mở Google Maps
+                        </a>
+                        }
+                        <button type="button" (click)="copyDeliveryAddress()"
+                            class="rounded-lg border border-[#322a4a] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-violet-500/15 hover:text-violet-300">
+                            Sao chép
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+            }
         </div>
 
         <div class="rounded-xl border border-[#322a4a] bg-[#171322] overflow-hidden">

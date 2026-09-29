@@ -25,6 +25,10 @@ import { TooltipComponent } from '../tooltip/tooltip';
   templateUrl: './table.html'
 })
 export class AppTableComponent {
+  /** Cột thao tác luôn dính bên phải khi bảng cuộn ngang — style ở styles.css (.table-sticky-action*). */
+  readonly stickyActionHeaderClass = 'table-sticky-action-head';
+  readonly stickyActionCellClass = 'table-sticky-action';
+
   @Input() columns: TableColumn[] = [];
   @Input() rows: TableRow[] = [];
   @Input() currentPage = 1;
@@ -181,6 +185,16 @@ export class AppTableComponent {
 
       case 'MEMBER':
         return 'bg-green-100 text-green-700';
+
+      // Nguồn đơn (OrderSource)
+      case 'POS':
+        return 'bg-violet-100 text-violet-700';
+
+      case 'WEB_USER':
+        return 'bg-sky-100 text-sky-700';
+
+      case 'WEB_GUEST':
+        return 'bg-orange-100 text-orange-700';
 
       default:
         return 'bg-gray-100 text-gray-700';

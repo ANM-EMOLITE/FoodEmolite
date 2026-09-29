@@ -1,0 +1,44 @@
+<div class="relative w-full">
+    <button type="button" (click)="toggle()" [disabled]="disabled() || loading()"
+        class="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left text-sm outline-none transition hover:border-violet-500/40 focus:border-violet-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+        [class.border-violet-500/40]="isOpen()">
+        <span class="truncate" [class.text-white]="selectedLabel()" [class.text-white/40]="!selectedLabel()">
+            {{ loading() ? 'Đang tải...' : (selectedLabel() ?? placeholder()) }}
+        </span>
+
+        <svg class="h-4 w-4 shrink-0 text-white/40 transition-transform duration-200" [class.rotate-180]="isOpen()"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    @if (isOpen()) {
+    <div class="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#130f21] shadow-2xl">
+        <div class="border-b border-white/10 p-2">
+            <input #searchInput type="text" [value]="query()" (input)="query.set($any($event.target).value)"
+                (keydown)="onSearchKeydown($event)" [placeholder]="searchPlaceholder()"
+                class="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40" />
+        </div>
+
+        <ul class="custom-scroll max-h-52 overflow-y-auto py-1">
+            @for (option of filteredOptions(); track option.value) {
+            <li (click)="choose(option)"
+                class="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm transition hover:bg-violet-500/10"
+                [class.bg-violet-500/10]="option.value === value()"
+                [class.text-violet-300]="option.value === value()"
+                [class.text-white/80]="option.value !== value()">
+                <span>{{ option.label }}</span>
+
+                @if (option.value === value()) {
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                }
+            </li>
+            } @empty {
+            <li class="px-3 py-3 text-center text-sm text-white/40">Không có kết quả</li>
+            }
+        </ul>
+    </div>
+    }
+</div>

@@ -1148,6 +1148,33 @@
             </div>
         </div>
 
+        <!-- Chỉ hiển thị (không nhập ở đây) — sửa ở trang "Thông tin nhận hàng" -->
+        @if (isDeliveryOrder) {
+        <div class="mt-4 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm">
+            @if (deliveryInfoService.hasInfo()) {
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-xs text-white/40">Giao đến</p>
+                    <p class="mt-0.5 text-white/80">
+                        {{ deliveryInfoService.addressText() || 'Vị trí đã ghim trên bản đồ' }}
+                    </p>
+                    @if (deliveryInfoService.info().phone) {
+                    <p class="mt-0.5 text-white/50">SĐT: {{ deliveryInfoService.info().phone }}</p>
+                    }
+                </div>
+                <button type="button" (click)="goDeliveryInfo()"
+                    class="shrink-0 cursor-pointer text-xs font-medium text-violet-300 hover:underline">Sửa</button>
+            </div>
+            } @else {
+            <div class="flex items-center justify-between gap-3">
+                <p class="text-white/50">Chưa có thông tin nhận hàng</p>
+                <button type="button" (click)="goDeliveryInfo()"
+                    class="shrink-0 cursor-pointer text-xs font-medium text-violet-300 hover:underline">Thêm</button>
+            </div>
+            }
+        </div>
+        }
+
         <div class="mt-6 flex justify-end gap-3">
             <button type="button" (click)="closeConfirmOrder()"
                 class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10 cursor-pointer">

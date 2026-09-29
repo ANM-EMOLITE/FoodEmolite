@@ -34,6 +34,8 @@ import { StoreFoodCategoryResponse } from '../../../common/models/store-food-cat
 import { SelectedStoreService } from '../../../common/services/selectedstore.service';
 import { GuestService } from '../../../common/services/guest.service';
 import { TooltipDirective } from '../../../shared/directive/tooltip.directive';
+import { DeliveryInfoService } from '../../../common/services/delivery-info.service';
+import { CartStateService } from '../../../common/services/cart-state.service';
 
 export interface CartItemOption {
     optionGroupId: number;
@@ -72,8 +74,14 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     private readonly promotionService = inject(PromotionService);
     private readonly realtimeService = inject(RealtimeService);
     private readonly posSearchService = inject(PosSearchService);
+    readonly deliveryInfoService = inject(DeliveryInfoService);
+    private readonly cartStateService = inject(CartStateService);
     private paymentInterval: any;
     private nextCartItemId = 1;
+    private restoredCartFor: string | null = null;
+
+    /** POS (chủ cửa hàng bán tại quầy) = đơn tại quầy; trang user / link cửa hàng = đơn giao hàng. */
+    readonly isDeliveryOrder = this.route.snapshot.data['isPos'] !== true;
 
     activePromotions = signal<PromotionResponse[]>([]);
     selectedGifts = signal<SelectedGiftRequest[]>([]);
@@ -286,6 +294,31 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             } else if (this.selectedStoreWideDiscounts().length > 0) {
                 this.selectedStoreWideDiscounts.set([]);
             }
+        });
+
+        // Giữ giỏ hàng khi rời trang rồi quay lại (vd: sang "Thông tin nhận hàng"): khôi phục 1 lần khi biết
+        // cửa hàng, sau đó lưu lại mỗi khi giỏ / ghi chú thay đổi.
+        effect(() => {
+            const storeRefCode = this.storeRefCode();
+            const items = this.cart();
+            const note = this.orderNote();
+
+            if (!storeRefCode) return;
+
+            if (this.restoredCartFor !== storeRefCode) {
+                this.restoredCartFor = storeRefCode;
+
+                const saved = this.cartStateService.get<CartItem>(storeRefCode);
+
+                if (saved && items.length === 0) {
+                    this.nextCartItemId = saved.nextItemId;
+                    this.cart.set(saved.items);
+                    this.orderNote.set(saved.note);
+                    return;
+                }
+            }
+
+            this.cartStateService.set(storeRefCode, { items, nextItemId: this.nextCartItemId, note });
         });
 
         this.realtimeService.connect();
@@ -755,6 +788,10 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             return;
         }
 
+        this.openConfirmOrderPopup();
+    }
+
+    private openConfirmOrderPopup(): void {
         this.isConfirmOrderOpen.set(true);
     }
 
@@ -765,7 +802,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
         }
 
         this.isGuestNameOpen.set(false);
-        this.isConfirmOrderOpen.set(true);
+        this.openConfirmOrderPopup();
     }
 
     closeGuestNamePopup(): void {
@@ -781,6 +818,10 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
         this.isConfirmOrderOpen.set(false);
     }
 
+    goDeliveryInfo(): void {
+        this.isConfirmOrderOpen.set(false);
+        this.router.navigate(['/', URL_ENDPOINT.USER, URL_ENDPOINT.USER_DELIVERY_INFO]);
+    }
 
     hasMissingRequiredOptions(): boolean {
         return this.cart().some(item => this.isCartItemMissingRequiredOption(item));
@@ -884,7 +925,9 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             selectedGifts: this.selectedGifts(),
             selectedStoreWideDiscounts: this.selectedStoreWideDiscounts(),
             promoCode: this.appliedPromoCode(),
-            paymentMethod: this.paymentMethod()
+            paymentMethod: this.paymentMethod(),
+            // Thông tin nhận hàng (nếu khách đã nhập ở trang "Thông tin nhận hàng") — không bắt buộc
+            ...(this.isDeliveryOrder ? this.deliveryInfoService.toOrderRequest() : {})
         };
 
         const createOrder$ = this.isLoggedIn()

@@ -30,7 +30,8 @@ export class AgentTopbarComponent {
 
   /** Thông báo đã lưu ở BE (mới nhất trước) — tải lại mỗi khi topbar được tạo nên không mất khi reload / chuyển agent ↔ POS. */
   notifications = signal<StoreNotificationResponse[]>([]);
-  unreadCount = signal(0);
+  /** Dùng chung với sidebar (badge mục "Thông Báo") qua StoreNotificationService. */
+  unreadCount = this.storeNotificationService.unreadCount;
   isNotificationsOpen = signal(false);
 
   storeRefCode = signal<string | null>(null);

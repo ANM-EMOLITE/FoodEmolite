@@ -1,7 +1,7 @@
 <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-4 shadow-lg">
-    <form [formGroup]="form" class="flex flex-wrap items-end gap-4">
+    <form [formGroup]="form" class="flex flex-wrap items-end gap-3">
 
-        @for(field of fields; track field.key) {
+        @for(field of basicFields; track field.key) {
 
         <div [class.w-[300px]]="field.type === 'date'" [class.w-[160px]]="field.type === 'select'"
             [class.w-[240px]]="field.type === 'text'">
@@ -46,10 +46,14 @@
 
         }
 
-        <div>
+        <div class="contents">
 
-            <button type="button" (click)="onReset()" class="h-[42px]
+            <button type="button" (click)="onReset()" [disabled]="!hasActiveFilter" class="h-[42px]
                        cursor-pointer
+                       disabled:cursor-not-allowed
+                       disabled:opacity-50
+                       disabled:hover:border-[#322a4a]
+                       disabled:hover:bg-[#1a1628]
                        rounded-lg
                        border border-[#322a4a]
                        bg-[#1a1628]
@@ -61,6 +65,104 @@
                        hover:bg-violet-500/10">
                 Đặt lại
             </button>
+
+            @if (advancedFields.length > 0) {
+            <div #advancedAnchor class="relative ml-auto">
+
+                <button type="button" (click)="toggleAdvanced()" title="Bộ lọc nâng cao"
+                    [attr.aria-expanded]="isAdvancedOpen"
+                    class="relative inline-flex h-[42px] w-[42px] cursor-pointer items-center justify-center rounded-lg border transition"
+                    [class.border-violet-600]="isAdvancedOpen || activeAdvancedCount > 0"
+                    [class.bg-violet-600]="isAdvancedOpen || activeAdvancedCount > 0"
+                    [class.text-white]="isAdvancedOpen || activeAdvancedCount > 0"
+                    [class.border-[#322a4a]]="!isAdvancedOpen && activeAdvancedCount === 0"
+                    [class.bg-[#1a1628]]="!isAdvancedOpen && activeAdvancedCount === 0"
+                    [class.text-gray-200]="!isAdvancedOpen && activeAdvancedCount === 0"
+                    [class.hover:border-violet-500]="!isAdvancedOpen && activeAdvancedCount === 0">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6" />
+                        <line x1="7" y1="12" x2="17" y2="12" />
+                        <line x1="10" y1="18" x2="14" y2="18" />
+                    </svg>
+
+                    @if (activeAdvancedCount > 0) {
+                    <span
+                        class="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-semibold text-white">
+                        {{ activeAdvancedCount }}
+                    </span>
+                    }
+                </button>
+
+                @if (isAdvancedOpen) {
+                <div class="absolute right-0 top-full z-40 mt-2 w-80 overflow-hidden rounded-xl border border-[#322a4a] bg-[#171322] shadow-2xl">
+
+                    <div class="flex items-center justify-between border-b border-[#322a4a] px-4 py-3">
+                        <h3 class="text-base font-semibold text-violet-400">Bộ Lọc Nâng Cao</h3>
+
+                        <button type="button" (click)="closeAdvanced()" title="Đóng"
+                            class="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-gray-400 transition hover:bg-violet-500/15 hover:text-violet-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 6 6 18" />
+                                <path d="m6 6 12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 px-4 py-4">
+                        @for (field of advancedFields; track field.key) {
+
+                        @switch (field.type) {
+
+                        @case ('text') {
+                        <input type="text" [value]="advancedDraft[field.key] ?? ''"
+                            (input)="setDraft(field.key, $any($event.target).value)"
+                            (keydown.enter)="$event.preventDefault(); applyAdvanced()"
+                            [placeholder]="field.placeholder || field.label" class="h-[42px] w-full rounded-lg border border-[#322a4a]
+                                   bg-[#1a1628]
+                                   px-3 text-sm text-white
+                                   placeholder:text-gray-500
+                                   outline-none transition
+                                   hover:border-violet-500/60
+                                   focus:border-violet-500
+                                   focus:ring-2 focus:ring-violet-500/20" />
+                        }
+
+                        @case ('select') {
+                        <app-dropdown [options]="field.options || []" [placeholder]="field.placeholder || field.label"
+                            [value]="advancedDraft[field.key] || null"
+                            (changed)="setDraft(field.key, $event?.value)">
+                        </app-dropdown>
+                        }
+
+                        @case ('date') {
+                        <app-date-picker [value]="advancedDraft[field.key]" [placeholder]="field.placeholder || field.label"
+                            (valueChange)="setDraft(field.key, $event)"></app-date-picker>
+                        }
+
+                        }
+
+                        }
+                    </div>
+
+                    <div class="flex gap-3 border-t border-[#322a4a] bg-[#1a1628] px-4 py-3">
+                        <button type="button" (click)="resetAdvanced()" [disabled]="!hasActiveAdvancedFilter"
+                            class="h-10 flex-1 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-[#322a4a] disabled:hover:bg-[#171322] rounded-lg border border-[#322a4a] bg-[#171322] text-sm font-medium text-gray-200 transition hover:border-violet-500 hover:bg-violet-500/10">
+                            Đặt Lại
+                        </button>
+                        <button type="button" (click)="applyAdvanced()"
+                            class="h-10 flex-1 cursor-pointer rounded-lg bg-violet-600 text-sm font-medium text-white transition hover:bg-violet-500">
+                            Áp Dụng
+                        </button>
+                    </div>
+
+                </div>
+                }
+
+            </div>
+            }
 
         </div>
 

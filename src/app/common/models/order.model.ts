@@ -1,3 +1,5 @@
+import { OrderSource, OrderType } from '../enums/order.enum';
+
 export type PaymentMethod = 'CASH' | 'BANK_TRANSFER';
 
 export interface CreateOrderRequest {
@@ -8,6 +10,15 @@ export interface CreateOrderRequest {
   selectedStoreWideDiscounts?: SelectedStoreWideDiscountRequest[];
   promoCode?: string | null;
   paymentMethod: PaymentMethod;
+  /** Địa chỉ giao hàng (đơn giao hàng): bắt buộc SĐT + (GPS hoặc đủ Tỉnh + Phường + số nhà). Bỏ qua với đơn tại quầy (POS). */
+  deliveryPhone?: string | null;
+  deliveryProvinceCode?: string | null;
+  deliveryProvinceName?: string | null;
+  deliveryWardCode?: string | null;
+  deliveryWardName?: string | null;
+  deliveryStreet?: string | null;
+  deliveryLatitude?: number | null;
+  deliveryLongitude?: number | null;
 }
 
 export interface SelectedGiftRequest {
@@ -62,6 +73,16 @@ export interface OrderResponse {
   paymentMethod: PaymentMethod;
   note?: string | null;
   createdAt: string;
+  orderSource: OrderSource;
+  orderType: OrderType;
+  deliveryPhone?: string | null;
+  deliveryProvinceCode?: string | null;
+  deliveryProvinceName?: string | null;
+  deliveryWardCode?: string | null;
+  deliveryWardName?: string | null;
+  deliveryStreet?: string | null;
+  deliveryLatitude?: number | null;
+  deliveryLongitude?: number | null;
   items: OrderItemResponse[];
 }
 
@@ -102,6 +123,8 @@ export interface OrderSearchRequest {
   promotionType?: string | null;
   /** Từ khoá lọc theo tên / mã khuyến mãi đã áp trong đơn. */
   promotionKeyword?: string | null;
+  /** Nguồn đơn: POS | WEB_USER | WEB_GUEST. */
+  orderSource?: OrderSource | null;
   fromDate?: string | null;
   toDate?: string | null;
 }
