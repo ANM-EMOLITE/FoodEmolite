@@ -2,30 +2,6 @@ import { Routes } from '@angular/router';
 import { URL_ENDPOINT } from './common/constants/url-endpoint';
 import { roleRedirectGuard } from './common/guard/role-redirect.guard';
 
-import { PageLoginComponent } from './pages/page-login/login/login';
-import { PageRegisterComponent } from './pages/page-login/register/register';
-import { LayoutAgentComponent } from './layouts/layout-agent/layout-agent';
-import { PageAgentInfoComponent } from './pages/page-agent/agent-info/agent-info';
-import { PageAgentFoodsComponent } from './pages/page-agent/agent-foods/agent-foods';
-import { LayoutUserComponent } from './layouts/layout-user/layout-user';
-import { LayoutPosComponent } from './layouts/layout-pos/layout-pos';
-import { PageUserStoresComponent } from './pages/page-user/user-stores/user-stores';
-import { PageUserStoreFoodsComponent } from './pages/page-user/user-store-foods/user-store-foods';
-import { PageUserOrderHistoryComponent } from './pages/page-user/user-histories/user-histories';
-import { PageUserDeliveryInfoComponent } from './pages/page-user/user-delivery-info/user-delivery-info';
-import { PageAgentOrdersComponent } from './pages/page-agent/agent-orders/agent-orders';
-import { PageAgentOrderDetailComponent } from './pages/page-agent/agent-orders/agent-order-detail/agent-order-detail';
-import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-revenue';
-import { PageOrderSuccessComponent } from './pages/page-user/order-success/order-success';
-import { PageAgentFoodCategoriesComponent } from './pages/page-agent/agent-food-categories/agent-food-categories';
-import { PageAgentPromotionsComponent } from './pages/page-agent/agent-promotions/agent-promotions';
-import { PageAgentPromotionFormComponent } from './pages/page-agent/agent-promotions/agent-promotion-form/agent-promotion-form';
-import { AgentProductRevenueComponent } from './pages/page-agent/agent-product-revenue/agent-product-revenue';
-import { PageAgentCustomersComponent } from './pages/page-agent/agent-customers/agent-customers';
-import { PageAgentActivityLogsComponent } from './pages/page-agent/agent-activity-logs/agent-activity-logs';
-import { PageAgentSettingsComponent } from './pages/page-agent/agent-settings/agent-settings';
-import { PageAgentNotificationsComponent } from './pages/page-agent/agent-notifications/agent-notifications';
-import { PageAgentStoreInfoComponent } from './pages/page-agent/agent-store-info/agent-store-info';
 
 export const routes: Routes = [
   {
@@ -36,20 +12,20 @@ export const routes: Routes = [
   },
   {
     path: URL_ENDPOINT.LOGIN,
-    component: PageLoginComponent
+    loadComponent: () => import('./pages/page-login/login/login').then(m => m.PageLoginComponent)
   },
   {
     path: URL_ENDPOINT.REGISTER,
-    component: PageRegisterComponent
+    loadComponent: () => import('./pages/page-login/register/register').then(m => m.PageRegisterComponent)
   },
   {
     path: URL_ENDPOINT.SUCCESS,
-    component: PageOrderSuccessComponent
+    loadComponent: () => import('./pages/page-user/order-success/order-success').then(m => m.PageOrderSuccessComponent)
   },
 
   {
     path: URL_ENDPOINT.AGENT,
-    component: LayoutAgentComponent,
+    loadComponent: () => import('./layouts/layout-agent/layout-agent').then(m => m.LayoutAgentComponent),
     children: [
       {
         path: '',
@@ -58,105 +34,105 @@ export const routes: Routes = [
       },
       {
         path: URL_ENDPOINT.AGENT_PROFILE,
-        component: PageAgentInfoComponent,
+        loadComponent: () => import('./pages/page-agent/agent-info/agent-info').then(m => m.PageAgentInfoComponent),
         data: {
           title: 'Thông tin'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_FOOD_CATEGORIES,
-        component: PageAgentFoodCategoriesComponent,
+        loadComponent: () => import('./pages/page-agent/agent-food-categories/agent-food-categories').then(m => m.PageAgentFoodCategoriesComponent),
         data: {
           title: 'Danh sách danh mục'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_FOODS,
-        component: PageAgentFoodsComponent,
+        loadComponent: () => import('./pages/page-agent/agent-foods/agent-foods').then(m => m.PageAgentFoodsComponent),
         data: {
           title: 'Danh sách món ăn'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_ORDERS,
-        component: PageAgentOrdersComponent,
+        loadComponent: () => import('./pages/page-agent/agent-orders/agent-orders').then(m => m.PageAgentOrdersComponent),
         data: {
           title: 'Danh sách đơn hàng'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_ORDER_DETAIL,
-        component: PageAgentOrderDetailComponent,
+        loadComponent: () => import('./pages/page-agent/agent-orders/agent-order-detail/agent-order-detail').then(m => m.PageAgentOrderDetailComponent),
         data: {
           title: 'Chi tiết đơn hàng'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_PROMOTIONS,
-        component: PageAgentPromotionsComponent,
+        loadComponent: () => import('./pages/page-agent/agent-promotions/agent-promotions').then(m => m.PageAgentPromotionsComponent),
         data: {
           title: 'Chương trình khuyến mãi'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_PROMOTION_CREATE,
-        component: PageAgentPromotionFormComponent,
+        loadComponent: () => import('./pages/page-agent/agent-promotions/agent-promotion-form/agent-promotion-form').then(m => m.PageAgentPromotionFormComponent),
         data: {
           title: 'Tạo khuyến mãi'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_PROMOTION_EDIT,
-        component: PageAgentPromotionFormComponent,
+        loadComponent: () => import('./pages/page-agent/agent-promotions/agent-promotion-form/agent-promotion-form').then(m => m.PageAgentPromotionFormComponent),
         data: {
           title: 'Chỉnh sửa khuyến mãi'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_REVENUE,
-        component: AgentRevenueComponent,
+        loadComponent: () => import('./pages/page-agent/agent-revenue/agent-revenue').then(m => m.AgentRevenueComponent),
         data: {
           title: 'Thống kê'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_PRODUCT_REVENUE,
-        component: AgentProductRevenueComponent,
+        loadComponent: () => import('./pages/page-agent/agent-product-revenue/agent-product-revenue').then(m => m.AgentProductRevenueComponent),
         data: {
           title: 'Doanh thu sản phẩm'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_CUSTOMERS,
-        component: PageAgentCustomersComponent,
+        loadComponent: () => import('./pages/page-agent/agent-customers/agent-customers').then(m => m.PageAgentCustomersComponent),
         data: {
           title: 'Danh sách khách hàng'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_ACTIVITY_LOGS,
-        component: PageAgentActivityLogsComponent,
+        loadComponent: () => import('./pages/page-agent/agent-activity-logs/agent-activity-logs').then(m => m.PageAgentActivityLogsComponent),
         data: {
           title: 'Lịch sử hoạt động'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_NOTIFICATIONS,
-        component: PageAgentNotificationsComponent,
+        loadComponent: () => import('./pages/page-agent/agent-notifications/agent-notifications').then(m => m.PageAgentNotificationsComponent),
         data: {
           title: 'Thông báo'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_SETTINGS,
-        component: PageAgentSettingsComponent,
+        loadComponent: () => import('./pages/page-agent/agent-settings/agent-settings').then(m => m.PageAgentSettingsComponent),
         data: {
           title: 'Cài đặt'
         }
       },
       {
         path: URL_ENDPOINT.AGENT_STORE,
-        component: PageAgentStoreInfoComponent,
+        loadComponent: () => import('./pages/page-agent/agent-store-info/agent-store-info').then(m => m.PageAgentStoreInfoComponent),
         data: {
           title: 'Thông tin cửa hàng'
         }
@@ -166,11 +142,11 @@ export const routes: Routes = [
 
   {
     path: URL_ENDPOINT.POS,
-    component: LayoutPosComponent,
+    loadComponent: () => import('./layouts/layout-pos/layout-pos').then(m => m.LayoutPosComponent),
     children: [
       {
         path: '',
-        component: PageUserStoreFoodsComponent,
+        loadComponent: () => import('./pages/page-user/user-store-foods/user-store-foods').then(m => m.PageUserStoreFoodsComponent),
         data: {
           title: 'Bán hàng tại quầy',
           // Đơn tại quầy — không cần địa chỉ giao hàng
@@ -182,7 +158,7 @@ export const routes: Routes = [
 
   {
     path: URL_ENDPOINT.USER,
-    component: LayoutUserComponent,
+    loadComponent: () => import('./layouts/layout-user/layout-user').then(m => m.LayoutUserComponent),
     children: [
       {
         path: '',
@@ -191,25 +167,25 @@ export const routes: Routes = [
       },
       {
         path: URL_ENDPOINT.USER_STORES,
-        component: PageUserStoresComponent,
+        loadComponent: () => import('./pages/page-user/user-stores/user-stores').then(m => m.PageUserStoresComponent),
         data: {
           title: 'Danh sách cửa hàng'
         }
       },
       {
         path: `${URL_ENDPOINT.USER_STORE_FOODS}/${URL_ENDPOINT.USER_ORDER}`,
-        component: PageUserStoreFoodsComponent
+        loadComponent: () => import('./pages/page-user/user-store-foods/user-store-foods').then(m => m.PageUserStoreFoodsComponent)
       },
       {
         path: URL_ENDPOINT.USER_HISTORY,
-        component: PageUserOrderHistoryComponent,
+        loadComponent: () => import('./pages/page-user/user-histories/user-histories').then(m => m.PageUserOrderHistoryComponent),
         data: {
           title: 'Lịch sử'
         }
       },
       {
         path: URL_ENDPOINT.USER_DELIVERY_INFO,
-        component: PageUserDeliveryInfoComponent,
+        loadComponent: () => import('./pages/page-user/user-delivery-info/user-delivery-info').then(m => m.PageUserDeliveryInfoComponent),
         data: {
           title: 'Thông tin nhận hàng'
         }
