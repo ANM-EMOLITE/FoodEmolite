@@ -1,0 +1,83 @@
+
+<div [class]="layout() === 'split' ? 'grid grid-cols-1 gap-5 lg:grid-cols-2' : 'space-y-3'">
+
+    <div class="space-y-3">
+        <ng-content />
+
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-white/80">
+                Số điện thoại nhận hàng
+            </label>
+            <input type="tel" inputmode="tel" autocomplete="tel" [value]="value().phone"
+                (input)="patch({ phone: $any($event.target).value })" placeholder="VD: 0901234567"
+                class="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40" />
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+                <label class="mb-1.5 block text-sm font-medium text-white/80">
+                    Tỉnh/Thành phố
+                </label>
+                <app-search-select [options]="provinceOptions()" [value]="value().provinceCode"
+                    [loading]="loadingProvinces()" placeholder="Chọn Tỉnh/Thành phố"
+                    searchPlaceholder="Tìm tỉnh/thành..." (selected)="onProvinceSelected($event)" />
+            </div>
+
+            <div>
+                <label class="mb-1.5 block text-sm font-medium text-white/80">
+                    Phường/Xã
+                </label>
+                <app-search-select [options]="wardOptions()" [value]="value().wardCode"
+                    [disabled]="!value().provinceCode" [loading]="loadingWards()"
+                    [placeholder]="value().provinceCode ? 'Chọn Phường/Xã' : 'Chọn Tỉnh trước'"
+                    searchPlaceholder="Tìm phường/xã..." (selected)="onWardSelected($event)" />
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1.5 block text-sm font-medium text-white/80">
+                Số nhà, tên đường
+            </label>
+            <input type="text" autocomplete="street-address" maxlength="500" [value]="value().street"
+                (input)="onStreetInput($any($event.target).value)" placeholder="VD: 123 Lê Lợi, hẻm 45"
+                class="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40" />
+
+            @if (suggestedStreet(); as suggestion) {
+            <p class="mt-1.5 text-xs text-white/50">
+                Theo vị trí ghim: <span class="font-medium text-white/80">{{ suggestion }}</span>
+                <button type="button" (click)="useSuggestedStreet()"
+                    class="ml-1 cursor-pointer font-medium text-violet-300 hover:underline">Dùng</button>
+            </p>
+            }
+        </div>
+    </div>
+
+    <div class="flex flex-col">
+        <div class="mb-1.5 flex items-center justify-between gap-2">
+            <label class="text-sm font-medium text-white/80">Vị trí trên bản đồ</label>
+
+            <div class="flex items-center gap-3 text-xs">
+                @if (hasPin()) {
+                <button type="button" (click)="clearPin()"
+                    class="cursor-pointer text-white/50 hover:text-white">Xoá ghim</button>
+                }
+                <button type="button" (click)="useCurrentLocation()" [disabled]="locating()"
+                    class="cursor-pointer font-medium text-violet-300 hover:underline disabled:cursor-wait disabled:opacity-60">
+                    {{ locating() ? 'Đang lấy vị trí...' : 'Vị trí hiện tại' }}
+                </button>
+            </div>
+        </div>
+
+        <app-location-picker class="overflow-hidden rounded-xl border border-white/10"
+            [class]="layout() === 'split' ? 'h-72 lg:h-auto lg:min-h-80 lg:flex-1' : 'h-64 sm:h-80'"
+            [latitude]="value().latitude" [longitude]="value().longitude" [zoom]="mapZoom()"
+            (picked)="onMapPicked($event)" />
+
+        <p class="mt-1.5 text-xs"
+            [class.text-white/50]="mapHint().tone === 'info'"
+            [class.text-amber-600]="mapHint().tone === 'warn'"
+            [class.text-emerald-600]="mapHint().tone === 'ok'">
+            {{ mapHint().text }}
+        </p>
+    </div>
+</div>

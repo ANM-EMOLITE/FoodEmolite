@@ -6,6 +6,7 @@ import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { MyProfileResponse } from '../../../common/models/profile.model';
 import { AGENT_NAV_GROUPS } from './agent-sidebar.config';
 import { ConfirmPopupComponent } from '../../../shared/component/confirm-popup/confirm-popup';
+import { StoreNotificationService } from '../../../common/services/store-notification.service';
 
 @Component({
   selector: 'app-agent-sidebar',
@@ -19,9 +20,13 @@ import { ConfirmPopupComponent } from '../../../shared/component/confirm-popup/c
 export class AgentSidebarComponent implements OnInit {
   readonly authService = inject(AuthService);
   readonly navGroups = AGENT_NAV_GROUPS;
+  readonly notificationsPath = URL_ENDPOINT.AGENT_NOTIFICATIONS;
 
   private readonly router = inject(Router);
   private readonly profileService = inject(ProfileService);
+
+  /** Số thông báo chưa đọc — topbar (chuông) cập nhật, sidebar hiện badge ở mục "Thông Báo". */
+  readonly unreadCount = inject(StoreNotificationService).unreadCount;
 
   profile = signal<MyProfileResponse | null>(null);
   isLogoutConfirmOpen = signal(false);

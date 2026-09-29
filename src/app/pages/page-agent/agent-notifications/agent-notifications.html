@@ -4,10 +4,6 @@
       <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
         Thông Báo
       </h1>
-
-      <p class="mt-2 text-md leading-4 text-gray-500">
-        Tất cả thông báo của cửa hàng ({{ unreadCount() }} chưa đọc)
-      </p>
     </div>
 
     <button type="button" (click)="markAllRead()" [disabled]="!unreadCount() || isSubmitting()"
@@ -21,23 +17,87 @@
     </button>
   </div>
 
-  <app-filter
-    [fields]="filterFields"
-    [initialValues]="filter()"
-    (filterChange)="onFilterChange($event)">
-  </app-filter>
-  <div></div>
-  <app-table
-    [columns]="columns"
-    [rows]="rows()"
-    [currentPage]="page()"
-    [totalPages]="totalPages()"
-    [totalRecords]="totalRecords()"
-    [pageSize]="pageSize()"
-    [loading]="loading()"
-    emptyText="Chưa có thông báo nào"
-    (pageChange)="onPageChange($event)"
-    (pageSizeChange)="onPageSizeChange($event)"
-    (rowClick)="openNotification($event)">
-  </app-table>
+  <div class="overflow-hidden rounded-xl border border-[#322a4a] bg-[#171322] shadow-lg">
+
+    @if (loading()) {
+    <div class="py-16 text-center text-sm text-gray-400">Đang tải thông báo...</div>
+    } @else if (notifications().length === 0) {
+    <div class="flex flex-col items-center gap-3 py-16 text-center">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-violet-500/15 text-violet-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+          <path
+            d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+        </svg>
+      </div>
+      <p class="text-sm text-gray-400">Không có thông báo nào trong {{ days }} ngày gần nhất</p>
+    </div>
+    } @else {
+
+    @for (group of groups(); track group.label) {
+    <div class="border-b border-[#322a4a] bg-[#1a1628] px-5 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+      {{ group.label }}
+    </div>
+
+    @for (notification of group.items; track notification.id) {
+    <button type="button" (click)="markRead(notification)" (dblclick)="openOrder(notification)"
+      title="Nhấp đúp để mở đơn hàng"
+      class="flex w-full cursor-pointer select-none items-center gap-4 border-b border-[#2b243d] px-5 py-4 text-left transition hover:bg-violet-500/10"
+      [class.bg-violet-500/5]="!notification.isRead">
+
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+        [class.bg-violet-600]="!notification.isRead" [class.text-white]="!notification.isRead"
+        [class.bg-violet-500/15]="notification.isRead" [class.text-violet-300]="notification.isRead">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 10a4 4 0 0 1-8 0" />
+          <path d="M3.103 6.034h17.794" />
+          <path
+            d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z" />
+        </svg>
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm" [class.font-semibold]="!notification.isRead"
+          [class.text-white]="!notification.isRead" [class.text-gray-200]="notification.isRead">
+          {{ getTitle(notification) }}
+          @if (notification.orderCode) {
+          <span class="font-medium text-violet-300">#{{ notification.orderCode }}</span>
+          }
+        </p>
+
+        <p class="mt-0.5 truncate text-sm text-gray-400">
+          {{ notification.customerName || 'Khách hàng' }}
+          @if (notification.totalAmount !== null) {
+          · <span class="font-medium text-gray-300">{{ formatCurrency(notification.totalAmount) }}</span>
+          }
+        </p>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-3">
+        <span class="text-xs text-gray-400">{{ getTimeText(notification.createdAt) }}</span>
+
+        @if (!notification.isRead) {
+        <span class="h-2.5 w-2.5 rounded-full bg-violet-600" title="Chưa đọc"></span>
+        } @else {
+        <span class="h-2.5 w-2.5"></span>
+        }
+      </div>
+    </button>
+    }
+
+    }
+
+    @if (hasMore()) {
+    <div class="p-3 text-center">
+      <button type="button" (click)="loadMore()" [disabled]="loadingMore()"
+        class="cursor-pointer rounded-lg border border-[#322a4a] bg-[#1a1628] px-5 py-2 text-sm font-medium text-gray-200 transition hover:border-violet-500 hover:bg-violet-500/10 disabled:cursor-wait disabled:opacity-60">
+        {{ loadingMore() ? 'Đang tải...' : 'Xem thêm' }}
+      </button>
+    </div>
+    }
+
+    }
+  </div>
 </div>

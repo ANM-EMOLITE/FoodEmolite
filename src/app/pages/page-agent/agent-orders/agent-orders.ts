@@ -23,9 +23,12 @@ import { getOrderDisplayStatus, ORDER_DISPLAY_STATUS_OPTIONS, ORDER_DISPLAY_STAT
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BaseSearchRequest } from '../../../common/models/base-search.model';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
+import { ORDER_SOURCE_OPTIONS, ORDER_SOURCE_TEXT, OrderSource } from '../../../common/enums/order.enum';
+import { getFullDeliveryAddress } from '../../../common/utils/delivery-address';
 
 interface OrderFilter {
     status: string;
+    orderSource: string;
     promotionType: string;
     promotionKeyword: string;
     fromDate: string;
@@ -71,13 +74,13 @@ export class PageAgentOrdersComponent {
         return this.orders().filter(order => ids.includes(order.id));
     });
 
-    // Nút xác nhận thanh toán hàng loạt chỉ bật khi có chọn dòng và tất cả đơn đã chọn đều còn chưa thanh toán (ngược lại bị disable).
     canBulkConfirmPayment = computed(() => this.selectedOrders().length > 0 && this.selectedOrders().every(o => this.canConfirmPayment(o)));
 
     sortBy = signal('');
     asc = signal(false);
     filter = signal<OrderFilter>({
         status: '',
+        orderSource: '',
         promotionType: '',
         promotionKeyword: '',
         fromDate: '',
@@ -96,14 +99,26 @@ export class PageAgentOrdersComponent {
         {
             key: 'orderCode',
             label: 'Mã đơn hàng',
-            width: '140px',
+            width: '200px',
             align: 'left'
         },
         {
             key: 'customerName',
             label: 'Tên khách hàng',
-            width: '140px',
+            width: '180px',
             align: 'left'
+        },
+        {
+            key: 'deliveryAddress',
+            label: 'Địa chỉ giao',
+            width: '240px'
+        },
+        {
+            key: 'createdAt',
+            label: 'Ngày tạo',
+            width: '180px',
+            align: 'right',
+            sortable: true
         },
         {
             key: 'totalAmount',
@@ -130,10 +145,11 @@ export class PageAgentOrdersComponent {
             type: 'badge'
         },
         {
-            key: 'createdAt',
-            label: 'Ngày tạo',
-            width: '180px',
-            sortable: true
+            key: 'orderSourceText',
+            label: 'Nguồn đơn',
+            width: '160px',
+            align: 'center',
+            type: 'badge'
         },
         {
             key: 'actions',
@@ -171,10 +187,18 @@ export class PageAgentOrdersComponent {
             options: ORDER_DISPLAY_STATUS_OPTIONS
         },
         {
+            key: 'orderSource',
+            label: 'Nguồn đơn',
+            type: 'select',
+            placeholder: 'Tất cả nguồn đơn',
+            options: ORDER_SOURCE_OPTIONS
+        },
+        {
             key: 'promotionType',
             label: 'Loại khuyến mãi',
             type: 'select',
             placeholder: 'Tất cả loại KM',
+            advanced: true,
             options: [
                 { label: 'Đồng giá', value: 'FIXED_PRICE' },
                 { label: 'Giảm giá sản phẩm', value: 'PRODUCT_DISCOUNT' },
@@ -184,9 +208,10 @@ export class PageAgentOrdersComponent {
         },
         {
             key: 'promotionKeyword',
-            label: 'Tên khuyến mãi',
+            label: 'Tên / mã khuyến mãi',
             type: 'text',
-            placeholder: 'Tên / mã khuyến mãi ...'
+            placeholder: 'Tên / mã khuyến mãi ...',
+            advanced: true
         }
     ];
 
@@ -215,6 +240,11 @@ export class PageAgentOrdersComponent {
             orderCode: order.orderCode,
             refCode: order.refCode,
             customerName: order.customerName,
+            orderSourceText: {
+                text: ORDER_SOURCE_TEXT[order.orderSource] ?? order.orderSource,
+                value: order.orderSource
+            },
+            deliveryAddress: getFullDeliveryAddress(order),
             storeRefCode: order.storeRefCode,
             totalAmount: this.formatCurrency(order.totalAmount),
             promotionNames: this.getPromotionNames(order),
@@ -267,6 +297,7 @@ export class PageAgentOrdersComponent {
                 storeRefCode: refCode,
                 keyword: this.filter().keyword || null,
                 status: this.filter().status || null,
+                orderSource: (this.filter().orderSource as OrderSource) || null,
                 promotionType: this.filter().promotionType || null,
                 promotionKeyword: this.filter().promotionKeyword || null,
                 fromDate: this.filter().fromDate || null,

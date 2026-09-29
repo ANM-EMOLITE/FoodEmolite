@@ -13,4 +13,6 @@ export interface FilterField {
   type: FilterFieldType;
   placeholder?: string;
   options?: FilterOption[];
+  /** Ẩn vào nhóm "Bộ lọc nâng cao" (bấm nút mới hiện). */
+  advanced?: boolean;
 }

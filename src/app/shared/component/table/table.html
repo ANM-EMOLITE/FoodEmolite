@@ -16,6 +16,7 @@
                    uppercase
                    text-violet-200
                    transition-colors" [style.width]="column.width || 'auto'" [class.cursor-pointer]="column.sortable"
+            [ngClass]="column.type === 'actions' ? stickyActionHeaderClass : ''"
             [class.hover:bg-violet-500/10]="column.sortable"
             [class.text-left]="column.align !== 'center' && column.align !== 'right'"
             [class.text-center]="column.align === 'center'" [class.text-right]="column.align === 'right'">
@@ -103,7 +104,7 @@
 
           @for (column of columns; track trackByColumn($index, column)) {
 
-          <td class="px-4 py-3 truncate" [class.text-left]="column.align !== 'center' && column.align !== 'right'"
+          <td class="px-4 py-3" [class.truncate]="column.type !== 'actions'" [ngClass]="column.type === 'actions' ? stickyActionCellClass : ''" [class.text-left]="column.align !== 'center' && column.align !== 'right'"
             [class.text-center]="column.align === 'center'" [class.text-right]="column.align === 'right'">
 
             @switch (column.type) {
