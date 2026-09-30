@@ -7,7 +7,7 @@ import { OrderService } from '../../../../common/services/order.service';
 import { OrderResponse } from '../../../../common/models/order.model';
 import { getOrderDisplayStatus, ORDER_DISPLAY_STATUS_TEXT } from '../../../../common/utils/order-status';
 import { URL_ENDPOINT } from '../../../../common/constants/url-endpoint';
-import { ORDER_SOURCE_TEXT, OrderType } from '../../../../common/enums/order.enum';
+import { ORDER_SOURCE_TEXT, OrderStatus, OrderType, PaymentStatus } from '../../../../common/enums/order.enum';
 import { getFullDeliveryAddress, getGoogleMapsUrl, getMapQuery } from '../../../../common/utils/delivery-address';
 
 @Component({
@@ -104,14 +104,14 @@ export class PageAgentOrderDetailComponent {
     readonly canCancel = computed(() => {
         const order = this.order();
 
-        return !!order && order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'COMPLETED' && order.paymentStatus !== 'PAID';
+        return !!order && order.orderStatus !== OrderStatus.Cancelled && order.orderStatus !== OrderStatus.Completed && order.paymentStatus !== PaymentStatus.Paid;
     });
 
     /** Đơn chưa thanh toán và chưa huỷ mới xác nhận thanh toán được — giống rule ở trang danh sách đơn hàng. */
     readonly canConfirmPayment = computed(() => {
         const order = this.order();
 
-        return !!order && order.paymentStatus !== 'PAID' && order.orderStatus !== 'CANCELLED';
+        return !!order && order.paymentStatus !== PaymentStatus.Paid && order.orderStatus !== OrderStatus.Cancelled;
     });
 
     constructor() {
@@ -181,7 +181,7 @@ export class PageAgentOrderDetailComponent {
         this.isSubmitting.set(true);
 
         this.orderService.updatePaymentStatus(order.id, {
-            newStatus: 'PAID',
+            newStatus: PaymentStatus.Paid,
             changedNote: 'Đại lý xác nhận đã thanh toán'
         }).subscribe({
             next: response => {

@@ -93,6 +93,7 @@
     <div class="mt-4">
       @if (activeTab() === 'PRODUCT') {
       <app-table [columns]="productColumns" [rows]="productRows()" [currentPage]="page()" [totalPages]="totalPages()" [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
+        [sortBy]="productSortBy()" [asc]="productAsc()" (sortChange)="onProductSortChange($event)"
         [loading]="loadingTable()" emptyText="Chưa có dữ liệu" (pageChange)="onPageChange($event)">
       </app-table>
       } @else {

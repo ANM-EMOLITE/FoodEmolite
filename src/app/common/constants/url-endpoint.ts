@@ -8,6 +8,7 @@ export const URL_ENDPOINT = {
   POS: 'pos',
   AGENT_PROFILE: 'profile',
   AGENT_FOODS: 'foods',
+  AGENT_INVENTORY: 'inventory',
   AGENT_FOOD_CATEGORIES: 'categories',
   AGENT_ORDERS: 'orders',
   AGENT_ORDER_DETAIL: 'orders/:id',

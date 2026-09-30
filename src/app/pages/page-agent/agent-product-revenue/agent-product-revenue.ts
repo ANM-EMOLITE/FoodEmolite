@@ -85,6 +85,8 @@ export class AgentProductRevenueComponent {
 
     page = signal(1);
     pageSize = signal(20);
+    productSortBy = signal('revenue');
+    productAsc = signal(false);
     totalPages = signal(1);
     totalRecords = signal(0);
 
@@ -127,6 +129,19 @@ export class AgentProductRevenueComponent {
         {
             key: 'revenue',
             label: 'Doanh thu',
+            width: '180px',
+            align: 'right',
+            sortable: true
+        },
+        {
+            key: 'cost',
+            label: 'Giá vốn',
+            width: '160px',
+            align: 'right'
+        },
+        {
+            key: 'profit',
+            label: 'Lợi nhuận',
             width: '180px',
             align: 'right',
             sortable: true
@@ -248,8 +263,8 @@ export class AgentProductRevenueComponent {
         }> = {
             page: this.page(),
             pageSize: this.pageSize(),
-            sortBy: 'revenue',
-            asc: false,
+            sortBy: this.productSortBy(),
+            asc: this.productAsc(),
             searchParams: {
                 fromDate: this.fromDate() || null,
                 toDate: this.toDate() || null,
@@ -312,7 +327,9 @@ export class AgentProductRevenueComponent {
             thumbnailUrl: product.thumbnailUrl,
             foodName: product.foodName,
             quantitySold: product.quantitySold,
-            revenue: this.formatCurrency(product.revenue)
+            revenue: this.formatCurrency(product.revenue),
+            cost: this.formatCurrency(product.cost ?? 0),
+            profit: this.formatCurrency(product.profit ?? 0)
         }));
     }
 
@@ -350,6 +367,18 @@ export class AgentProductRevenueComponent {
         this.pageSize.set(size);
         this.page.set(1);
         this.loadTable();
+    }
+
+    onProductSortChange(key: string): void {
+        if (this.productSortBy() === key) {
+            this.productAsc.set(!this.productAsc());
+        } else {
+            this.productSortBy.set(key);
+            this.productAsc.set(false);
+        }
+
+        this.page.set(1);
+        this.loadProductTable();
     }
 
     onPageChange(page: number): void {

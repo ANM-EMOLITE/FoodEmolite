@@ -8,7 +8,7 @@
 
             <p class="mt-1 text-sm text-white/40">
                 {{ isCancelled() ? 'Đơn hàng đã bị hủy'
-                : order().paymentStatus === 'PAID' ? 'Đơn hàng đã được thanh toán'
+                : order().paymentStatus === PaymentStatus.Paid ? 'Đơn hàng đã được thanh toán'
                 : isCash() ? 'Thanh toán tiền mặt khi nhận món'
                 : 'Quét mã QR để thanh toán' }}
             </p>
@@ -55,7 +55,7 @@
 
             </div>
 
-            } @else if (isCash() && order().paymentStatus !== 'PAID') {
+            } @else if (isCash() && order().paymentStatus !== PaymentStatus.Paid) {
 
             <div class="rounded-2xl
                         border border-emerald-500/20
@@ -95,7 +95,7 @@
             </div>
 
 
-            } @else if (order().paymentStatus === 'PAID') {
+            } @else if (order().paymentStatus === PaymentStatus.Paid) {
 
 
             <div class="rounded-2xl

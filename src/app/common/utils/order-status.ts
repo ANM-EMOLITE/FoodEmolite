@@ -1,3 +1,5 @@
+import { OrderStatus, PaymentStatus } from '../enums/order.enum';
+
 /**
  * Trạng thái gộp của đơn hàng (thay cho việc hiện riêng "trạng thái đơn" + "thanh toán"):
  * đơn đã huỷ luôn là CANCELLED, còn lại theo việc đã thanh toán hay chưa.
@@ -16,12 +18,12 @@ export const ORDER_DISPLAY_STATUS_OPTIONS = [
     { label: ORDER_DISPLAY_STATUS_TEXT.CANCELLED, value: 'CANCELLED' }
 ];
 
-export function getOrderDisplayStatus(order: { orderStatus: string; paymentStatus: string }): OrderDisplayStatus {
-    if (order.orderStatus === 'CANCELLED') {
+export function getOrderDisplayStatus(order: { orderStatus: OrderStatus; paymentStatus: PaymentStatus }): OrderDisplayStatus {
+    if (order.orderStatus === OrderStatus.Cancelled) {
         return 'CANCELLED';
     }
 
-    return order.paymentStatus === 'PAID' ? 'PAID' : 'UNPAID';
+    return order.paymentStatus === PaymentStatus.Paid ? 'PAID' : 'UNPAID';
 }
 
 /** Badge sáng (nền nhạt + viền) dùng ở trang lịch sử của khách. */

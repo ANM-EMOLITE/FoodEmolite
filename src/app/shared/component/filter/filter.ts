@@ -4,8 +4,10 @@ import {
     EventEmitter,
     HostListener,
     Input,
+    OnChanges,
     OnInit,
     Output,
+    SimpleChanges,
     ViewChild
 } from '@angular/core';
 
@@ -38,7 +40,7 @@ import { FilterField } from '../../../common/models/front-end/filter/filter-fiel
     templateUrl: './filter.html',
     styleUrl: './filter.css'
 })
-export class FilterComponent implements OnInit {
+export class FilterComponent implements OnInit, OnChanges {
 
     @Input() fields: FilterField[] = [];
 
@@ -109,8 +111,7 @@ export class FilterComponent implements OnInit {
 
         this.form = this.fb.group(controls);
 
-        this.basicFields = this.fields.filter(field => !field.advanced);
-        this.advancedFields = this.fields.filter(field => field.advanced);
+        this.splitFields();
 
         this.form.valueChanges
             .pipe(
@@ -120,6 +121,30 @@ export class FilterComponent implements OnInit {
 
                 this.filterChange.emit(value);
             });
+    }
+
+    /**
+     * Trang cha thường gán lại `fields` sau khi gọi API (vd. options danh mục load về sau) —
+     * phải tách lại basic/advanced, nếu không dropdown vẫn giữ field cũ với options rỗng ("Không có kết quả").
+     */
+    ngOnChanges(changes: SimpleChanges): void {
+        if (!changes['fields'] || changes['fields'].firstChange || !this.form) {
+            return;
+        }
+
+        this.fields.forEach(field => {
+            if (!this.form.contains(field.key)) {
+                this.defaultValues[field.key] = this.initialValues?.[field.key] ?? '';
+                this.form.addControl(field.key, this.fb.control(this.defaultValues[field.key]), { emitEvent: false });
+            }
+        });
+
+        this.splitFields();
+    }
+
+    private splitFields(): void {
+        this.basicFields = this.fields.filter(field => !field.advanced);
+        this.advancedFields = this.fields.filter(field => field.advanced);
     }
 
     @HostListener('document:click', ['$event'])

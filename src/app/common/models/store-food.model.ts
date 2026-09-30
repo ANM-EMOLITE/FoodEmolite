@@ -28,6 +28,7 @@ export interface StoreFoodResponse {
   thumbnailUrl: string | null;
   description: string | null;
   price: number;
+  costPrice?: number | null;
   quantity: number;
   isAvailable: boolean;
   storeFoodCategoryId: number;
@@ -68,6 +69,7 @@ export interface CreateStoreFoodRequest {
   thumbnailFile?: File | null;
   description?: string | null;
   price: number;
+  costPrice: number;
   quantity: number;
   storeFoodCategoryId: number | null;
   optionGroups: StoreFoodOptionGroupRequest[];
@@ -80,7 +82,8 @@ export interface UpdateStoreFoodRequest {
   thumbnailUrl?: string | null;
   description?: string | null;
   price: number;
-  quantity: number;
+  costPrice: number;
+  quantity?: number | null;
   isAvailable: boolean;
   storeFoodCategoryId: number | null;
   optionGroups: StoreFoodOptionGroupRequest[];

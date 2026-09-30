@@ -1,0 +1,96 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+  <div class="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-md border border-[#322a4a] bg-[#171322] shadow-xl">
+    <div class="flex items-center justify-between border-b border-[#322a4a] px-5 py-4">
+      <div>
+        <h2 class="text-base font-semibold text-violet-200">Nhập hàng</h2>
+        <p class="mt-1 text-sm text-gray-400">Cộng số lượng vào kho và cập nhật giá vốn bình quân</p>
+      </div>
+
+      <button type="button" (click)="closed.emit()" class="text-gray-400 transition hover:text-violet-300">✕</button>
+    </div>
+
+    <div class="space-y-4 overflow-y-auto p-5">
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-300">Nhà cung cấp</label>
+          <input type="text" [(ngModel)]="supplierName" placeholder="Không bắt buộc"
+            class="h-10.5 w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-300">Ghi chú</label>
+          <input type="text" [(ngModel)]="note" placeholder="Không bắt buộc"
+            class="h-10.5 w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-300">Thêm món</label>
+        <app-search-select [options]="foodOptions()" [value]="null" placeholder="Chọn món cần nhập"
+          searchPlaceholder="Tìm theo tên hoặc mã" (selected)="addFood($event)">
+        </app-search-select>
+      </div>
+
+      <div class="overflow-x-auto rounded-md border border-[#322a4a]">
+        <table class="w-full min-w-[640px] text-sm">
+          <thead class="bg-[#1a1628] text-left text-xs uppercase text-violet-300">
+            <tr>
+              <th class="px-3 py-2.5">Món</th>
+              <th class="w-24 px-3 py-2.5 text-right">Tồn</th>
+              <th class="w-32 px-3 py-2.5">Số lượng nhập</th>
+              <th class="w-40 px-3 py-2.5">Giá nhập</th>
+              <th class="w-36 px-3 py-2.5 text-right">Thành tiền</th>
+              <th class="w-10 px-3 py-2.5"></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (line of lines(); track line.food.id; let i = $index) {
+            <tr class="border-t border-[#322a4a]">
+              <td class="px-3 py-2">
+                <div class="font-medium text-white">{{ line.food.foodName }}</div>
+                <div class="text-xs text-gray-500">{{ line.food.productCode }}</div>
+              </td>
+              <td class="px-3 py-2 text-right text-gray-400">{{ line.food.quantity }}</td>
+              <td class="px-3 py-2">
+                <input type="number" min="1" [ngModel]="line.quantity" (ngModelChange)="updateLine(i, { quantity: $event })"
+                  class="h-9 w-full rounded-md border border-[#322a4a] bg-[#1a1628] px-2 text-sm text-white outline-none focus:border-violet-500" />
+              </td>
+              <td class="px-3 py-2">
+                <input type="number" min="0" [ngModel]="line.unitCost" (ngModelChange)="updateLine(i, { unitCost: $event })"
+                  class="h-9 w-full rounded-md border border-[#322a4a] bg-[#1a1628] px-2 text-sm text-white outline-none focus:border-violet-500" />
+              </td>
+              <td class="px-3 py-2 text-right text-white">{{ formatCurrency((line.quantity || 0) * (line.unitCost || 0)) }}</td>
+              <td class="px-3 py-2 text-center">
+                <button type="button" (click)="removeLine(i)" class="text-gray-400 transition hover:text-red-400">✕</button>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="6" class="px-3 py-8 text-center text-gray-500">Chưa chọn món nào</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between gap-4 border-t border-[#322a4a] px-5 py-4">
+      <div class="text-sm text-gray-400">
+        Tổng: <span class="font-semibold text-white">{{ totalQuantity() }}</span> sản phẩm ·
+        <span class="font-semibold text-white">{{ formatCurrency(totalAmount()) }}</span>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="button" (click)="closed.emit()"
+          class="rounded-md border border-[#322a4a] px-4 py-2 text-sm text-gray-300 transition hover:bg-white/5">
+          Huỷ
+        </button>
+        <button type="button" (click)="submit()" [disabled]="!isValid() || isSubmitting()"
+          class="rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ isSubmitting() ? 'Đang lưu...' : 'Lưu phiếu nhập' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

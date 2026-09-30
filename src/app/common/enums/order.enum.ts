@@ -31,3 +31,15 @@ export const ORDER_TYPE_TEXT: Record<OrderType, string> = {
     [OrderType.DineIn]: 'Tại quầy',
     [OrderType.Delivery]: 'Giao hàng'
 };
+
+export enum OrderStatus {
+    Pending = 'PENDING',
+    Confirmed = 'CONFIRMED',
+    Completed = 'COMPLETED',
+    Cancelled = 'CANCELLED'
+}
+
+export enum PaymentStatus {
+    Unpaid = 'UNPAID',
+    Paid = 'PAID'
+}

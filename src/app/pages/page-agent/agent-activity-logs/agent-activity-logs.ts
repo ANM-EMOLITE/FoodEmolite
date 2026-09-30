@@ -35,13 +35,15 @@ const ACTION_TEXT: Record<string, string> = {
     CANCEL_PROMOTION: 'Huỷ khuyến mãi',
     DELETE_PROMOTION: 'Xoá khuyến mãi',
     CONFIRM_PAYMENT: 'Xác nhận thanh toán',
-    CANCEL_ORDER: 'Huỷ đơn hàng'
+    CANCEL_ORDER: 'Huỷ đơn hàng',
+    IMPORT_STOCK: 'Nhập hàng',
+    STOCKTAKE: 'Kiểm kho'
 };
 
 /** Màu badge theo nhóm hành động (dùng lại các giá trị màu có sẵn của bảng): tạo/tiếp tục = xanh lá, cập nhật = xanh dương, tạm dừng = vàng, xoá/huỷ = đỏ. */
 function getActionTone(action: string): string {
-    if (action.startsWith('CREATE_') || action === 'RESUME_PROMOTION' || action === 'CONFIRM_PAYMENT') return 'ACTIVE';
-    if (action.startsWith('UPDATE_')) return 'SCHEDULED';
+    if (action.startsWith('CREATE_') || action === 'RESUME_PROMOTION' || action === 'CONFIRM_PAYMENT' || action === 'IMPORT_STOCK') return 'ACTIVE';
+    if (action.startsWith('UPDATE_') || action === 'STOCKTAKE') return 'SCHEDULED';
     if (action === 'PAUSE_PROMOTION') return 'PAUSED';
     if (action.startsWith('DELETE_') || action.startsWith('CANCEL_')) return 'ENDED';
     return 'DRAFT';
