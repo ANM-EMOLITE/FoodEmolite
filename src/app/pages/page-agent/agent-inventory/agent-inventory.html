@@ -1,0 +1,81 @@
+<div class="space-y-3">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+        Kho Hàng
+      </h1>
+      <p class="mt-2 text-md leading-4 text-gray-500">
+        Nhập hàng, kiểm kho và theo dõi biến động tồn kho
+      </p>
+    </div>
+
+    <div class="flex shrink-0 items-center gap-3">
+      <button type="button" (click)="openStocktake()" [disabled]="!storeRefCode()"
+        class="flex items-center justify-center gap-2 rounded-md border border-violet-600 px-4 py-2.5 text-sm font-medium text-violet-400 transition hover:bg-violet-600/10 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+          <path d="m9 14 2 2 4-4" />
+        </svg>
+        Kiểm Kho
+      </button>
+
+      <button type="button" (click)="openReceipt()" [disabled]="!storeRefCode()"
+        class="flex items-center justify-center gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M8 12h8" />
+          <path d="M12 8v8" />
+        </svg>
+        Nhập Hàng
+      </button>
+    </div>
+  </div>
+
+  <div class="flex gap-1 border-b border-[#322a4a]">
+    @for (tab of tabs; track tab.key) {
+    <button type="button" (click)="switchTab(tab.key)"
+      class="-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition cursor-pointer"
+      [class.border-violet-500]="activeTab() === tab.key" [class.text-violet-400]="activeTab() === tab.key"
+      [class.border-transparent]="activeTab() !== tab.key" [class.text-gray-500]="activeTab() !== tab.key">
+      {{ tab.label }}
+    </button>
+    }
+  </div>
+
+  @switch (activeTab()) {
+  @case ('transactions') {
+  <app-filter [fields]="transactionFilterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
+  </app-filter>
+  }
+  @default {
+  <app-filter [fields]="documentFilterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
+  </app-filter>
+  }
+  }
+  <div></div>
+  <app-table [columns]="columns()" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
+    [totalRecords]="totalRecords()" [pageSize]="pageSize()" [loading]="loading()" [sortBy]="'createdAt'" [asc]="asc()"
+    [emptyText]="emptyText()" (rowClick)="onRowClick($event)" (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)" (sortChange)="onSortChange()">
+  </app-table>
+</div>
+
+@if (isReceiptOpen()) {
+<app-pop-up-inventory-receipt [foods]="foods()" [isSubmitting]="isSubmitting()" (closed)="isReceiptOpen.set(false)"
+  (submitted)="createReceipt($event)">
+</app-pop-up-inventory-receipt>
+}
+
+@if (isStocktakeOpen()) {
+<app-pop-up-inventory-stocktake [foods]="foods()" [isSubmitting]="isSubmitting()" (closed)="isStocktakeOpen.set(false)"
+  (submitted)="createStocktake($event)">
+</app-pop-up-inventory-stocktake>
+}
+
+@if (viewingReceipt() || viewingStocktake()) {
+<app-pop-up-inventory-document [receipt]="viewingReceipt()" [stocktake]="viewingStocktake()" (closed)="closeDocument()">
+</app-pop-up-inventory-document>
+}

@@ -111,6 +111,7 @@ export class StoreFoodService {
     }
 
     formData.append('Price', String(request.price));
+    formData.append('CostPrice', String(request.costPrice ?? 0));
     formData.append('Quantity', String(request.quantity));
     formData.append('Description', request.description ?? '');
     formData.append('StoreFoodCategoryId', String(request.storeFoodCategoryId));
@@ -132,7 +133,12 @@ export class StoreFoodService {
     formData.append('FoodName', request.foodName);
     formData.append('ProductCode', request.productCode);
     formData.append('Price', String(request.price));
-    formData.append('Quantity', String(request.quantity));
+    formData.append('CostPrice', String(request.costPrice ?? 0));
+
+    if (request.quantity !== null && request.quantity !== undefined) {
+      formData.append('Quantity', String(request.quantity));
+    }
+
     formData.append('IsAvailable', String(request.isAvailable));
     formData.append('Description', request.description ?? '');
     formData.append('StoreFoodCategoryId', String(request.storeFoodCategoryId));

@@ -54,6 +54,15 @@ export const API_ENDPOINT = {
   ACTIVITY_LOG: {
     STORE_SEARCH: 'activity-logs/store/search'
   },
+  INVENTORY: {
+    TRANSACTIONS_SEARCH: 'inventory/transactions/search',
+    RECEIPTS: 'inventory/receipts',
+    RECEIPTS_SEARCH: 'inventory/receipts/search',
+    RECEIPT_DETAIL: (id: number) => `inventory/receipts/${id}`,
+    STOCKTAKES: 'inventory/stocktakes',
+    STOCKTAKES_SEARCH: 'inventory/stocktakes/search',
+    STOCKTAKE_DETAIL: (id: number) => `inventory/stocktakes/${id}`
+  },
   REVENUE: {
     AGENT: 'revenue/agent',
     AGENT_TOP_PRODUCTS: 'revenue/agent/top-products',

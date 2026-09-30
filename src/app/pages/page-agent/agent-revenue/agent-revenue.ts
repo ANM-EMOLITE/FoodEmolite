@@ -1,5 +1,6 @@
 import {
     Component,
+    computed,
     inject,
     signal
 } from '@angular/core';
@@ -29,13 +30,14 @@ import {
 } from '../../../common/models/revenue.model';
 
 import { DropdownComponent, DropdownOption } from '../../../shared/component/dropdown/dropdown';
+import { TooltipDirective } from '../../../shared/directive/tooltip.directive';
 import { ORDER_DISPLAY_STATUS_TEXT, OrderDisplayStatus } from '../../../common/utils/order-status';
 
 export type LineChartOptions = {
     series: ApexAxisChartSeries;
     chart: ApexChart;
     xaxis: ApexXAxis;
-    yaxis: ApexYAxis;
+    yaxis: ApexYAxis | ApexYAxis[];
     stroke: ApexStroke;
     dataLabels: ApexDataLabels;
     tooltip: ApexTooltip;
@@ -46,11 +48,15 @@ export type LineChartOptions = {
 /** Màu dùng chung cho thẻ số liệu và biểu đồ — thẻ nào màu gì thì series tương ứng trên chart cùng màu đó. */
 const CHART_COLORS = {
     revenue: '#10b981',
+    profit: '#8b5cf6',
     orders: '#0ea5e9',
     PAID: '#10b981',
     UNPAID: '#f59e0b',
     CANCELLED: '#ef4444'
 } as const;
+
+/** Thứ tự trạng thái trên biểu đồ tròn và chú thích: đã thanh toán bên trái → chưa thanh toán → đã huỷ. */
+const STATUS_ORDER: string[] = ['PAID', 'UNPAID', 'CANCELLED'];
 
 export type DonutChartOptions = {
     series: ApexNonAxisChartSeries;
@@ -71,7 +77,8 @@ export type DonutChartOptions = {
         CommonModule,
         FormsModule,
         NgApexchartsModule,
-        DropdownComponent
+        DropdownComponent,
+        TooltipDirective
     ],
     templateUrl: './agent-revenue.html'
 })
@@ -113,6 +120,13 @@ export class AgentRevenueComponent {
     readonly totalOrders = signal(0);
     readonly totalCancelledOrders = signal(0);
     readonly totalRevenue = signal(0);
+    readonly totalCost = signal(0);
+    readonly totalProfit = signal(0);
+    readonly profitMargin = computed(() =>
+        this.totalRevenue() > 0 ? Math.round(this.totalProfit() / this.totalRevenue() * 1000) / 10 : 0);
+
+    /** Chú thích dưới biểu đồ tròn: mỗi trạng thái 1 cột, số tiền nằm dưới tên. */
+    readonly statusBreakdown = signal<{ label: string; value: number; color: string }[]>([]);
 
     lineChartOptions: Partial<LineChartOptions> = this.getDefaultLineChartOptions();
     donutChartOptions: Partial<DonutChartOptions> = this.getDefaultDonutChartOptions();
@@ -137,6 +151,8 @@ export class AgentRevenueComponent {
                         this.totalOrders.set(0);
                         this.totalCancelledOrders.set(0);
                         this.totalRevenue.set(0);
+                        this.totalCost.set(0);
+                        this.totalProfit.set(0);
                         this.updateCharts(null);
                         return;
                     }
@@ -145,6 +161,8 @@ export class AgentRevenueComponent {
                     this.totalOrders.set(res.data.totalOrders);
                     this.totalCancelledOrders.set(res.data.totalCancelledOrders ?? 0);
                     this.totalRevenue.set(res.data.totalRevenue);
+                    this.totalCost.set(res.data.totalCost ?? 0);
+                    this.totalProfit.set(res.data.totalProfit ?? 0);
                     this.updateCharts(res.data);
                 },
                 complete: () => {
@@ -184,9 +202,87 @@ export class AgentRevenueComponent {
         }).format(value);
     }
 
+    /** Số tiền rút gọn (1.2M, 850k) để hiển thị gọn; con số chính xác xem qua tooltip formatCurrency. */
+    formatShortCurrency(value: number): string {
+        if (Math.abs(value) >= 1000000) {
+            return `${+(value / 1000000).toFixed(2)}M`;
+        }
+
+        if (Math.abs(value) >= 1000) {
+            return `${+(value / 1000).toFixed(1)}k`;
+        }
+
+        return this.formatCurrency(value);
+    }
+
+    private donutTooltipEl: HTMLElement | null = null;
+
+    /**
+     * Tooltip biểu đồ tròn dùng class .app-tooltip dùng chung (giống appTooltip), gắn vào body với position: fixed
+     * và kẹp trong màn hình — không nằm trong card nên không đẩy layout ra gây scroll ngang.
+     */
+    private showDonutTooltip(event: MouseEvent, index: number): void {
+        const item = this.statusBreakdown()[index];
+
+        if (!item) {
+            return;
+        }
+
+        this.hideDonutTooltip();
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'app-tooltip';
+        tooltip.textContent = `${item.label}: ${this.formatCurrency(item.value)}`;
+        document.body.appendChild(tooltip);
+
+        this.donutTooltipEl = tooltip;
+        this.moveDonutTooltip(event);
+    }
+
+    private moveDonutTooltip(event: MouseEvent): void {
+        const tooltip = this.donutTooltipEl;
+
+        if (!tooltip) {
+            return;
+        }
+
+        const rect = tooltip.getBoundingClientRect();
+
+        let top = event.clientY - rect.height - 12;
+        let left = event.clientX - rect.width / 2;
+
+        if (top < 4) {
+            top = event.clientY + 16;
+        }
+
+        left = Math.min(Math.max(left, 4), window.innerWidth - rect.width - 4);
+
+        tooltip.style.top = `${top}px`;
+        tooltip.style.left = `${left}px`;
+    }
+
+    private hideDonutTooltip(): void {
+        this.donutTooltipEl?.remove();
+        this.donutTooltipEl = null;
+    }
+
+    ngOnDestroy(): void {
+        this.hideDonutTooltip();
+    }
+
     private updateCharts(data: AgentRevenueResponse | null): void {
+        this.hideDonutTooltip();
+
         const lineItems = data?.lineChart ?? [];
-        const pieItems = data?.pieChart ?? [];
+        const pieItems = [...(data?.pieChart ?? [])].sort(
+            (a, b) => STATUS_ORDER.indexOf(a.label) - STATUS_ORDER.indexOf(b.label)
+        );
+
+        this.statusBreakdown.set(pieItems.map(x => ({
+            label: this.getStatusLabel(x.label),
+            value: x.value,
+            color: CHART_COLORS[x.label as keyof typeof CHART_COLORS] ?? '#a78bfa'
+        })));
 
         this.lineChartOptions = {
             ...this.getDefaultLineChartOptions(),
@@ -194,6 +290,10 @@ export class AgentRevenueComponent {
                 {
                     name: 'Doanh thu',
                     data: lineItems.map(x => x.revenue)
+                },
+                {
+                    name: 'Lợi nhuận',
+                    data: lineItems.map(x => x.profit)
                 },
                 {
                     name: 'Số đơn',
@@ -227,6 +327,10 @@ export class AgentRevenueComponent {
                     data: []
                 },
                 {
+                    name: 'Lợi nhuận',
+                    data: []
+                },
+                {
                     name: 'Số đơn',
                     data: []
                 }
@@ -242,10 +346,10 @@ export class AgentRevenueComponent {
                 },
                 fontFamily: 'inherit'
             },
-            colors: [CHART_COLORS.revenue, CHART_COLORS.orders],
+            colors: [CHART_COLORS.revenue, CHART_COLORS.profit, CHART_COLORS.orders],
             stroke: {
                 curve: 'smooth',
-                width: [3, 2]
+                width: [3, 2, 2]
             },
             dataLabels: {
                 enabled: false
@@ -262,25 +366,51 @@ export class AgentRevenueComponent {
                     }
                 }
             },
-            yaxis: {
-                labels: {
-                    formatter: (value: number) =>
-                        value >= 1000000
-                            ? `${Math.round(value / 1000000)}tr`
-                            : `${Math.round(value)}`,
-                    style: {
-                        colors: '#6b7280',
-                        fontSize: '12px'
+            // Doanh thu (hàng trăm nghìn) và số đơn (vài đơn) chênh nhau quá xa nên mỗi series một trục,
+            // nếu dùng chung trục thì đường "Số đơn" luôn nằm bẹp ở 0.
+            yaxis: [
+                {
+                    seriesName: 'Doanh thu',
+                    labels: {
+                        formatter: (value: number) =>
+                            Math.abs(value) >= 1000000
+                                ? `${+(value / 1000000).toFixed(1)}M`
+                                : Math.abs(value) >= 1000
+                                    ? `${Math.round(value / 1000)}k`
+                                    : `${Math.round(value)}`,
+                        style: {
+                            colors: CHART_COLORS.revenue,
+                            fontSize: '12px'
+                        }
+                    }
+                },
+                {
+                    seriesName: 'Doanh thu',
+                    show: false
+                },
+                {
+                    seriesName: 'Số đơn',
+                    opposite: true,
+                    min: 0,
+                    forceNiceScale: true,
+                    labels: {
+                        formatter: (value: number) => `${Math.round(value)}`,
+                        style: {
+                            colors: CHART_COLORS.orders,
+                            fontSize: '12px'
+                        }
                     }
                 }
-            },
+            ],
             tooltip: {
+                shared: true,
+                intersect: false,
                 y: {
                     formatter: (value: number, opts) => {
                         const seriesName =
                             opts.w.globals.seriesNames[opts.seriesIndex];
 
-                        if (seriesName === 'Doanh thu') {
+                        if (seriesName === 'Doanh thu' || seriesName === 'Lợi nhuận') {
                             return this.formatCurrency(value);
                         }
 
@@ -298,24 +428,26 @@ export class AgentRevenueComponent {
             colors: [],
             chart: {
                 type: 'donut',
-                height: 330,
-                fontFamily: 'inherit'
-            },
-            legend: {
-                position: 'bottom',
-                fontSize: '13px',
-                labels: {
-                    colors: '#374151'
+                height: 270,
+                fontFamily: 'inherit',
+                events: {
+                    dataPointMouseEnter: (event: MouseEvent, _ctx: unknown, config: { dataPointIndex: number }) =>
+                        this.showDonutTooltip(event, config.dataPointIndex),
+                    mouseMove: (event: MouseEvent) => this.moveDonutTooltip(event),
+                    dataPointMouseLeave: () => this.hideDonutTooltip()
                 }
+            },
+            // Chú thích tự vẽ bên dưới (statusBreakdown) để hiện kèm số tiền.
+            legend: {
+                show: false
             },
             dataLabels: {
                 enabled: true,
                 // formatter: (value: number) => `${value.toFixed(0)}%`
             },
+            // Tooltip mặc định của ApexCharts tràn ra ngoài card gây scroll ngang → dùng .app-tooltip dùng chung (showDonutTooltip).
             tooltip: {
-                y: {
-                    formatter: (value: number) => this.formatCurrency(value)
-                }
+                enabled: false
             },
             plotOptions: {
                 pie: {
@@ -325,18 +457,12 @@ export class AgentRevenueComponent {
                             show: true,
                             value: {
                                 formatter: (value: string) =>
-                                    this.formatCurrency(Number(value))
+                                    this.formatShortCurrency(Number(value))
                             },
                             total: {
                                 show: true,
-                                label: 'Tổng',
-                                formatter: () => {
-                                    const total =
-                                        (this.donutChartOptions.series as number[])
-                                            ?.reduce((a, b) => a + b, 0) ?? 0;
-
-                                    return this.formatCurrency(total);
-                                }
+                                label: 'Tổng doanh thu',
+                                formatter: () => this.formatShortCurrency(this.totalRevenue())
                             }
                         }
                     }
@@ -347,7 +473,7 @@ export class AgentRevenueComponent {
                     breakpoint: 768,
                     options: {
                         chart: {
-                            height: 280
+                            height: 240
                         },
                         legend: {
                             position: 'bottom'
@@ -535,8 +661,13 @@ export class AgentRevenueComponent {
         this.openToDatePicker = false;
     }
 
+    /** yyyy-MM-dd theo giờ máy — không dùng toISOString() vì đổi sang UTC làm ngày ở VN (UTC+7) lùi 1 ngày. */
     private toDateValue(date: Date): string {
-        return date.toISOString().split('T')[0];
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+
+        return `${y}-${m}-${d}`;
     }
 
     private isToday(date: Date): boolean {

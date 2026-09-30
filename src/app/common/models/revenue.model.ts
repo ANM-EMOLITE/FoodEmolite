@@ -9,6 +9,8 @@ export interface RevenueQuery {
 export interface RevenueLineChartItem {
   label: string;
   revenue: number;
+  cost: number;
+  profit: number;
   orderCount: number;
 }
 
@@ -21,6 +23,8 @@ export interface AgentRevenueResponse {
   totalOrders: number;
   totalCancelledOrders: number;
   totalRevenue: number;
+  totalCost: number;
+  totalProfit: number;
   lineChart: RevenueLineChartItem[];
   pieChart: RevenuePieChartItem[];
 }
@@ -31,6 +35,8 @@ export interface TopSellingProduct {
   thumbnailUrl: string | null;
   quantitySold: number;
   revenue: number;
+  cost: number;
+  profit: number;
   storeRefCode: string;
   storeName: string;
 }

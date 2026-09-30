@@ -25,6 +25,7 @@ export class PopUpAgentFoodAddComponent {
     thumbnailFile: null,
     description: '',
     price: 0,
+    costPrice: 0,
     quantity: 0,
     storeFoodCategoryId: 0,
     optionGroups: []

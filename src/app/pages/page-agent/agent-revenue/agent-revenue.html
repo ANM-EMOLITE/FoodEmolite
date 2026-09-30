@@ -310,7 +310,7 @@
 
   </div>
 
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
     <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5 shadow-lg">
 
       <div class="flex items-center justify-between">
@@ -321,8 +321,9 @@
             Tổng doanh thu
           </p>
 
-          <h3 class="mt-2 text-2xl font-semibold text-white">
-            {{ formatCurrency(totalRevenue()) }}
+          <h3 class="mt-2 w-fit cursor-default text-2xl font-semibold text-white"
+            [appTooltip]="formatCurrency(totalRevenue())">
+            {{ formatShortCurrency(totalRevenue()) }}
           </h3>
 
         </div>
@@ -334,6 +335,43 @@
 
             <path d="M12 1v22" />
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
+
+          </svg>
+
+        </div>
+
+      </div>
+
+    </div>
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5 shadow-lg">
+
+      <div class="flex items-center justify-between">
+
+        <div>
+
+          <p class="text-sm text-gray-400 uppercase">
+            Lợi nhuận
+          </p>
+
+          <h3 class="mt-2 w-fit cursor-default text-2xl font-semibold"
+            [class.text-white]="totalProfit() >= 0" [class.text-red-500]="totalProfit() < 0"
+            [appTooltip]="formatCurrency(totalProfit())">
+            {{ formatShortCurrency(totalProfit()) }}
+          </h3>
+
+          <p class="mt-1 text-xs text-gray-500">
+            Giá vốn {{ formatShortCurrency(totalCost()) }} · Biên {{ profitMargin() }}%
+          </p>
+
+        </div>
+
+        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#8b5cf6]/10 text-[#8b5cf6]">
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+            <path d="M22 7 13.5 15.5 8.5 10.5 2 17" />
+            <path d="M16 7h6v6" />
 
           </svg>
 
@@ -440,7 +478,7 @@
 
         @if (loading()) {
 
-        <div class="flex h-[330px] items-center justify-center text-sm text-gray-500">
+        <div class="flex h-82.5 items-center justify-center text-sm text-gray-500">
 
           Đang tải dữ liệu...
 
@@ -451,7 +489,7 @@
         @else if ((lineChartOptions.series?.[0]?.data?.length ?? 0) === 0) {
 
         <div
-          class="flex h-[330px] items-center justify-center rounded-xl border border-dashed border-[#322a4a] text-sm text-gray-500">
+          class="flex h-82.5 items-center justify-center rounded-xl border border-dashed border-[#322a4a] text-sm text-gray-500">
 
           Chưa có dữ liệu doanh thu
 
@@ -491,7 +529,7 @@
 
         @if (loading()) {
 
-        <div class="flex h-[330px] items-center justify-center text-sm text-gray-500">
+        <div class="flex h-82.5 items-center justify-center text-sm text-gray-500">
 
           Đang tải dữ liệu...
 
@@ -502,7 +540,7 @@
         @else if ((donutChartOptions.series?.length ?? 0) === 0) {
 
         <div
-          class="flex h-[330px] items-center justify-center rounded-xl border border-dashed border-[#322a4a] text-sm text-gray-500">
+          class="flex h-82.5 items-center justify-center rounded-xl border border-dashed border-[#322a4a] text-sm text-gray-500">
 
           Chưa có dữ liệu
 
@@ -518,6 +556,27 @@
           [plotOptions]="donutChartOptions.plotOptions!" [responsive]="donutChartOptions.responsive!"
           [colors]="donutChartOptions.colors!">
         </apx-chart>
+
+        <div class="mt-4 flex justify-between gap-4">
+
+          @for (item of statusBreakdown(); track item.label) {
+
+          <div class="flex flex-col items-center gap-1 last:items-end first:items-start">
+
+            <div class="flex items-center gap-2 text-sm text-gray-400">
+              <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background-color]="item.color"></span>
+              {{ item.label }}
+            </div>
+
+            <span class="text-base font-semibold text-white">
+              {{ formatCurrency(item.value) }}
+            </span>
+
+          </div>
+
+          }
+
+        </div>
 
         }
 

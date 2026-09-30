@@ -1,4 +1,4 @@
-import { OrderSource, OrderType } from '../enums/order.enum';
+import { OrderSource, OrderStatus, OrderType, PaymentStatus } from '../enums/order.enum';
 
 export type PaymentMethod = 'CASH' | 'BANK_TRANSFER';
 
@@ -51,12 +51,12 @@ export interface CreateGuestOrderRequest extends CreateOrderRequest {
 }
 
 export interface UpdateOrderStatusRequest {
-  newStatus: string;
+  newStatus: OrderStatus;
   changedNote?: string | null;
 }
 
 export interface UpdatePaymentStatusRequest {
-  newStatus: string;
+  newStatus: PaymentStatus;
   changedNote?: string | null;
 }
 
@@ -68,8 +68,8 @@ export interface OrderResponse {
   customerName: string;
   storeRefCode: string;
   totalAmount: number;
-  orderStatus: string;
-  paymentStatus: string;
+  orderStatus: OrderStatus;
+  paymentStatus: PaymentStatus;
   paymentMethod: PaymentMethod;
   note?: string | null;
   createdAt: string;
@@ -132,7 +132,7 @@ export interface OrderSearchRequest {
 export interface CreateOrderResponse {
     orderId: number;
     orderCode: string;
-    paymentStatus: string;
+    paymentStatus: PaymentStatus;
     paymentMethod: PaymentMethod;
     totalAmount: number;
 }

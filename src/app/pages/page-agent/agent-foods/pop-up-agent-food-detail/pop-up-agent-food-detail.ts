@@ -31,7 +31,7 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
     thumbnailUrl: null,
     description: '',
     price: 0,
-    quantity: 0,
+    costPrice: 0,
     isAvailable: true,
     storeFoodCategoryId: null,
     optionGroups: []
@@ -46,7 +46,7 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
         thumbnailUrl: this.food.thumbnailUrl,
         description: this.food.description,
         price: this.food.price,
-        quantity: this.food.quantity,
+        costPrice: this.food.costPrice ?? 0,
         isAvailable: this.food.isAvailable,
         storeFoodCategoryId: this.food.storeFoodCategoryId ?? null,
         optionGroups: (this.food.optionGroups ?? []).map(group => ({

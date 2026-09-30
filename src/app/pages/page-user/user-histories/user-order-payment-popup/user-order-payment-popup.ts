@@ -7,6 +7,7 @@ import {
     output,
     signal
 } from '@angular/core';
+import { OrderStatus, PaymentStatus } from '../../../../common/enums/order.enum';
 import { OrderItemResponse, OrderResponse } from '../../../../common/models/order.model';
 import { StorePaymentInfoResponse } from '../../../../common/models/profile.model';
 import { ProfileService } from '../../../../common/services/profile.service';
@@ -37,14 +38,16 @@ export class UserOrderPaymentPopupComponent {
         });
     }
 
-    isCancelled = computed(() => this.order().orderStatus === 'CANCELLED');
+    readonly PaymentStatus = PaymentStatus;
+
+    isCancelled = computed(() => this.order().orderStatus === OrderStatus.Cancelled);
     isCash = computed(() => this.order().paymentMethod === 'CASH');
 
     /** Chỉ đơn chuyển khoản, chưa thanh toán và chưa bị hủy mới cần hiện mã QR. */
     showQr = computed(() =>
         !this.isCancelled()
         && !this.isCash()
-        && this.order().paymentStatus !== 'PAID'
+        && this.order().paymentStatus !== PaymentStatus.Paid
     );
 
     loadPaymentInfo(): void {

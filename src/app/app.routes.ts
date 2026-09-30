@@ -54,6 +54,13 @@ export const routes: Routes = [
         }
       },
       {
+        path: URL_ENDPOINT.AGENT_INVENTORY,
+        loadComponent: () => import('./pages/page-agent/agent-inventory/agent-inventory').then(m => m.PageAgentInventoryComponent),
+        data: {
+          title: 'Kho hàng'
+        }
+      },
+      {
         path: URL_ENDPOINT.AGENT_ORDERS,
         loadComponent: () => import('./pages/page-agent/agent-orders/agent-orders').then(m => m.PageAgentOrdersComponent),
         data: {

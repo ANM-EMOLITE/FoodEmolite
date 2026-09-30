@@ -416,3 +416,20 @@ tr:hover > .table-sticky-action {
     transform: scaleX(0);
   }
 }
+
+/* ApexCharts: bỏ viền mặc định của tooltip, dùng bóng nhẹ cho gọn */
+.apexcharts-tooltip,
+.apexcharts-tooltip.apexcharts-theme-light,
+.apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title,
+.apexcharts-xaxistooltip {
+  border: none !important;
+}
+
+.apexcharts-tooltip.apexcharts-theme-light {
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12) !important;
+}
+
+.apexcharts-xaxistooltip::before,
+.apexcharts-xaxistooltip::after {
+  display: none;
+}

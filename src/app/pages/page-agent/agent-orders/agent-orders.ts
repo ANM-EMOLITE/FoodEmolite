@@ -23,7 +23,7 @@ import { getOrderDisplayStatus, ORDER_DISPLAY_STATUS_OPTIONS, ORDER_DISPLAY_STAT
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BaseSearchRequest } from '../../../common/models/base-search.model';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
-import { ORDER_SOURCE_OPTIONS, ORDER_SOURCE_TEXT, OrderSource } from '../../../common/enums/order.enum';
+import { ORDER_SOURCE_OPTIONS, ORDER_SOURCE_TEXT, OrderSource, OrderStatus, PaymentStatus } from '../../../common/enums/order.enum';
 import { getFullDeliveryAddress } from '../../../common/utils/delivery-address';
 
 interface OrderFilter {
@@ -147,7 +147,7 @@ export class PageAgentOrdersComponent {
         {
             key: 'orderSourceText',
             label: 'Nguồn đơn',
-            width: '160px',
+            width: '180px',
             align: 'center',
             type: 'badge'
         },
@@ -442,7 +442,7 @@ export class PageAgentOrdersComponent {
     readonly isRowCheckDisabled = (row: TableRow): boolean => {
         const order = this.orders().find(x => x.id === Number(row['id']));
 
-        return !order || order.orderStatus === 'CANCELLED';
+        return !order || order.orderStatus === OrderStatus.Cancelled;
     };
 
     readonly isSelectableRow = (row: TableRow): boolean => {
@@ -504,7 +504,7 @@ export class PageAgentOrdersComponent {
     /** Xác nhận thanh toán các đơn đã chọn — chạy ngay, không hỏi lại. */
     confirmPaymentSelected(): void {
         this.bulkUpdatePayment(this.selectedOrders().map(order => order.id), {
-            newStatus: 'PAID',
+            newStatus: PaymentStatus.Paid,
             changedNote: 'Đại lý xác nhận đã thanh toán'
         });
     }
@@ -587,11 +587,11 @@ export class PageAgentOrdersComponent {
     }
 
     canConfirmPayment(order: OrderResponse): boolean {
-        return order.paymentStatus !== 'PAID' && order.orderStatus !== 'CANCELLED';
+        return order.paymentStatus !== PaymentStatus.Paid && order.orderStatus !== OrderStatus.Cancelled;
     }
 
     canCancel(order: OrderResponse): boolean {
-        return order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'COMPLETED' && order.paymentStatus !== 'PAID';
+        return order.orderStatus !== OrderStatus.Cancelled && order.orderStatus !== OrderStatus.Completed && order.paymentStatus !== PaymentStatus.Paid;
     }
 
     private isSelected(orderId: number): boolean {

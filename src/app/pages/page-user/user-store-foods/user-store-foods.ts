@@ -18,6 +18,7 @@ import { RealtimeService } from '../../../common/services/realtime.service';
 import { PosSearchService } from '../../../common/services/pos-search.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
 import { PromotionResponse } from '../../../common/models/promotion.model';
+import { PaymentStatus } from '../../../common/enums/order.enum';
 import { PaymentMethod, SelectedGiftRequest, SelectedStoreWideDiscountRequest } from '../../../common/models/order.model';
 import {
     PromotionalPriceInfo,
@@ -965,7 +966,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
                 }
                 this.closeMobileCart();
 
-                if (order.totalAmount <= 0 || order.paymentStatus === 'PAID') {
+                if (order.totalAmount <= 0 || order.paymentStatus === PaymentStatus.Paid) {
                     this.toastService.success('Tạo đơn hàng thành công!');
                     this.ordering.set(false);
                     return;

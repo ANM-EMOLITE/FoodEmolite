@@ -1,0 +1,98 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+  <div class="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-md border border-[#322a4a] bg-[#171322] shadow-xl">
+    <div class="flex items-center justify-between border-b border-[#322a4a] px-5 py-4">
+      <div>
+        <h2 class="text-base font-semibold text-violet-200">Kiểm kho</h2>
+        <p class="mt-1 text-sm text-gray-400">Nhập số lượng đếm thực tế, tồn kho sẽ được cập nhật theo số này</p>
+      </div>
+
+      <button type="button" (click)="closed.emit()" class="text-gray-400 transition hover:text-violet-300">✕</button>
+    </div>
+
+    <div class="space-y-4 overflow-y-auto p-5">
+      <div class="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-300">Ghi chú phiếu</label>
+          <input type="text" [(ngModel)]="note" placeholder="Không bắt buộc"
+            class="h-10.5 w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-300">Tìm món</label>
+          <input type="text" [ngModel]="keyword()" (ngModelChange)="keyword.set($event)" placeholder="Tên hoặc mã món"
+            class="h-10.5 w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+        </div>
+
+        <label class="flex h-10.5 cursor-pointer items-center gap-2 text-sm text-gray-300">
+          <input type="checkbox" [ngModel]="onlyDifferent()" (ngModelChange)="onlyDifferent.set($event)" class="accent-violet-600" />
+          Chỉ món bị lệch
+        </label>
+      </div>
+
+      <div class="overflow-x-auto rounded-md border border-[#322a4a]">
+        <table class="w-full min-w-[680px] text-sm">
+          <thead class="bg-[#1a1628] text-left text-xs uppercase text-violet-300">
+            <tr>
+              <th class="px-3 py-2.5">Món</th>
+              <th class="w-24 px-3 py-2.5 text-right">Hệ thống</th>
+              <th class="w-32 px-3 py-2.5">Thực tế</th>
+              <th class="w-24 px-3 py-2.5 text-right">Chênh lệch</th>
+              <th class="w-52 px-3 py-2.5">Ghi chú</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (row of visibleLines(); track row.line.food.id) {
+            <tr class="border-t border-[#322a4a]">
+              <td class="px-3 py-2">
+                <div class="font-medium text-white">{{ row.line.food.foodName }}</div>
+                <div class="text-xs text-gray-500">{{ row.line.food.productCode }}</div>
+              </td>
+              <td class="px-3 py-2 text-right text-gray-400">{{ row.line.food.quantity }}</td>
+              <td class="px-3 py-2">
+                <input type="number" min="0" [ngModel]="row.line.actualQuantity"
+                  (ngModelChange)="updateLine(row.index, { actualQuantity: $event })"
+                  class="h-9 w-full rounded-md border border-[#322a4a] bg-[#1a1628] px-2 text-sm text-white outline-none focus:border-violet-500" />
+              </td>
+              <td class="px-3 py-2 text-right font-semibold"
+                [class.text-emerald-500]="difference(row.line) > 0"
+                [class.text-red-500]="difference(row.line) < 0"
+                [class.text-gray-500]="difference(row.line) === 0">
+                {{ formatDifference(difference(row.line)) }}
+              </td>
+              <td class="px-3 py-2">
+                <input type="text" [ngModel]="row.line.note" (ngModelChange)="updateLine(row.index, { note: $event })"
+                  placeholder="Lý do lệch"
+                  class="h-9 w-full rounded-md border border-[#322a4a] bg-[#1a1628] px-2 text-sm text-white placeholder:text-gray-500 outline-none focus:border-violet-500" />
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="5" class="px-3 py-8 text-center text-gray-500">Không có món nào</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between gap-4 border-t border-[#322a4a] px-5 py-4">
+      <div class="text-sm text-gray-400">
+        Lệch <span class="font-semibold text-white">{{ changedLines().length }}</span> món ·
+        <span class="font-semibold text-white">{{ formatDifference(totalDifference()) }}</span> sản phẩm ·
+        <span class="font-semibold text-white">{{ formatCurrency(differenceValue()) }}</span>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="button" (click)="closed.emit()"
+          class="rounded-md border border-[#322a4a] px-4 py-2 text-sm text-gray-300 transition hover:bg-white/5">
+          Huỷ
+        </button>
+        <button type="button" (click)="submit()" [disabled]="!isValid() || isSubmitting()"
+          class="rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ isSubmitting() ? 'Đang lưu...' : 'Hoàn tất kiểm kho' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

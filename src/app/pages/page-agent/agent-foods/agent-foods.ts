@@ -117,6 +117,12 @@ export class PageAgentFoodsComponent {
             sortable: true
         },
         {
+            key: 'costPrice',
+            label: 'Giá vốn',
+            width: '130px',
+            align: 'right'
+        },
+        {
             key: 'promotionBadge',
             label: 'Khuyến mãi',
             width: '120px',
@@ -238,6 +244,7 @@ export class PageAgentFoodsComponent {
                 price: pricing.hasPromotion
                     ? `${this.formatCurrency(pricing.effectivePrice)} (gốc ${this.formatCurrency(pricing.originalPrice)})`
                     : this.formatCurrency(food.price),
+                costPrice: this.formatCurrency(food.costPrice ?? 0),
                 promotionBadge: pricing.hasPromotion
                     ? { text: 'Đang KM', value: 'PROMO' }
                     : { text: '—', value: '' },
@@ -533,7 +540,7 @@ export class PageAgentFoodsComponent {
             productCode: food.productCode,
             description: food.description,
             price: food.price,
-            quantity: food.quantity,
+            costPrice: food.costPrice ?? 0,
             isAvailable: event.value,
             storeFoodCategoryId: food.storeFoodCategoryId,
             optionGroups: food.optionGroups?.map(g => ({
