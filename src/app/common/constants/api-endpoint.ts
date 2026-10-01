@@ -44,7 +44,8 @@ export const API_ENDPOINT = {
     PENDING_ORDER: 'orders/pending-order'
   },
   CUSTOMER: {
-    AGENT_SEARCH: 'customers/agent/search'
+    AGENT_SEARCH: 'customers/agent/search',
+    AGENT_DETAIL: (refCode: string) => `customers/agent/${refCode}`
   },
   STORE_NOTIFICATION: {
     BASE: 'store-notifications',
@@ -62,6 +63,11 @@ export const API_ENDPOINT = {
     STOCKTAKES: 'inventory/stocktakes',
     STOCKTAKES_SEARCH: 'inventory/stocktakes/search',
     STOCKTAKE_DETAIL: (id: number) => `inventory/stocktakes/${id}`
+  },
+  SUPPLIER: {
+    BASE: 'suppliers',
+    SEARCH: 'suppliers/search',
+    DETAIL: (id: number) => `suppliers/${id}`
   },
   REVENUE: {
     AGENT: 'revenue/agent',

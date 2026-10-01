@@ -1,4 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { CustomerService } from '../../../common/services/customer.service';
 import { ToastService } from '../../../common/services/toast.service';
 import { CustomerListItem } from '../../../common/models/customer.model';
@@ -27,6 +29,7 @@ interface CustomerFilter {
 export class PageAgentCustomersComponent {
     private readonly customerService = inject(CustomerService);
     private readonly toastService = inject(ToastService);
+    private readonly router = inject(Router);
 
     customers = signal<CustomerListItem[]>([]);
     loading = signal(false);
@@ -117,6 +120,8 @@ export class PageAgentCustomersComponent {
     rows(): TableRow[] {
         return this.customers().map((customer, index) => ({
             index: (this.page() - 1) * this.pageSize() + index + 1,
+            refCode: customer.refCode,
+            isGuest: customer.isGuest,
             avatarUrl: customer.avatarUrl,
             customerName: customer.customerName,
             typeText: {
@@ -185,6 +190,17 @@ export class PageAgentCustomersComponent {
 
         this.page.set(1);
         this.loadCustomers();
+    }
+
+    openDetail(row: TableRow): void {
+        if (!row['refCode']) {
+            return;
+        }
+
+        this.router.navigate(
+            ['/', URL_ENDPOINT.AGENT, URL_ENDPOINT.AGENT_CUSTOMERS, row['refCode']],
+            { queryParams: row['isGuest'] ? { guest: true } : {} }
+        );
     }
 
     private formatCurrency(value: number): string {

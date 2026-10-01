@@ -13,8 +13,9 @@
       <div class="grid gap-4 md:grid-cols-2">
         <div>
           <label class="mb-1 block text-sm font-medium text-gray-300">Nhà cung cấp</label>
-          <input type="text" [(ngModel)]="supplierName" placeholder="Không bắt buộc"
-            class="h-10.5 w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+          <app-search-select [options]="supplierOptions()" [value]="supplierId()" placeholder="Không bắt buộc"
+            searchPlaceholder="Tìm theo tên hoặc mã" (selected)="supplierId.set($event.value || null)">
+          </app-search-select>
         </div>
 
         <div>
@@ -58,7 +59,11 @@
               </td>
               <td class="px-3 py-2">
                 <input type="number" min="0" [ngModel]="line.unitCost" (ngModelChange)="updateLine(i, { unitCost: $event })"
-                  class="h-9 w-full rounded-md border border-[#322a4a] bg-[#1a1628] px-2 text-sm text-white outline-none focus:border-violet-500" />
+                  class="h-9 w-full rounded-md border border-[#322a4a] bg-[#1a1628] px-2 text-sm text-white outline-none focus:border-violet-500"
+                  [style.border-color]="isCostChanged(line) ? '#f59e0b' : null" />
+                @if (isCostChanged(line)) {
+                <div class="mt-1 text-xs text-amber-500">Giá vốn hiện tại: {{ formatCurrency(line.food.costPrice ?? 0) }}</div>
+                }
               </td>
               <td class="px-3 py-2 text-right text-white">{{ formatCurrency((line.quantity || 0) * (line.unitCost || 0)) }}</td>
               <td class="px-3 py-2 text-center">
@@ -94,3 +99,23 @@
     </div>
   </div>
 </div>
+
+@if (isCostConfirmOpen()) {
+<app-confirm-popup title="Giá nhập khác giá vốn hiện tại"
+  message="Giá vốn của các món dưới đây sẽ được tính lại theo bình quân gia quyền. Bạn có chắc muốn tiếp tục?"
+  confirmText="Xác nhận nhập hàng" [isSubmitting]="isSubmitting()" (confirmed)="confirmCostChange()"
+  (cancelled)="isCostConfirmOpen.set(false)">
+  <div class="mt-4 max-h-60 space-y-2 overflow-y-auto custom-scroll">
+    @for (line of costChangedLines(); track line.food.id) {
+    <div class="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm">
+      <div class="font-medium text-white">{{ line.food.foodName }}</div>
+      <div class="mt-1 grid grid-cols-3 gap-2 text-sm text-white/50">
+        <div>Giá vốn cũ<div class="text-white/80">{{ formatCurrency(line.food.costPrice ?? 0) }}</div></div>
+        <div>Giá nhập<div class="text-amber-400">{{ formatCurrency(line.unitCost || 0) }}</div></div>
+        <div>Giá vốn mới<div class="text-white">{{ formatCurrency(line.newCostPrice) }}</div></div>
+      </div>
+    </div>
+    }
+  </div>
+</app-confirm-popup>
+}

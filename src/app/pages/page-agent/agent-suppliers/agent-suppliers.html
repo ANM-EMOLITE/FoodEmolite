@@ -1,0 +1,37 @@
+<div class="space-y-3">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+        Nhà Cung Cấp
+      </h1>
+      <p class="mt-2 text-md leading-4 text-gray-500">
+        Quản lý thông tin nhà cung cấp và lịch sử nhập kho
+      </p>
+    </div>
+
+    <button type="button" (click)="isFormOpen.set(true)"
+      class="flex shrink-0 items-center justify-center gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M8 12h8" />
+        <path d="M12 8v8" />
+      </svg>
+      Thêm Nhà Cung Cấp
+    </button>
+  </div>
+
+  <app-filter [fields]="filterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
+  </app-filter>
+  <div></div>
+  <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
+    [totalRecords]="totalRecords()" [pageSize]="pageSize()" [loading]="loading()" [sortBy]="sortBy()" [asc]="asc()"
+    emptyText="Chưa có nhà cung cấp nào" (rowDblClick)="openDetail($event)" (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)" (sortChange)="onSortChange($event)">
+  </app-table>
+</div>
+
+@if (isFormOpen()) {
+<app-pop-up-supplier-form [isSubmitting]="isSubmitting()" (closed)="isFormOpen.set(false)" (submitted)="create($event)">
+</app-pop-up-supplier-form>
+}

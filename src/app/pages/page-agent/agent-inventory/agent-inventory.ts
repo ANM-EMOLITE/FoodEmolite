@@ -2,8 +2,10 @@ import { Component, inject, signal } from '@angular/core';
 import { InventoryService } from '../../../common/services/inventory.service';
 import { ProfileService } from '../../../common/services/profile.service';
 import { StoreFoodService } from '../../../common/services/store-food.service';
+import { SupplierService } from '../../../common/services/supplier.service';
 import { ToastService } from '../../../common/services/toast.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
+import { SupplierResponse } from '../../../common/models/supplier.model';
 import {
     CreateInventoryReceiptRequest,
     CreateInventoryStocktakeRequest,
@@ -59,6 +61,7 @@ export class PageAgentInventoryComponent {
     private readonly inventoryService = inject(InventoryService);
     private readonly profileService = inject(ProfileService);
     private readonly storeFoodService = inject(StoreFoodService);
+    private readonly supplierService = inject(SupplierService);
     private readonly toastService = inject(ToastService);
 
     readonly tabs: { key: InventoryTab; label: string }[] = [
@@ -71,6 +74,7 @@ export class PageAgentInventoryComponent {
 
     storeRefCode = signal<string | null>(null);
     foods = signal<StoreFoodResponse[]>([]);
+    suppliers = signal<SupplierResponse[]>([]);
 
     loading = signal(false);
     page = signal(1);
@@ -321,6 +325,9 @@ export class PageAgentInventoryComponent {
     }
 
     openReceipt(): void {
+        this.supplierService.search({ page: 1, pageSize: 1000, sortBy: 'supplierName', asc: true, searchParams: { isActive: true } }).subscribe({
+            next: response => this.suppliers.set(response.items ?? [])
+        });
         this.loadFoods(() => this.isReceiptOpen.set(true));
     }
 

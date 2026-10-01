@@ -9,6 +9,7 @@ import {
     CreateInventoryStocktakeRequest,
     InventoryDocumentSearchRequest,
     InventoryReceiptResponse,
+    InventoryReceiptSearchRequest,
     InventoryStocktakeResponse,
     InventoryTransactionResponse,
     InventoryTransactionSearchRequest
@@ -27,8 +28,8 @@ export class InventoryService {
         );
     }
 
-    searchReceipts(request: BaseSearchRequest<InventoryDocumentSearchRequest>): Observable<BaseTableResponse<InventoryReceiptResponse>> {
-        return this.apiService.post<BaseTableResponse<InventoryReceiptResponse>, BaseSearchRequest<InventoryDocumentSearchRequest>>(
+    searchReceipts(request: BaseSearchRequest<InventoryReceiptSearchRequest>): Observable<BaseTableResponse<InventoryReceiptResponse>> {
+        return this.apiService.post<BaseTableResponse<InventoryReceiptResponse>, BaseSearchRequest<InventoryReceiptSearchRequest>>(
             API_ENDPOINT.INVENTORY.RECEIPTS_SEARCH,
             request
         );

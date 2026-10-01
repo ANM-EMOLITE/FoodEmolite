@@ -1,9 +1,5 @@
 import { Directive, ElementRef, HostListener, Input, OnDestroy, Renderer2, inject } from '@angular/core';
 
-/**
- * Tooltip đơn giản, tự tạo DOM (không phụ thuộc thư viện ngoài): hiện khi hover, mất khi rời chuột.
- * Dùng: <span appTooltip="Nội dung tooltip">...</span>. Bỏ trống (hoặc null) thì không hiện gì cả.
- */
 @Directive({
     selector: '[appTooltip]',
     standalone: true

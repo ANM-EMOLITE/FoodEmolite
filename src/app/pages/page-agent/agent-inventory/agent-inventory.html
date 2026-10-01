@@ -64,7 +64,7 @@
 </div>
 
 @if (isReceiptOpen()) {
-<app-pop-up-inventory-receipt [foods]="foods()" [isSubmitting]="isSubmitting()" (closed)="isReceiptOpen.set(false)"
+<app-pop-up-inventory-receipt [foods]="foods()" [suppliers]="suppliers()" [isSubmitting]="isSubmitting()" (closed)="isReceiptOpen.set(false)"
   (submitted)="createReceipt($event)">
 </app-pop-up-inventory-receipt>
 }

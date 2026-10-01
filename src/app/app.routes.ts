@@ -61,6 +61,20 @@ export const routes: Routes = [
         }
       },
       {
+        path: URL_ENDPOINT.AGENT_SUPPLIERS,
+        loadComponent: () => import('./pages/page-agent/agent-suppliers/agent-suppliers').then(m => m.PageAgentSuppliersComponent),
+        data: {
+          title: 'Nhà cung cấp'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_SUPPLIER_DETAIL,
+        loadComponent: () => import('./pages/page-agent/agent-suppliers/agent-supplier-detail/agent-supplier-detail').then(m => m.PageAgentSupplierDetailComponent),
+        data: {
+          title: 'Chi tiết nhà cung cấp'
+        }
+      },
+      {
         path: URL_ENDPOINT.AGENT_ORDERS,
         loadComponent: () => import('./pages/page-agent/agent-orders/agent-orders').then(m => m.PageAgentOrdersComponent),
         data: {
@@ -117,6 +131,13 @@ export const routes: Routes = [
         }
       },
       {
+        path: URL_ENDPOINT.AGENT_CUSTOMER_DETAIL,
+        loadComponent: () => import('./pages/page-agent/agent-customers/agent-customer-detail/agent-customer-detail').then(m => m.PageAgentCustomerDetailComponent),
+        data: {
+          title: 'Chi tiết khách hàng'
+        }
+      },
+      {
         path: URL_ENDPOINT.AGENT_ACTIVITY_LOGS,
         loadComponent: () => import('./pages/page-agent/agent-activity-logs/agent-activity-logs').then(m => m.PageAgentActivityLogsComponent),
         data: {
@@ -156,7 +177,6 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/page-user/user-store-foods/user-store-foods').then(m => m.PageUserStoreFoodsComponent),
         data: {
           title: 'Bán hàng tại quầy',
-          // Đơn tại quầy — không cần địa chỉ giao hàng
           isPos: true
         }
       }
