@@ -1,13 +1,11 @@
-<div class="space-y-6">
-  <div class="flex items-start justify-between gap-4">
-    <div>
-      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
-        Thông Tin Cửa Hàng
-      </h1>
-      <p class="mt-2 text-md leading-4 text-gray-500">
-        Thông tin cửa hàng của đại lý
-      </p>
-    </div>
+<div class="space-y-4">
+  <div>
+    <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+      Thông Tin Cửa Hàng
+    </h1>
+    <p class="mt-2 text-md leading-4 text-gray-500">
+      Thông tin cửa hàng của đại lý
+    </p>
   </div>
 
   @if (errorMessage()) {
@@ -16,46 +14,93 @@
   </div>
   }
 
-  <div class="rounded-md border border-white/5 bg-[#171322] p-6">
-    @if (loading()) {
-    <div class="py-8 text-center text-sm text-gray-500">
-      Đang tải...
+  @if (loading()) {
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-8 text-center text-sm text-gray-500">Đang tải...</div>
+  } @else if (profile()?.store; as store) {
+  <div class="relative overflow-hidden rounded-xl border border-[#322a4a] bg-[#171322]">
+    <div class="relative h-40 overflow-hidden bg-violet-600/20 md:h-48">
+      @if (store.thumbnailUrl) {
+      <img [src]="store.thumbnailUrl" alt="" class="h-full w-full scale-110 object-cover blur-sm" />
+      }
+      <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
     </div>
-    } @else if (profile()?.store) {
-    <div class="grid gap-6 md:grid-cols-[180px_1fr]">
-      <div class="h-36 overflow-hidden rounded-md border border-white/5 bg-blue-50">
-        @if (profile()?.store?.thumbnailUrl) {
-        <img [src]="profile()?.store?.thumbnailUrl" class="h-full w-full object-cover" />
-        }
-      </div>
 
-      <div class="grid gap-4 md:grid-cols-2">
-        <div>
-          <p class="text-sm text-white">Tên cửa hàng</p>
-          <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.storeName }}</p>
-        </div>
-
-        <div>
-          <p class="text-sm text-white">Số điện thoại</p>
-          <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.phoneNumber || '-' }}</p>
-        </div>
-
-        <div class="md:col-span-2">
-          <p class="text-sm text-white">Địa chỉ</p>
-          <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.address || '-' }}</p>
-        </div>
-
-        <div class="md:col-span-2">
-          <p class="text-sm text-white">Mô tả</p>
-          <p class="mt-1 text-sm text-gray-500">{{ profile()?.store?.description || '-' }}</p>
+    <div class="pointer-events-none absolute right-8 top-8 hidden -rotate-12 select-none md:block"
+      [class.text-emerald-500]="store.isApproved" [class.text-red-500]="!store.isApproved">
+      <div class="flex h-32 w-32 items-center justify-center rounded-full border-2 border-current bg-white/85 shadow-md">
+        <div class="flex h-26 w-26 flex-col items-center justify-center rounded-full border border-dashed border-current">
+          <span class="text-xs font-semibold tracking-[0.2em]">★ EMOLITE ★</span>
+          <span class="my-1 w-full border-y-2 border-current py-0.5 text-center text-base font-extrabold uppercase tracking-wider">
+            {{ store.isApproved ? 'Đã duyệt' : 'Từ chối' }}
+          </span>
+          <span class="text-xs font-semibold tracking-[0.2em]">FOOD</span>
         </div>
       </div>
     </div>
-    } @else {
-    <div
-      class="rounded-md border border-dashed border-blue-200 bg-blue-50 px-4 py-8 text-center text-sm text-blue-500">
-      Chưa có thông tin cửa hàng
+
+    <div class="relative px-6 pb-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-start">
+        <div class="-mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-xl border-2 border-white bg-violet-600/20 shadow-md">
+          @if (store.thumbnailUrl) {
+          <img [src]="store.thumbnailUrl" alt="" class="h-full w-full object-cover" />
+          }
+        </div>
+
+        <div class="min-w-0 flex-1 pt-4">
+          <h2 class="truncate text-[20px] font-semibold text-white">{{ store.storeName }}</h2>
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+              [class]="store.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-gray-500/10 text-gray-500'">
+              <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+              {{ store.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+            </span>
+            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+              [class]="store.isApproved ? 'bg-violet-500/10 text-violet-400' : 'bg-red-500/10 text-red-500'">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                @if (store.isApproved) {
+                <path d="M20 6 9 17l-5-5" />
+                } @else {
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+                }
+              </svg>
+              {{ store.isApproved ? 'Đã được duyệt' : 'Bị từ chối' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    @for (item of infoItems(store); track item.label) {
+    <div class="flex items-start gap-3 rounded-xl border border-[#322a4a] bg-[#171322] p-4">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          @for (d of item.icon; track $index) {
+          <path [attr.d]="d" />
+          }
+        </svg>
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm text-gray-500">{{ item.label }}</p>
+        <p class="mt-1 wrap-break-word text-sm font-semibold text-white">{{ item.value }}</p>
+      </div>
     </div>
     }
   </div>
+
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+    <h3 class="text-base font-semibold text-violet-200">Giới thiệu</h3>
+    <p class="mt-3 whitespace-pre-line text-sm leading-6 text-gray-400">
+      {{ store.description || 'Chưa có mô tả cho cửa hàng.' }}
+    </p>
+  </div>
+  } @else {
+  <div class="rounded-md border border-dashed border-blue-200 bg-blue-50 px-4 py-8 text-center text-sm text-blue-500">
+    Chưa có thông tin cửa hàng
+  </div>
+  }
 </div>

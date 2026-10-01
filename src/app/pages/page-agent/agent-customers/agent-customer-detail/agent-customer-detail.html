@@ -1,0 +1,161 @@
+<div class="space-y-4">
+  <div class="flex items-center gap-3">
+    <button type="button" (click)="goBack()" title="Quay lại danh sách khách hàng"
+      class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[#322a4a] text-gray-400 transition hover:bg-violet-500/15 hover:text-violet-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </button>
+
+    @if (customer()?.avatarUrl) {
+    <img [src]="customer()!.avatarUrl" alt="" class="h-10 w-10 rounded-full object-cover" />
+    }
+
+    <div>
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+        {{ customer()?.customerName || 'Chi Tiết Khách Hàng' }}
+      </h1>
+      @if (customer(); as c) {
+      <p class="mt-1 text-sm leading-4 text-gray-500">
+        {{ c.isGuest ? 'Khách vãng lai' : 'Thành viên' }}
+        @if (c.customerCode) { · {{ c.customerCode }} }
+      </p>
+      }
+    </div>
+  </div>
+
+  @if (loadingCustomer()) {
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-8 text-center text-sm text-gray-400">Đang tải...</div>
+  } @else if (!customer()) {
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-8 text-center text-sm text-gray-400">
+    Không tìm thấy khách hàng
+  </div>
+  } @else {
+  @let c = customer()!;
+
+  <div class="flex gap-1 border-b border-[#322a4a]">
+    @for (tab of tabs; track tab.key) {
+    <button type="button" (click)="switchTab(tab.key)"
+      class="-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition cursor-pointer"
+      [class.border-violet-500]="activeTab() === tab.key" [class.text-violet-400]="activeTab() === tab.key"
+      [class.border-transparent]="activeTab() !== tab.key" [class.text-gray-500]="activeTab() !== tab.key">
+      {{ tab.label }}
+    </button>
+    }
+  </div>
+
+  @switch (activeTab()) {
+  @case ('info') {
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] px-4 py-3">
+      <div class="text-sm text-gray-500">Tổng đơn</div>
+      <div class="mt-1 text-base font-semibold text-white">{{ c.totalOrders }}</div>
+    </div>
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] px-4 py-3">
+      <div class="text-sm text-gray-500">Đã thanh toán</div>
+      <div class="mt-1 text-base font-semibold text-white">{{ c.paidOrders }}</div>
+    </div>
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] px-4 py-3">
+      <div class="text-sm text-gray-500">Đã huỷ</div>
+      <div class="mt-1 text-base font-semibold text-white">{{ c.cancelledOrders }}</div>
+    </div>
+    <div class="rounded-xl border border-[#322a4a] bg-[#171322] px-4 py-3">
+      <div class="text-sm text-gray-500">Tổng chi tiêu</div>
+      <div class="mt-1 text-base font-semibold text-white">{{ formatCurrency(c.totalSpent) }}</div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+    <h3 class="text-base font-semibold text-violet-200">Thông tin khách hàng</h3>
+
+    <dl class="mt-4 grid gap-x-6 gap-y-4 text-sm md:grid-cols-3">
+      @if (!c.isGuest) {
+      <div>
+        <dt class="text-gray-400">Số điện thoại</dt>
+        <dd class="mt-1 text-white">{{ c.phoneNumber || '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-gray-400">Email</dt>
+        <dd class="mt-1 text-white">{{ c.email || '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-gray-400">Giới tính</dt>
+        <dd class="mt-1 text-white">{{ c.gender || '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-gray-400">Ngày sinh</dt>
+        <dd class="mt-1 text-white">{{ c.dateOfBirth ? (c.dateOfBirth | date: 'dd/MM/yyyy') : '—' }}</dd>
+      </div>
+      <div class="md:col-span-2">
+        <dt class="text-gray-400">Địa chỉ</dt>
+        <dd class="mt-1 text-white">{{ c.address || '—' }}</dd>
+      </div>
+      }
+      <div>
+        <dt class="text-gray-400">Đơn đầu tiên</dt>
+        <dd class="mt-1 text-white">{{ c.firstOrderAt ? (c.firstOrderAt | date: 'dd/MM/yyyy HH:mm') : '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-gray-400">Mua gần nhất</dt>
+        <dd class="mt-1 text-white">{{ c.lastOrderAt ? (c.lastOrderAt | date: 'dd/MM/yyyy HH:mm') : '—' }}</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-semibold text-violet-200">Đơn hàng gần đây</h3>
+      @if (c.totalOrders > c.recentOrders.length) {
+      <button type="button" (click)="switchTab('orders')"
+        class="text-sm text-violet-400 transition hover:text-violet-300 cursor-pointer">
+        Xem tất cả {{ c.totalOrders }} đơn
+      </button>
+      }
+    </div>
+
+    <div class="mt-4 overflow-x-auto rounded-md border border-[#322a4a]">
+      <table class="w-full min-w-160 text-sm">
+        <thead class="bg-[#1a1628] text-left text-xs uppercase text-violet-300">
+          <tr>
+            <th class="px-3 py-2.5">Mã đơn</th>
+            <th class="px-3 py-2.5">Thời gian</th>
+            <th class="px-3 py-2.5">Loại đơn</th>
+            <th class="px-3 py-2.5 text-right">Tổng tiền</th>
+            <th class="px-3 py-2.5 text-center">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of c.recentOrders; track order.id) {
+          @let status = displayStatus(order);
+          <tr class="cursor-pointer border-t border-[#322a4a] transition hover:bg-violet-500/5"
+            (dblclick)="openOrder(order.id)">
+            <td class="px-3 py-2.5 font-medium text-white">{{ order.orderCode }}</td>
+            <td class="px-3 py-2.5 text-gray-400">{{ order.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td class="px-3 py-2.5 text-gray-400">{{ orderTypeText(order.orderType) }}</td>
+            <td class="px-3 py-2.5 text-right text-white">{{ formatCurrency(order.totalAmount) }}</td>
+            <td class="px-3 py-2.5 text-center font-medium" [class.text-emerald-500]="status === 'PAID'"
+              [class.text-orange-500]="status === 'UNPAID'" [class.text-red-500]="status === 'CANCELLED'">
+              {{ statusText(status) }}
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="5" class="px-3 py-8 text-center text-gray-500">Chưa có đơn hàng</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+  @case ('orders') {
+  <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
+    [totalRecords]="totalRecords()" [pageSize]="pageSize()" [loading]="loading()" [sortBy]="sortBy()" [asc]="asc()"
+    emptyText="Khách hàng chưa có đơn nào" (rowDblClick)="openOrder($event.id)" (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)" (sortChange)="onSortChange($event)">
+  </app-table>
+  }
+  }
+  }
+</div>

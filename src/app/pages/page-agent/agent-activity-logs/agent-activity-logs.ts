@@ -22,6 +22,8 @@ const ACTION_TEXT: Record<string, string> = {
     CREATE_STORE: 'Tạo cửa hàng',
     UPDATE_STORE: 'Cập nhật cửa hàng',
     DELETE_STORE: 'Xoá cửa hàng',
+    APPROVE_STORE: 'Duyệt cửa hàng',
+    REJECT_STORE: 'Từ chối cửa hàng',
     CREATE_CATEGORY: 'Tạo danh mục',
     UPDATE_CATEGORY: 'Cập nhật danh mục',
     DELETE_CATEGORY: 'Xoá danh mục',
@@ -37,15 +39,18 @@ const ACTION_TEXT: Record<string, string> = {
     CONFIRM_PAYMENT: 'Xác nhận thanh toán',
     CANCEL_ORDER: 'Huỷ đơn hàng',
     IMPORT_STOCK: 'Nhập hàng',
-    STOCKTAKE: 'Kiểm kho'
+    STOCKTAKE: 'Kiểm kho',
+    CREATE_SUPPLIER: 'Thêm nhà cung cấp',
+    UPDATE_SUPPLIER: 'Cập nhật nhà cung cấp',
+    DELETE_SUPPLIER: 'Xoá nhà cung cấp'
 };
 
 /** Màu badge theo nhóm hành động (dùng lại các giá trị màu có sẵn của bảng): tạo/tiếp tục = xanh lá, cập nhật = xanh dương, tạm dừng = vàng, xoá/huỷ = đỏ. */
 function getActionTone(action: string): string {
-    if (action.startsWith('CREATE_') || action === 'RESUME_PROMOTION' || action === 'CONFIRM_PAYMENT' || action === 'IMPORT_STOCK') return 'ACTIVE';
+    if (action.startsWith('CREATE_') || action === 'RESUME_PROMOTION' || action === 'CONFIRM_PAYMENT' || action === 'IMPORT_STOCK' || action === 'APPROVE_STORE') return 'ACTIVE';
     if (action.startsWith('UPDATE_') || action === 'STOCKTAKE') return 'SCHEDULED';
     if (action === 'PAUSE_PROMOTION') return 'PAUSED';
-    if (action.startsWith('DELETE_') || action.startsWith('CANCEL_')) return 'ENDED';
+    if (action.startsWith('DELETE_') || action.startsWith('CANCEL_') || action === 'REJECT_STORE') return 'ENDED';
     return 'DRAFT';
 }
 

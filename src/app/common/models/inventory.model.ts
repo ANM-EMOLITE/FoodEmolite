@@ -31,8 +31,12 @@ export interface InventoryDocumentSearchRequest {
     toDate?: string | null;
 }
 
+export interface InventoryReceiptSearchRequest extends InventoryDocumentSearchRequest {
+    supplierId?: number | null;
+}
+
 export interface CreateInventoryReceiptRequest {
-    supplierName?: string | null;
+    supplierId?: number | null;
     note?: string | null;
     items: { storeFoodId: number; quantity: number; unitCost: number }[];
 }
@@ -50,6 +54,7 @@ export interface InventoryReceiptItemResponse {
 export interface InventoryReceiptResponse {
     id: number;
     receiptCode: string;
+    supplierId: number | null;
     supplierName: string | null;
     note: string | null;
     totalQuantity: number;

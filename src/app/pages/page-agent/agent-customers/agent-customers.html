@@ -15,6 +15,6 @@
   <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
     [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
     [loading]="loading()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Chưa có khách hàng nào"
-    (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
+    (rowDblClick)="openDetail($event)" (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
   </app-table>
 </div>

@@ -125,6 +125,8 @@ export interface OrderSearchRequest {
   promotionKeyword?: string | null;
   /** Nguồn đơn: POS | WEB_USER | WEB_GUEST. */
   orderSource?: OrderSource | null;
+  customerRefCode?: string | null;
+  isGuestCustomer?: boolean;
   fromDate?: string | null;
   toDate?: string | null;
 }

@@ -74,6 +74,32 @@ export const AGENT_NAV_GROUPS: AgentNavGroup[] = [
     ]
   },
   {
+    title: 'Khách Hàng & NCC',
+    items: [
+      {
+        label: 'Nhà Cung Cấp',
+        path: URL_ENDPOINT.AGENT_SUPPLIERS,
+        icon: [
+          { d: 'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2' },
+          { d: 'M15 18H9' },
+          { d: 'M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14' },
+          { cx: 17, cy: 18, r: 2 },
+          { cx: 7, cy: 18, r: 2 }
+        ]
+      },
+      {
+        label: 'Khách Hàng',
+        path: URL_ENDPOINT.AGENT_CUSTOMERS,
+        icon: [
+          { d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' },
+          { d: 'M16 3.128a4 4 0 0 1 0 7.744' },
+          { d: 'M22 21v-2a4 4 0 0 0-3-3.87' },
+          { cx: 9, cy: 7, r: 4 }
+        ]
+      }
+    ]
+  },
+  {
     title: 'Quản Lý',
     items: [
       {
@@ -92,16 +118,6 @@ export const AGENT_NAV_GROUPS: AgentNavGroup[] = [
         icon: [
           { d: 'M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z' },
           { cx: 7.5, cy: 7.5, r: 1.5, solid: true }
-        ]
-      },
-      {
-        label: 'Khách Hàng',
-        path: URL_ENDPOINT.AGENT_CUSTOMERS,
-        icon: [
-          { d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' },
-          { d: 'M16 3.128a4 4 0 0 1 0 7.744' },
-          { d: 'M22 21v-2a4 4 0 0 0-3-3.87' },
-          { cx: 9, cy: 7, r: 4 }
         ]
       }
     ]

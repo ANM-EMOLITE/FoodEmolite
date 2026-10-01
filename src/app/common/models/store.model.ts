@@ -9,5 +9,6 @@ export interface StoreResponse {
   address: string | null;
   description: string | null;
   isActive: boolean;
+  isApproved: boolean;
   createdAt: string;
 }

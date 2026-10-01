@@ -2,9 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_ENDPOINT } from '../constants/api-endpoint';
 import { ApiService } from '../constants/api.service';
-import { BaseTableResponse } from '../models/base-response.model';
+import { BaseResponse, BaseTableResponse } from '../models/base-response.model';
 import { BaseSearchRequest } from '../models/base-search.model';
-import { CustomerListItem, CustomerSearchRequest } from '../models/customer.model';
+import { CustomerDetail, CustomerListItem, CustomerSearchRequest } from '../models/customer.model';
 
 @Injectable({
     providedIn: 'root'
@@ -24,4 +24,7 @@ export class CustomerService {
         );
     }
 
+    getAgentCustomerDetail(refCode: string, isGuest: boolean): Observable<BaseResponse<CustomerDetail>> {
+        return this.apiService.get<BaseResponse<CustomerDetail>>(API_ENDPOINT.CUSTOMER.AGENT_DETAIL(refCode), { isGuest });
+    }
 }
