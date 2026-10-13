@@ -28,3 +28,22 @@
     }
 
 }
+.payment-hint {
+    background: #ffffff;
+    color: #5b21b6;
+    animation: paymentHintIn .15s ease-out;
+}
+
+@keyframes paymentHintIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.payment-hint-arrow {
+    background: #ffffff;
+}
