@@ -89,7 +89,9 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     selectedStoreWideDiscounts = signal<SelectedStoreWideDiscountRequest[]>([]);
     promoCodeInput = signal('');
     appliedPromoCode = signal<string | null>(null);
-    paymentMethod = signal<PaymentMethod>('CASH');
+    paymentMethod = signal<PaymentMethod | null>(null);
+    isPaymentHintOpen = signal(false);
+    private paymentHintTimer: ReturnType<typeof setTimeout> | null = null;
 
     categories = signal<StoreFoodCategoryResponse[]>([]);
     selectedCategoryId = signal<number | null>(null);
@@ -438,6 +440,22 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
 
     setPaymentMethod(method: PaymentMethod): void {
         this.paymentMethod.set(method);
+        this.hidePaymentHint();
+    }
+
+    private showPaymentHint(): void {
+        this.hidePaymentHint();
+        this.isPaymentHintOpen.set(true);
+        this.paymentHintTimer = setTimeout(() => this.isPaymentHintOpen.set(false), 4000);
+    }
+
+    private hidePaymentHint(): void {
+        if (this.paymentHintTimer) {
+            clearTimeout(this.paymentHintTimer);
+            this.paymentHintTimer = null;
+        }
+
+        this.isPaymentHintOpen.set(false);
     }
 
     selectGift(promotionId: number, storeFoodId: number): void {
@@ -580,6 +598,8 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     ngOnDestroy() {
+        this.hidePaymentHint();
+
         if (this.paymentInterval) {
             clearInterval(this.paymentInterval);
             this.paymentInterval = null;
@@ -793,6 +813,8 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     private openConfirmOrderPopup(): void {
+        this.paymentMethod.set(null);
+        this.hidePaymentHint();
         this.isConfirmOrderOpen.set(true);
     }
 
@@ -811,15 +833,22 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     confirmOrder(): void {
+        if (!this.paymentMethod()) {
+            this.showPaymentHint();
+            return;
+        }
+
         this.isConfirmOrderOpen.set(false);
         this.createOrder();
     }
 
     closeConfirmOrder(): void {
+        this.hidePaymentHint();
         this.isConfirmOrderOpen.set(false);
     }
 
     goDeliveryInfo(): void {
+        this.hidePaymentHint();
         this.isConfirmOrderOpen.set(false);
         this.router.navigate(['/', URL_ENDPOINT.USER, URL_ENDPOINT.USER_DELIVERY_INFO]);
     }
@@ -905,7 +934,9 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     createOrder(): void {
-        if (this.cart().length === 0 || this.ordering()) return;
+        const paymentMethod = this.paymentMethod();
+
+        if (this.cart().length === 0 || this.ordering() || !paymentMethod) return;
 
         this.ordering.set(true);
 
@@ -926,7 +957,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             selectedGifts: this.selectedGifts(),
             selectedStoreWideDiscounts: this.selectedStoreWideDiscounts(),
             promoCode: this.appliedPromoCode(),
-            paymentMethod: this.paymentMethod(),
+            paymentMethod,
             // Thông tin nhận hàng (nếu khách đã nhập ở trang "Thông tin nhận hàng") — không bắt buộc
             ...(this.isDeliveryOrder ? this.deliveryInfoService.toOrderRequest() : {})
         };
