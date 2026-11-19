@@ -31,6 +31,7 @@ export interface StoreFoodResponse {
   costPrice?: number | null;
   quantity: number;
   isAvailable: boolean;
+  isPayLater?: boolean;
   storeFoodCategoryId: number;
   optionGroups: StoreFoodOptionGroupResponse[];
 }
@@ -72,7 +73,13 @@ export interface CreateStoreFoodRequest {
   costPrice: number;
   quantity: number;
   storeFoodCategoryId: number | null;
+  isPayLater?: boolean;
   optionGroups: StoreFoodOptionGroupRequest[];
+}
+
+export interface CreateBulkStoreFoodRequest {
+  storeFoodCategoryId: number;
+  foodNames: string[];
 }
 
 export interface UpdateStoreFoodRequest {
@@ -85,6 +92,7 @@ export interface UpdateStoreFoodRequest {
   costPrice: number;
   quantity?: number | null;
   isAvailable: boolean;
+  isPayLater?: boolean;
   storeFoodCategoryId: number | null;
   optionGroups: StoreFoodOptionGroupRequest[];
 }

@@ -48,6 +48,7 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
         price: this.food.price,
         costPrice: this.food.costPrice ?? 0,
         isAvailable: this.food.isAvailable,
+        isPayLater: this.food.isPayLater ?? false,
         storeFoodCategoryId: this.food.storeFoodCategoryId ?? null,
         optionGroups: (this.food.optionGroups ?? []).map(group => ({
           id: group.id,

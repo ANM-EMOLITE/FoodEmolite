@@ -10,6 +10,18 @@
     </div>
 
     <div class="flex shrink-0 items-center gap-3">
+      @if (selectedFoodIds().length > 0) {
+      <button type="button" (click)="onHeaderAction('show')"
+        class="flex items-center justify-center gap-2 rounded-md border border-emerald-500 px-4 py-2.5 text-sm font-medium text-emerald-500 transition hover:bg-emerald-500/10 cursor-pointer">
+        Bật hiển thị ({{ selectedFoodIds().length }})
+      </button>
+
+      <button type="button" (click)="onHeaderAction('hide')"
+        class="flex items-center justify-center gap-2 rounded-md border border-red-500 px-4 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-500/10 cursor-pointer">
+        Tắt hiển thị
+      </button>
+      }
+
       <button type="button" (click)="copyOrderLink()" [disabled]="!storeRefCode()"
         class="flex items-center justify-center gap-2 rounded-md border border-violet-600 px-4 py-2.5 text-sm font-medium text-violet-400 transition hover:bg-violet-600/10 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -72,15 +84,17 @@
   <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
     [totalRecords]="totalRecords()" [pageSize]="pageSize()" (pageSizeChange)="onPageSizeChange($event)"
     [loading]="loading() || isDetailLoading()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Không có món ăn"
-    [rowClickToggle]="true" (rowDblClick)="openDetail($event)"
+    [rowClickToggle]="true"
     (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)" (toggleChange)="onToggleAvailable($event)"
-    (rowCheckChange)="toggleSelected($event.row, $event.checked)" (allCheckChange)="toggleAllSelected($event)">
+    (rowCheckChange)="toggleSelected($event.row, $event.checked)" (allCheckChange)="toggleAllSelected($event)"
+    [rowActions]="rowActions" (actionClick)="onRowAction($event)">
   </app-table>
 </div>
 
 @if (isAddOpen() && storeRefCode()) {
 <app-pop-up-agent-food-add [storeRefCode]="storeRefCode()!" [isSubmitting]="isSubmitting()"
-  [categoryOptions]="categoryDropdownOptions" (closed)="closeCreateModal()" (submitted)="createFood($event)">
+  [categoryOptions]="categoryDropdownOptions" (closed)="closeCreateModal()" (submitted)="createFood($event)"
+  (bulkSubmitted)="createBulkFoods($event)">
 </app-pop-up-agent-food-add>
 }
 

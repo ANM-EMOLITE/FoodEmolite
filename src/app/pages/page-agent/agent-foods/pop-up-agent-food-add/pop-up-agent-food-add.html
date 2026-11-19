@@ -11,7 +11,53 @@
       </button>
     </div>
 
+    <div class="flex gap-2 border-b border-[#322a4a] px-5 py-3">
+      <button type="button" (click)="mode.set('single')"
+        class="rounded-md px-3 py-1.5 text-sm font-medium transition"
+        [class.bg-violet-600]="mode() === 'single'" [class.text-white]="mode() === 'single'"
+        [class.text-gray-400]="mode() !== 'single'">
+        Thêm 1 món
+      </button>
+      <button type="button" (click)="mode.set('bulk')"
+        class="rounded-md px-3 py-1.5 text-sm font-medium transition"
+        [class.bg-violet-600]="mode() === 'bulk'" [class.text-white]="mode() === 'bulk'"
+        [class.text-gray-400]="mode() !== 'bulk'">
+        Thêm nhanh theo danh sách
+      </button>
+    </div>
+
     <div class="overflow-y-auto p-5">
+      @if (mode() === 'bulk') {
+      <div class="grid gap-4">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-300">Danh mục</label>
+          <app-dropdown [options]="categoryOptions" [ngModel]="bulkCategoryId()" (ngModelChange)="bulkCategoryId.set($event)"
+            placeholder="Chọn danh mục">
+          </app-dropdown>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-300">Danh sách món</label>
+          <textarea rows="8" [ngModel]="bulkText()" (ngModelChange)="bulkText.set($event)"
+            placeholder="1. cá nục chiên&#10;2. cá lóc hấp bầu&#10;3. gà xào mắm"
+            class="w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 py-2 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"></textarea>
+          <p class="mt-1 text-xs text-gray-400">
+            Dán danh sách đánh số hoặc JSON. Giá tính sau khi lên món, thanh toán tiền mặt, số lượng mặc định 500.
+          </p>
+        </div>
+
+        @if (bulkNames().length > 0) {
+        <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-3">
+          <p class="mb-2 text-sm font-medium text-violet-200">Sẽ thêm {{ bulkNames().length }} món</p>
+          <ul class="list-inside list-decimal space-y-1 text-sm text-gray-300">
+            @for (name of bulkNames(); track name) {
+            <li>{{ name }}</li>
+            }
+          </ul>
+        </div>
+        }
+      </div>
+      } @else {
       <div class="grid gap-5 md:grid-cols-[160px_1fr]">
         <label
           class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-[#322a4a] bg-[#1a1628]">
@@ -39,7 +85,12 @@
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-300">Mã sản phẩm</label>
             <input type="text" [(ngModel)]="form().productCode" placeholder="Để trống sẽ tự sinh mã"
+              (blur)="checkProductCode()" (input)="productCodeError.set(null)"
+              [class.border-red-500]="productCodeError()"
               class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
+            @if (productCodeError()) {
+            <p class="mt-1 text-xs text-red-500">{{ productCodeError() }}</p>
+            }
           </div>
 
           <div>
@@ -71,6 +122,14 @@
             <label class="mb-1 block text-sm font-medium text-gray-300">Mô tả</label>
             <textarea rows="3" [(ngModel)]="form().description"
               class="w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 py-2 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"></textarea>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="flex items-center gap-2 text-sm text-gray-300">
+              <input type="checkbox" [(ngModel)]="form().isPayLater"
+                class="h-4 w-4 rounded border-[#322a4a] bg-[#1a1628] text-violet-600" />
+              Trả tiền sau khi lên món (chỉ tiền mặt)
+            </label>
           </div>
         </div>
       </div>
@@ -139,15 +198,20 @@
         </div>
         }
       </div>
+      }
     </div>
 
-    <div class="flex justify-end gap-2 border-t border-[#322a4a] px-5 py-4">
+    <div class="flex items-center justify-end gap-2 border-t border-[#322a4a] px-5 py-4">
+      @if (mode() === 'single' && formError()) {
+      <p class="mr-auto text-sm text-red-500">{{ formError() }}</p>
+      }
       <button type="button" (click)="close()"
         class="rounded-md border border-[#322a4a] bg-[#1a1628] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:border-violet-500 hover:bg-violet-500/10">
         Hủy
       </button>
 
-      <button type="button" (click)="submit()" [disabled]="isSubmitting"
+      <button type="button" (click)="mode() === 'bulk' ? submitBulk() : submit()"
+        [disabled]="isSubmitting || isCheckingCode() || (mode() === 'single' && !!productCodeError()) || (mode() === 'bulk' && (bulkNames().length === 0 || !bulkCategoryId()))"
         class="rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
         Lưu
       </button>

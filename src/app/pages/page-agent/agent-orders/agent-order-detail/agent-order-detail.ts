@@ -114,6 +114,54 @@ export class PageAgentOrderDetailComponent {
         return !!order && order.paymentStatus !== PaymentStatus.Paid && order.orderStatus !== OrderStatus.Cancelled;
     });
 
+    readonly payLaterPrices = signal<Partial<Record<number, number>>>({});
+
+    readonly canEditPayLaterPrice = computed(() =>
+        this.canConfirmPayment() && (this.order()?.items ?? []).some(item => item.isPayLater)
+    );
+
+    setPayLaterPrice(orderItemId: number, value: number): void {
+        this.payLaterPrices.update(prices => ({ ...prices, [orderItemId]: Number.isFinite(value) ? value : 0 }));
+    }
+
+    savePayLaterPrices(): void {
+        const order = this.order();
+
+        if (!order || !this.canEditPayLaterPrice()) return;
+
+        const prices = this.payLaterPrices();
+
+        const items = order.items
+            .filter(item => item.isPayLater)
+            .map(item => ({ orderItemId: item.id, unitPrice: prices[item.id] ?? item.unitPrice }));
+
+        if (items.some(item => item.unitPrice < 0)) {
+            this.toastService.error('Giá không được âm');
+            return;
+        }
+
+        this.isSubmitting.set(true);
+
+        this.orderService.updatePayLaterPrice(order.id, { items }).subscribe({
+            next: response => {
+                this.isSubmitting.set(false);
+
+                if (!response.isSuccess) {
+                    this.toastService.error(response.message);
+                    return;
+                }
+
+                this.toastService.success(response.message);
+                this.payLaterPrices.set({});
+                this.loadOrder(order.id);
+            },
+            error: () => {
+                this.isSubmitting.set(false);
+                this.toastService.error('Cập nhật giá thất bại');
+            }
+        });
+    }
+
     constructor() {
         this.route.paramMap
             .pipe(takeUntilDestroyed())

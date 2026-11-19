@@ -5,6 +5,7 @@ import { ApiService } from '../constants/api.service';
 import { BaseResponse, BaseTableResponse } from '../models/base-response.model';
 import { BaseSearchRequest } from '../models/base-search.model';
 import {
+  CreateBulkStoreFoodRequest,
   CreateStoreFoodRequest,
   GetStoreFoodsRequest,
   StoreFoodOptionGroupRequest,
@@ -78,6 +79,25 @@ export class StoreFoodService {
     );
   }
 
+  checkProductCode(
+    productCode: string,
+    excludeId: number | null = null
+  ): Observable<BaseResponse<boolean>> {
+    return this.apiService.get<BaseResponse<boolean>>(
+      API_ENDPOINT.STORE_FOOD.CHECK_PRODUCT_CODE,
+      excludeId ? { productCode, excludeId } : { productCode }
+    );
+  }
+
+  createBulk(
+    request: CreateBulkStoreFoodRequest
+  ): Observable<BaseResponse<string>> {
+    return this.apiService.post<BaseResponse<string>, CreateBulkStoreFoodRequest>(
+      API_ENDPOINT.STORE_FOOD.BULK,
+      request
+    );
+  }
+
   update(
     id: number,
     request: UpdateStoreFoodRequest
@@ -115,6 +135,7 @@ export class StoreFoodService {
     formData.append('Quantity', String(request.quantity));
     formData.append('Description', request.description ?? '');
     formData.append('StoreFoodCategoryId', String(request.storeFoodCategoryId));
+    formData.append('IsPayLater', String(request.isPayLater ?? false));
 
     if (request.thumbnailFile) {
       formData.append('ThumbnailFile', request.thumbnailFile);
@@ -140,6 +161,10 @@ export class StoreFoodService {
     }
 
     formData.append('IsAvailable', String(request.isAvailable));
+
+    if (request.isPayLater !== undefined) {
+      formData.append('IsPayLater', String(request.isPayLater));
+    }
     formData.append('Description', request.description ?? '');
     formData.append('StoreFoodCategoryId', String(request.storeFoodCategoryId));
 

@@ -13,7 +13,9 @@ export const API_ENDPOINT = {
   STORE_FOOD: {
     BASE: 'store-foods',
     DETAIL: (id: number) => `store-foods/${id}`,
-    BY_STORE:`store-foods/store`
+    BY_STORE:`store-foods/store`,
+    BULK: 'store-foods/bulk',
+    CHECK_PRODUCT_CODE: 'store-foods/check-product-code'
   },
   STORE_FOOD_CATEGORY: {
     BASE: 'store-food-categories',
@@ -38,6 +40,7 @@ export const API_ENDPOINT = {
     STORE_DETAIL: (id: number) => `orders/${id}/store`,
     STATUS: (id: number) => `orders/${id}/status`,
     STATUS_PAYMENT: (id: number) => `orders/${id}/payment-status`,
+    PAY_LATER_PRICE: (id: number) => `orders/${id}/pay-later-price`,
     ORDER_CANCEL: (id: number) => `orders/${id}/cancel`,
     BY_STORE: 'orders/store/search',
     PAYMENT_STATUS: (orderCode: string) => `orders/${orderCode}/payment-status`,

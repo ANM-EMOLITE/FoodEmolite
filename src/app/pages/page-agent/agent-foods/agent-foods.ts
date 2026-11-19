@@ -9,10 +9,12 @@ import { RealtimeService } from '../../../common/services/realtime.service';
 import { PromotionService } from '../../../common/services/promotion.service';
 import { FilterField } from '../../../common/models/front-end/filter/filter-field.model';
 import {
+    TableAction,
     TableColumn,
     TableRow
 } from '../../../common/models/front-end/table/table-column.model';
 import {
+    CreateBulkStoreFoodRequest,
     CreateStoreFoodRequest,
     StoreFoodResponse,
     UpdateStoreFoodRequest
@@ -157,6 +159,13 @@ export class PageAgentFoodsComponent {
             label: 'Mô tả',
             width: '220px'
         },
+        {
+            key: 'actions',
+            label: 'Thao tác',
+            width: '100px',
+            align: 'center',
+            type: 'actions'
+        }
     ];
 
     filterFields: FilterField[] = [];
@@ -402,6 +411,29 @@ export class PageAgentFoodsComponent {
         });
     }
 
+    createBulkFoods(request: CreateBulkStoreFoodRequest): void {
+        this.isSubmitting.set(true);
+
+        this.storeFoodService.createBulk(request).subscribe({
+            next: response => {
+                this.isSubmitting.set(false);
+
+                if (!response.isSuccess) {
+                    this.toastService.error(response.message);
+                    return;
+                }
+
+                this.toastService.success(response.message);
+                this.closeCreateModal();
+                this.loadStoreFoods();
+            },
+            error: () => {
+                this.isSubmitting.set(false);
+                this.toastService.error('Thêm món ăn thất bại');
+            }
+        });
+    }
+
     toggleExportMenu(event: Event): void {
         event.stopPropagation();
         this.isExportMenuOpen.update(open => !open);
@@ -427,6 +459,64 @@ export class PageAgentFoodsComponent {
 
     toggleAllSelected(checked: boolean): void {
         this.selectedFoodIds.set(checked ? this.storeFoods().map(f => f.id) : []);
+    }
+
+    onHeaderAction(key: string): void {
+        const value = key === 'show';
+        const ids = this.selectedFoodIds();
+
+        this.storeFoods()
+            .filter(food => ids.includes(food.id) && food.isAvailable !== value)
+            .forEach(food => this.onToggleAvailable({ row: { id: food.id }, value }));
+    }
+
+    readonly rowActions = (row: TableRow): TableAction[] => {
+        const food = this.storeFoods().find(f => f.id === Number(row['id']));
+
+        if (!food) return [];
+
+        return [
+            {
+                key: 'DETAIL',
+                label: 'Xem chi tiết',
+                icon: [
+                    'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0',
+                    'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'
+                ]
+            },
+            food.isAvailable
+                ? {
+                    key: 'HIDE',
+                    label: 'Tắt hiển thị',
+                    tone: 'danger',
+                    icon: [
+                        'M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49',
+                        'M14.084 14.158a3 3 0 0 1-4.242-4.242',
+                        'M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143',
+                        'm2 2 20 20'
+                    ]
+                }
+                : {
+                    key: 'SHOW',
+                    label: 'Bật hiển thị',
+                    tone: 'success',
+                    icon: [
+                        'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0',
+                        'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'
+                    ]
+                }
+        ];
+    };
+
+    onRowAction(event: { row: TableRow; action: string }): void {
+        if (event.action === 'DETAIL') {
+            this.openDetail(event.row);
+            return;
+        }
+
+        if (event.action === 'SHOW' || event.action === 'HIDE') {
+            this.onToggleAvailable({ row: event.row, value: event.action === 'SHOW' });
+        }
     }
 
     private isSelected(foodId: number): boolean {

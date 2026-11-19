@@ -99,6 +99,7 @@ export interface OrderItemResponse {
   originalUnitPrice: number;
   promotionId: number | null;
   promotionName: string | null;
+  isPayLater?: boolean;
   options: OrderItemOptionResponse[];
 }
 
@@ -137,4 +138,7 @@ export interface CreateOrderResponse {
     paymentStatus: PaymentStatus;
     paymentMethod: PaymentMethod;
     totalAmount: number;
+}
+export interface UpdatePayLaterPriceRequest {
+  items: { orderItemId: number; unitPrice: number }[];
 }

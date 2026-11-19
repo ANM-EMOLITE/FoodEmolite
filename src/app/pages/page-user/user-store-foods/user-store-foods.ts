@@ -134,6 +134,8 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
 
     selectedStoreInfo = computed(() => this.selectedStoreService.storeInfo());
 
+    hasPayLaterItem = computed(() => this.cart().some(item => !!item.food.isPayLater));
+
     totalQuantity = computed(() =>
         this.cart().reduce((total, item) => total + item.quantity, 0)
     );
@@ -439,6 +441,8 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     setPaymentMethod(method: PaymentMethod): void {
+        if (this.hasPayLaterItem() && method !== 'CASH') return;
+
         this.paymentMethod.set(method);
         this.hidePaymentHint();
     }
@@ -813,7 +817,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     private openConfirmOrderPopup(): void {
-        this.paymentMethod.set(null);
+        this.paymentMethod.set(this.hasPayLaterItem() ? 'CASH' : null);
         this.hidePaymentHint();
         this.isConfirmOrderOpen.set(true);
     }
@@ -1074,6 +1078,10 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
 
     formatCurrency(value: number): string {
         return `${value.toLocaleString('vi-VN')}đ`;
+    }
+
+    displayFoodPrice(food: StoreFoodResponse, value: number): string {
+        return food.isPayLater ? 'Tính sau' : this.formatCurrency(value);
     }
 
     flyToCart(food: StoreFoodResponse): void {

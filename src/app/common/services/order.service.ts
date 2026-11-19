@@ -11,6 +11,7 @@ import {
     OrderResponse,
     OrderSearchRequest,
     UpdateOrderStatusRequest,
+    UpdatePayLaterPriceRequest,
     UpdatePaymentStatusRequest
 } from '../models/order.model';
 import { BaseSearchRequest } from '../models/base-search.model';
@@ -111,6 +112,16 @@ export class OrderService {
     ): Observable<BaseResponse<string>> {
         return this.apiService.put<BaseResponse<string>, UpdatePaymentStatusRequest>(
             API_ENDPOINT.ORDER.STATUS_PAYMENT(id),
+            request
+        );
+    }
+
+    updatePayLaterPrice(
+        id: number,
+        request: UpdatePayLaterPriceRequest
+    ): Observable<BaseResponse<string>> {
+        return this.apiService.put<BaseResponse<string>, UpdatePayLaterPriceRequest>(
+            API_ENDPOINT.ORDER.PAY_LATER_PRICE(id),
             request
         );
     }

@@ -161,6 +161,16 @@
             }
         </div>
 
+        @if (canEditPayLaterPrice()) {
+        <div class="flex items-center justify-between gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3">
+            <p class="text-sm text-amber-300">Đơn có món trả tiền sau — nhập đơn giá rồi lưu để tính tổng tiền (thanh toán tiền mặt).</p>
+            <button type="button" (click)="savePayLaterPrices()" [disabled]="isSubmitting()"
+                class="shrink-0 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50">
+                Lưu giá
+            </button>
+        </div>
+        }
+
         <div class="rounded-xl border border-[#322a4a] bg-[#171322] overflow-hidden">
             <table class="w-full border-collapse text-sm text-gray-200">
                 <thead class="bg-[#1a1628]">
@@ -216,7 +226,15 @@
                             </div>
                         </td>
                         <td class="px-4 py-3 text-center align-middle">{{ item.quantity }}</td>
-                        <td class="px-4 py-3 text-right align-middle">{{ formatCurrency(item.unitPrice) }}</td>
+                        <td class="px-4 py-3 text-right align-middle">
+                            @if (item.isPayLater && canEditPayLaterPrice()) {
+                            <input type="number" min="0" [value]="payLaterPrices()[item.id] ?? item.unitPrice"
+                                (input)="setPayLaterPrice(item.id, $any($event.target).valueAsNumber)"
+                                class="h-9 w-28 rounded-lg border border-amber-500/60 bg-[#1a1628] px-2 text-right text-sm text-white outline-none focus:border-amber-400" />
+                            } @else {
+                            {{ formatCurrency(item.unitPrice) }}
+                            }
+                        </td>
                         <td class="px-4 py-3 text-center align-middle">
                             @if (item.promotionName) {
                             <span class="font-medium text-emerald-400">-{{ formatCurrency((item.originalUnitPrice - item.unitPrice) * item.quantity) }}</span>

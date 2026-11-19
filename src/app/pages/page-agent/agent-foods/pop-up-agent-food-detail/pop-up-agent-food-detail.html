@@ -78,6 +78,11 @@
             <app-checkbox [checked]="form().isAvailable" (changed)="form().isAvailable = $event" />
             Đang bán
           </label>
+
+          <label class="flex items-center gap-2 text-sm text-gray-300">
+            <app-checkbox [checked]="!!form().isPayLater" (changed)="form().isPayLater = $event" />
+            Trả tiền sau (chỉ tiền mặt)
+          </label>
         </div>
       </div>
 
